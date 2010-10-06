@@ -24,7 +24,7 @@ static char **jopt_argv;
 static int jopt_argc;
 struct jopt_error_rec jopt_error_desc;
 
-int jopt_error(int emode, int error_no, char *argument)
+int jopt_error(int emode, int error_no, const char *argument)
 {
   jopt_error_desc.error_no = error_no;
   strcpy(jopt_error_desc.argument, argument);

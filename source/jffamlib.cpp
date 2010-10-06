@@ -100,7 +100,7 @@ static struct jffam_multi_desc jffam_then_var; /* describes the output-var.  */
 /****************************************************************************/
 
 #define JFRD_WMAX 100
-static char *jffam_words[JFRD_WMAX];
+static const char *jffam_words[JFRD_WMAX];
 
 #define JFRD_MAX_TEXT 512
 static char jffam_text[JFRD_MAX_TEXT];
@@ -167,53 +167,53 @@ static int cel_husk[JFRD_VMAX];     /* remeber center-cell.                */
 
 /**************************************************************************/
 
-static char jffam_t_jfrd[]     = "jfrd";
-static char jffam_t_input[]    = "input";
-static char jffam_t_output[]   = "output";
+static const char jffam_t_jfrd[]     = "jfrd";
+static const char jffam_t_input[]    = "input";
+static const char jffam_t_output[]   = "output";
 static char jffam_da_fname[256];
 
 /**************************************************************************/
 /* Error handling                                                         */
 /**************************************************************************/
 
-struct jfr_err_desc { int eno;
-              		      char *text;
-		                  };
+struct jfr_err_desc {
+	int eno;
+	const char *text;
+};
 
 struct jfr_err_desc jfr_err_texts[] =
 {{  0, " "},
-	{	 1, "Cannot open file:"},
-	{	 2, "Error reading from file:"},
-	{	 3, "Error writing to file:"},
- {	 4, "Not an jfr-file:"},
-	{	 5, "Wrong version:"},
-	{	 6, "Cannot allocate memory to:"},
-	{	 9, "Illegal number:"},
-	{	10, "Value out of domain-range:"},
-	{	11, "Unexpected EOF."},
-	{	13, "Undefined adjectiv:"},
+	{  1, "Cannot open file:"},
+	{  2, "Error reading from file:"},
+	{  3, "Error writing to file:"},
+	{  4, "Not an jfr-file:"},
+	{  5, "Wrong version:"},
+	{  6, "Cannot allocate memory to:"},
+	{  9, "Illegal number:"},
+	{ 10, "Value out of domain-range:"},
+	{ 11, "Unexpected EOF."},
+	{ 13, "Undefined adjectiv:"},
 	{401, "jfp cannot insert this type of statement"},
 	{402, "Statement to large."},
 	{403, "Not enogh free memory to insert statement"},
-
- {501, "Illegal create-type:"},
+	{501, "Illegal create-type:"},
 	{504, "Syntax error in jfrd-statement:"},
-	{505, "To many variables in statement (max 50)."},
+	{505, "Too many variables in statement (max 50)."},
 	{506, "Undefined variable:"},
 	{507, "Illegal number of adjectives to variable ([1..126]:"},
 	{508, "Out of memory in rule-array"},
 	{514, "Tree not large enogh to hold statement"},
 	{517, "Cannot create rules from data without a data-file"},
-	{519, "To many words in statement (max 255)."},
+	{519, "Too many words in statement (max 255)."},
 	{520, "No 'call jfrd'-statement in program"},
 	{9999, "Unknown error!"},
 };
 
 static void jffam_close(void);
-static int jf_error(int eno, char *name, int mode);
+static int jf_error(int eno, const char *name, int mode);
 static int jffam_fl_ip_get(struct jft_data_record *dd);
 static int jffam_ip_get();
-static int jffam_var_no(char *text);
+static int jffam_var_no(const char *text);
 static int jffam_get_command(int argc);
 
 static unsigned char *jffam_ins_s_rule(unsigned char *progid);
@@ -266,7 +266,7 @@ static void jffam_close(void)
   jfp_free();
 }
 
-static int jf_error(int eno, char *name, int mode)
+static int jf_error(int eno, const char *name, int mode)
 {
   int m, v, e;
 
@@ -344,7 +344,7 @@ static int jffam_ip_get()
 /* funktioner til afkodning af jfrd-statement                         */
 /**********************************************************************/
 
-static int jffam_var_no(char *text)
+static int jffam_var_no(const char *text)
 {
   int m, res;
   struct jfg_var_desc vdesc;

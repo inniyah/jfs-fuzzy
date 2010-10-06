@@ -85,7 +85,7 @@ static float jfid3_id3_M;
 /* variables to handle extern-statement:                                */
 
 #define JFRD_WMAX 100
-static char *jfid3_words[JFRD_WMAX];
+static const char *jfid3_words[JFRD_WMAX];
 
 static struct jfg_sprog_desc     jfid3_pdesc;
 static struct jfg_statement_desc jfid3_sdesc;
@@ -158,7 +158,7 @@ static FILE *jfid3_sout;
 #define JFE_FATAL   2
 
 struct jfr_err_desc { int eno;
-                      char *text;
+                      const char *text;
       };
 
 static struct jfr_err_desc jfr_err_texts[] =
@@ -178,21 +178,21 @@ static struct jfr_err_desc jfr_err_texts[] =
     {403, "Not enogh free memory to insert statement"},
 
     {504, "Syntax error in jfrd-statement:"},
-    {505, "To many variables in statement (max 50)."},
+    {505, "Too many variables in statement (max 50)."},
     {506, "Undefined variable:"},
     {507, "Illegal number of adjectives to variable ([1..127]:"},
     {508, "Out of memory in rule-array"},
     {514, "Tree not large enogh to hold statement"},
     {517, "Cannot create rules from data without a data-file"},
-    {519, "To many words in statement (max 255)."},
+    {519, "Too many words in statement (max 255)."},
     {520, "No 'call jfrd'-statement in program"},
     {9999, "Unknown error!"},
    };
 
-static int jf_error(int errno, char *name, int mode);
+static int jf_error(int errno, const char *name, int mode);
 static int jfid3_fl_ip_get(struct jft_data_record *dd);
 static int jfid3_ip_get();
-static int jfid3_var_no(char *text);
+static int jfid3_var_no(const char *text);
 static int jfid3_get_command(int argc);
 static unsigned char *jfid3_ins_s_rule(unsigned char *progid);
 static int jfid3_oom(void);
@@ -223,7 +223,7 @@ static void jfid3_hist_rules(void);
 
 
 
-static int jf_error(int eno, char *name, int mode)
+static int jf_error(int eno, const char *name, int mode)
 {
   int m, v, e;
 
@@ -300,7 +300,7 @@ static int jfid3_ip_get()
 /* functions to decode an 'extern jfrd'-statement                     */
 /**********************************************************************/
 
-static int jfid3_var_no(char *text)
+static int jfid3_var_no(const char *text)
 {
   int m, res;
   struct jfg_var_desc vdesc;
@@ -422,7 +422,7 @@ static unsigned char *jfid3_ins_s_rule(unsigned char *progid)
 {
   int res, ff_tree, v, first;
   unsigned char *pc;
-  char *dummy[2];
+  const char *dummy[2] = { NULL, NULL };
 
   pc = progid;
   ff_tree = 0;
@@ -1039,7 +1039,7 @@ static void jfid3_hist_rules(void)
 static int jfid3_tilbage(void)
 {
   int slut, rettet, top, id, res;
-  char *dummy[2];
+  const char *dummy[2] = { NULL, NULL };
 
   slut = 0;
   rettet = 0;
@@ -1081,7 +1081,7 @@ static int jfid3_red_id3(void)
 {
   int slut, res, id;
   int node_c, leaf_c;
-  char *dummy[2];
+  const char *dummy[2] = { NULL, NULL };
 
   node_c = leaf_c = 0;
   jfid3_ff_id3_stak = 0;

@@ -95,7 +95,7 @@ static struct jfrd_multi_desc jfrd_then_var;
 
 
 #define JFRD_WMAX 100
-static char *jfrd_words[JFRD_WMAX];
+static const char *jfrd_words[JFRD_WMAX];
 
 static int jfrd_gains[JFRD_VMAX];
 
@@ -177,12 +177,12 @@ static float jfrd_id3_M;
 
 static FILE *sout;
 
-static char jfrd_t_jfrd[]     = "jfrd";
-static char jfrd_t_input[]    = "input";
-static char jfrd_t_output[]   = "output";
+static const char jfrd_t_jfrd[]     = "jfrd";
+static const char jfrd_t_input[]    = "input";
+static const char jfrd_t_output[]   = "output";
 
 struct jfr_err_desc { int eno;
-                      char *text;
+                      const char *text;
                     };
 
 static struct jfr_err_desc jfr_err_texts[] =
@@ -204,22 +204,22 @@ static struct jfr_err_desc jfr_err_texts[] =
     { 501, "Illegal create-type:"},
     { 502, "Extern-statement ignored:"},
     { 504, "Syntax error in jfrd-statement:"},
-    { 505, "To many variables in statement (max 50)."},
+    { 505, "Too many variables in statement (max 50)."},
     { 506, "Undefined variable:"},
     { 507, "Illegal number of adjectives to variable ([1..127]:"},
     { 508, "Out of memory in rule-array."},
     { 514, "Tree not large enogh to hold statement:"},
     { 517, "Cannot create rules from data without a data-file."},
-    { 519, "To many words in statement (max 255)."},
+    { 519, "Too many words in statement (max 255)."},
     { 520, "No 'extern jfrd'-statement in program."},
     { 521, "Not enogh free memory to in-reduction."},
     {9999, "Unknown error!"},
   };
 
-static int jf_error(int eno, char *name, int mode);
+static int jf_error(int eno, const char *name, int mode);
 static int jfrd_fl_ip_get(struct jft_data_record *dd);
 static int jfrd_ip_get(void);
-static int jfrd_var_no(char *text);
+static int jfrd_var_no(const char *text);
 static int jfrd_get_command(int argc);
 static unsigned char *jfrd_ins_s_rule(unsigned char *progid);
 static unsigned char *jfrd_ins_c_rule(unsigned char *progid, long srno);
@@ -264,7 +264,7 @@ static void jfrd_insert_rules(void);
 static int jfrd_data(unsigned char *program_id);
 
 
-static int jf_error(int eno, char *name, int mode)
+static int jf_error(int eno, const char *name, int mode)
 {
   int m, v, e;
 
@@ -350,7 +350,7 @@ static int jfrd_ip_get(void)
 /* funktions to decoding 'extern jfrd...'-statement                   */
 /**********************************************************************/
 
-static int jfrd_var_no(char *text)
+static int jfrd_var_no(const char *text)
 {
   int m, res;
   struct jfg_var_desc vdesc;
@@ -492,7 +492,7 @@ static unsigned char *jfrd_ins_s_rule(unsigned char *progid)
 {
   int res, ff_tree, v, first;
   unsigned char *pc;
-  char *dummy[2];
+  const char *dummy[2] = { NULL, NULL };
 
   pc = progid;
   ff_tree = 0;
@@ -546,7 +546,7 @@ static unsigned char *jfrd_ins_c_rule(unsigned char *progid, long srno)
   unsigned char *pc;
   unsigned char cthen;
   unsigned char vfrom, vto;
-  char *dummy[2];
+  const char *dummy[2] = { NULL, NULL };
 
   pc = progid;
   ff_tree = 0;
@@ -1685,7 +1685,7 @@ static unsigned char *jfrd_case_ins(unsigned char *programid)
   unsigned char *pc;
   int ff, m, first_or, res, im, b;
   unsigned char vfrom, vto;
-  char *dummy[2];
+  const char *dummy[2] = { NULL, NULL };
 
   pc = programid;
   jfrd_sdesc.type = JFG_ST_CASE;
@@ -1762,7 +1762,7 @@ static void jfrd_insert_rules(void)
   unsigned char *pc;
   int a, casecount, res;
   unsigned char cthen;
-  char *dummy[2];
+  const char *dummy[2] = { NULL, NULL };
 
   pc = jfrd_program_id;
 

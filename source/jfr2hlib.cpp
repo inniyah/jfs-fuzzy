@@ -101,7 +101,7 @@ static int    jfr2htm_stacksize = 64;
 static int    jfr2htm_overwrite = 0;
 
 #define JFR2HTM_MAX_WORDS 256
-static char *jfr2htm_words[JFR2HTM_MAX_WORDS];
+static const char *jfr2htm_words[JFR2HTM_MAX_WORDS];
 
 struct jfr2htm_tarea_desc
 {
@@ -170,9 +170,9 @@ static FILE *jfr2htm_op  = NULL;
 static FILE *jfr2htm_ip  = NULL;
 static FILE *jfr2htm_sout = NULL;
 
-static char jf_empty[] = " ";
+static const char jf_empty[] = " ";
 
-static char *jfr2htm_fixed[] =
+static const char *jfr2htm_fixed[] =
 {
   "function PREFIXrmm(v, mi, ma)",     /* rounds v to [mi, ma] */
   "{var r = v;",
@@ -195,7 +195,7 @@ static char *jfr2htm_fixed[] =
 /*----------------------------------------------------------------------*/
 /* Functions to check input:                                            */
 
-static char *jfr2htm_t_fval[] =  /* validate a number with isNaN() check */
+static const char *jfr2htm_t_fval[] =  /* validate a number with isNaN() check */
 {
   "function PREFIXf_validate(elem, minval, maxval)",
   "{ var res = 0;",
@@ -213,7 +213,7 @@ static char *jfr2htm_t_fval[] =  /* validate a number with isNaN() check */
   "<!-- JFS END -->",
 };
 
-static char *jfr2htm_t_no_fval[] =  /* validate a number without isNaN() check */
+static const char *jfr2htm_t_no_fval[] =  /* validate a number without isNaN() check */
 {
   "function PREFIXf_validate(elem, minval, maxval)",
   "{ var res = 0;",
@@ -225,7 +225,7 @@ static char *jfr2htm_t_no_fval[] =  /* validate a number without isNaN() check *
   "<!-- JFS END -->",
 };
 
-static char *jfr2htm_t_val[] =
+static const char *jfr2htm_t_val[] =
 {
   "function PREFIXvalidate(elem, minval, maxval)",
   "{ var res = PREFIXf_validate(elem, minval, maxval);",
@@ -249,7 +249,7 @@ static char *jfr2htm_t_val[] =
 
 /*------------------------------------------------------------------*/
 
-static char *jfr2htm_t_iif[] =
+static const char *jfr2htm_t_iif[] =
 {
   "function PREFIXiif(c,e1,e2)",
   "{ var r=PREFIXr01(c);",
@@ -259,7 +259,7 @@ static char *jfr2htm_t_iif[] =
 
 };
 
-static char *jfr2htm_t_whichRadio[] =
+static const char *jfr2htm_t_whichRadio[] =
 {
   "function PREFIXwhichRadio(radioBtn)",
   "{ for (var i=0; i < radioBtn.length; i++)",
@@ -271,7 +271,7 @@ static char *jfr2htm_t_whichRadio[] =
   "<!-- JFS END -->"
 };
 
-static char *jfr2htm_t_plcalc[] =
+static const char *jfr2htm_t_plcalc[] =
 {
   "function PREFIXpl_calc(xv, first, last)",
   "{var a; var r; var m",
@@ -297,17 +297,17 @@ static char *jfr2htm_t_plcalc[] =
 static char jfr2htm_t_ediv[16];
 static char jfr2htm_t_espan[16];
 
-static char jfr2htm_t_end[]      = "<!-- JFS END -->";
-static char jfr2htm_t_begin[]    = "<!-- JFS BEGIN -->";
-static char jfr2htm_t_stack[]    = "stack";
-static char jfr2htm_t_java[]     = "javascript";
-static char jfr2htm_t_textarea[] = "textarea";
-static char jfr2htm_t_printf[]   = "printf";
-static char jfr2htm_t_fprintf[]  = "fprintf";
-static char jfr2htm_t_alert[]    = "alert";
-static char jfr2htm_t_stdout[]   = "stdout";
+static const char jfr2htm_t_end[]      = "<!-- JFS END -->";
+static const char jfr2htm_t_begin[]    = "<!-- JFS BEGIN -->";
+static const char jfr2htm_t_stack[]    = "stack";
+static const char jfr2htm_t_java[]     = "javascript";
+static const char jfr2htm_t_textarea[] = "textarea";
+static const char jfr2htm_t_printf[]   = "printf";
+static const char jfr2htm_t_fprintf[]  = "fprintf";
+static const char jfr2htm_t_alert[]    = "alert";
+static const char jfr2htm_t_stdout[]   = "stdout";
 
-static char *jfr2htm_t_labels[] =
+static const char *jfr2htm_t_labels[] =
 { "label_left",  /* never */
   "label_left",
   "label_above",
@@ -316,7 +316,7 @@ static char *jfr2htm_t_labels[] =
   "label_table",
 };
 
-static char *jfr2htm_t_tables[] =
+static const char *jfr2htm_t_tables[] =
 {
   "table_2cl",
   "table_mcl",
@@ -330,7 +330,7 @@ static char *jfr2htm_t_tables[] =
 static int jfr2htm_errcount = 0;
 
 struct jfr_err_desc { int eno;
-                      char *text;
+                      const char *text;
                     };
 
 static struct jfr_err_desc jfr_err_texts[] =
@@ -350,19 +350,19 @@ static struct jfr_err_desc jfr_err_texts[] =
      {303, "Stack-overflow (jfg-stack)."},
      {304, "program-id (pc) is not the start of a statement."},
      {1000,"HTML file corupted. No <!-- JFR BEGIN -->. Run in overwrite mode."},
-     {1007,"To many block-levels (switch/while-blocks). Max 128."},
+     {1007,"Too many block-levels (switch/while-blocks). Max 128."},
      {1008,"Extern-statement ignored."},
-     {1009,"To many different between-expresions. Max 256."},
+     {1009,"Too many different between-expresions. Max 256."},
      {1010,"Illegal argument to 'extern textarea'-statement:"},
-     {1011,"To few arguments to 'extern textarea'-statement."},
+     {1011,"Too few arguments to 'extern textarea'-statement."},
      {1012,"Syntax error in 'extern printf' argument:"},
      {1013,"Unknown variable in 'extern printf' or 'extern alert' statement:"},
      {1014,"Unknown 'extern printf' or 'extern alert' specifier:"},
      {1015,"No adjectives bound to:"},
      {1016,"Wrong number of variables in 'extern printf' or 'extern alert' statement."},
      {1017," 'extern printf' statement, but no 'extern textarea' statement."},
-     {1018,"To many destinations in 'extern fprintf' statements. max 32."},
-     {1019,"To many 'extern textarea' statements. max 32."},
+     {1018,"Too many destinations in 'extern fprintf' statements. max 32."},
+     {1019,"Too many 'extern textarea' statements. max 32."},
      {1020,"Errors in program."},
      {1021,"Field type TEXT_ADJ is only for output variables:"},
      {1022,"Field type CHECKBOX only possible if exactly 2 adjectives:"},
@@ -374,10 +374,10 @@ static struct jfr_err_desc jfr_err_texts[] =
      {9999, "unknown error."}
    };
 
-static int jf_error(int errno, char *name, int mode);
-static void jfr2htm_dst_write(char *dest, char *dstype, char *clstxt);
-static char *jfr2htm_divt(char *clstxt);
-static char *jfr2htm_spant(char *clstxt);
+static int jf_error(int errno, const char *name, int mode);
+static void jfr2htm_dst_write(char *dest, const char *dstype, const char *clstxt);
+static char *jfr2htm_divt(const char *clstxt);
+static char *jfr2htm_spant(const char *clstxt);
 static void jf_ftoa(char *txt, float f);
 static void jfr2htm_float(float f);
 static char *jfr2htm_ttrunc(char *txt, int len);
@@ -388,7 +388,7 @@ static void jfr2htm_write_fround(void);
 static int jfr2htm_pl_adr_add(int typ, int id, int ant);
 static int jfr2htm_pl_find(int typ, int id);
 static int jfr2htm_pl_write(void);  /* write constant arrays to pl-functions */
-static int  jfr2htm_var_find(char *name);
+static int  jfr2htm_var_find(const char *name);
 static void jfr2htm_var_write(void);
 static void jfr2htm_fzvar_write(void);
 static void jfr2htm_hedges_write(void);
@@ -401,7 +401,7 @@ static void jfr2htm_sfunc_write(void);
 static void jfr2htm_dfunc_write(void);
 static void jfr2htm_vfunc_write(int vno, int fno);
 static int  jfr2htm_expr_check(unsigned short id);
-static int  jfr2htm_printf_check(char *jfr2htm_words[], int a);
+static int  jfr2htm_printf_check(const char *jfr2htm_words[], int a);
 static int  jfr2htm_program_check(void);
 static void jfr2htm_between_write(void);
 static void jfr2htm_vround_write(void);
@@ -417,20 +417,19 @@ static void jfr2htm_init_write(void);
 static void jfr2htm_form2var_write(void);
 static void jfr2htm_var2form_write(void);
 
-static void jfr2htm_var_check(int id);
-static void jfr2htm_printf_write(char *dest, char *words[], int count, int sword);
+static void jfr2htm_printf_write(const char *dest, const char *words[], int count, int sword);
 static int jfr2htm_run_write(void);
 static int jfr2htm_vget(struct jfg_var_desc *vdesc, int vno, int fset);
 static void jfr2htm_jfs_write(void);
 static int jfr2htm_head_write(void);
-static int jfr2htm_subst(char *d, char *s, char *ds, char *ss);
-static void jfr2htm_t_write(char **txts);
+static int jfr2htm_subst(char *d, const char *s, const char *ds, const char *ss);
+static void jfr2htm_t_write(const char **txts);
 
 static void jfr2htm_iface_functions_write(void);
 static void jfr2htm_form_functions_write(void);
 static int jfr2htm_program_write(char * jfname);
 
-static int jfr2htm_buf_cmp(char *t);
+static int jfr2htm_buf_cmp(const char *t);
 static int jfr2htm_head_copy(int mode);
 static void jfr2htm_body_write(void);
 static void jfr2htm_body_copy(int mode);
@@ -447,7 +446,7 @@ static void jfr2htm_end_copy(void);
 /* Hjaelpe-funktioner                                                    */
 /*************************************************************************/
 
-static int jf_error(int eno, char *name, int mode)
+static int jf_error(int eno, const char *name, int mode)
 {
   int m, v, e;
 
@@ -481,7 +480,7 @@ static int jf_error(int eno, char *name, int mode)
   return m;
 }
 
-static void jfr2htm_dst_write(char *dest, char *dstype, char *clstxt)
+static void jfr2htm_dst_write(char *dest, const char *dstype, const char *clstxt)
 {
    /* writes a DIV or SPAN tag to dest */
 
@@ -491,14 +490,14 @@ static void jfr2htm_dst_write(char *dest, char *dstype, char *clstxt)
      dest[0] = '\0';
 }
 
-static char *jfr2htm_divt(char *clstxt)
+static char *jfr2htm_divt(const char *clstxt)
 {
   /* writes a DIV-tag to the global var jfr2htm_ds_text.  */
   jfr2htm_dst_write(jfr2htm_ds_text, "DIV", clstxt);
   return jfr2htm_ds_text;
 }
 
-static char *jfr2htm_spant(char *clstxt)
+static char *jfr2htm_spant(const char *clstxt)
 {
   /* writes a SPAN-tag to the global var jfr2htm_ds_text.  */
   jfr2htm_dst_write(jfr2htm_ds_text, "SPAN", clstxt);
@@ -851,7 +850,7 @@ static int jfr2htm_pl_write(void)  /* write constant arrays to pl-functions */
   return 0;
 }
 
-static int  jfr2htm_var_find(char *name)
+static int  jfr2htm_var_find(const char *name)
 {
   int m, res;
   struct jfg_var_desc vdesc;
@@ -1438,33 +1437,34 @@ static int jfr2htm_expr_check(unsigned short id)
   return 0;
 }
 
-static int jfr2htm_printf_check(char *words[], int a)
+static int jfr2htm_printf_check(const char *words[], int a)
 {
   int sw, m, p, vno, id;
-  char *w;
   char etxt[4];
+  const char *w;
 
   sw = 1;
   if (strcmp(words[0], jfr2htm_t_fprintf) == 0)
-  { w = words[sw]; /* printf-destination */
-    if (strlen(w) > 31)
-      w[31] = '\0';
+  { char *wd = strdup(words[sw]); /* printf-destination */
+    if (strlen(wd) > 31)
+      wd[31] = '\0';
     id = -1;
     for (m = 0; id == -1 && m < jfr2htm_ff_ptxt; m++)
-    { if (strcmp(w, jfr2htm_ptxts[m].name) == 0)
+    { if (strcmp(wd, jfr2htm_ptxts[m].name) == 0)
         id = m;
     }
     if (id == -1)
     { if (jfr2htm_ff_ptxt >= JFR2HTM_MAX_PTXT)
         return jf_error(1018, jfr2htm_spaces, JFE_ERROR);
       else
-      { strcpy(jfr2htm_ptxts[jfr2htm_ff_ptxt].name, w);
+      { strcpy(jfr2htm_ptxts[jfr2htm_ff_ptxt].name, wd);
         jfr2htm_ptxts[jfr2htm_ff_ptxt].dtype = 0;
         jfr2htm_ff_ptxt++;
       }
     }
     sw++;
     sw++; /* ignore ',' */
+    free(wd);
   }
   w = words[sw]; /* format-string */
   p = 0;
@@ -1512,7 +1512,6 @@ static int jfr2htm_program_check(void)
   struct jfg_fzvar_desc fzvdesc;
   struct jfg_function_desc fudesc;
   unsigned char *pc;
-  char *w;
 
   for (m = 0; m < 20; m++)
   { jfr2htm_sfunc_use[m] = 0;
@@ -1612,8 +1611,11 @@ static int jfr2htm_program_check(void)
                 }
                 else
                 if (strcmp(jfr2htm_words[0], jfr2htm_t_textarea) == 0)
-                { if (a >= 4)
-                  { /* extern textarea [name] label cols rows; */
+                {
+                  if (a >= 4)
+                  {
+                    char *w0, *w;
+                    /* extern textarea [name] label cols rows; */
                     /*           0        1     2     3    4   */
                     if (jfr2htm_ff_textarea >= JFR2HTM_MAX_TEXTAREA)
                       return jf_error(1019, jfr2htm_spaces, JFE_ERROR);
@@ -1623,14 +1625,15 @@ static int jfr2htm_program_check(void)
                              jfr2htm_t_stdout);
                     }
                     else
-                    { p = 1;
-                      w = jfr2htm_words[p]; /* name */
-                      w = jfr2htm_ttrunc(w, 32);
-                      strcpy(jfr2htm_textareas[jfr2htm_ff_textarea].name, w);
+                    { char *wd0 = strdup(jfr2htm_words[p]); /* name */
+                      char *wd = jfr2htm_ttrunc(wd0, 32);
+                      p = 1;
+                      strcpy(jfr2htm_textareas[jfr2htm_ff_textarea].name, wd);
+                      free(wd0);
                     }
                     p++;
-                    w = jfr2htm_words[p]; /* label */
-                    w = jfr2htm_ttrunc(w, 128);
+                    w0 = strdup(jfr2htm_words[p]); /* label */
+                    w = jfr2htm_ttrunc(w0, 128);
                     strcpy(jfr2htm_textareas[jfr2htm_ff_textarea].label, w);
                     p++;
                     jfr2htm_textareas[jfr2htm_ff_textarea].cols
@@ -1643,6 +1646,7 @@ static int jfr2htm_program_check(void)
                     if (jfr2htm_textareas[jfr2htm_ff_textarea].cols < 2)
                       return jf_error(1010, jfr2htm_words[p], JFE_ERROR);
                     jfr2htm_ff_textarea++;
+                    free(w0);
                   }
                   else
                     return jf_error(1011, jfr2htm_spaces, JFE_ERROR);
@@ -2154,7 +2158,7 @@ static void jfr2htm_defuz_write(void)
               fprintf(jfr2htm_op, ";\n");
             }
             else
-              fprintf(jfr2htm_op, "%sv%=%sf%;\n",
+              fprintf(jfr2htm_op, "%sv%d=%s%f;\n",
                       jfr2htm_prefix_txt, vno,
                       jfr2htm_prefix_txt, vdesc.f_fzvar_no + a);
             break;
@@ -2465,11 +2469,11 @@ static void jfr2htm_var2form_write(void)
   fprintf(jfr2htm_op, "};\n");
 }
 
-static void jfr2htm_printf_write(char *dest, char *words[], int count, int sword)
+static void jfr2htm_printf_write(const char *dest, const char *words[], int count, int sword)
 {
   /* adds text to t_variable from 'extern printf/alert/fprintf' statement */
   int m, i, did, vno, first;
-  char *w;
+  const char *w;
   char dtxt[256];
 
   fprintf(jfr2htm_op, "%st_%s += ", jfr2htm_prefix_txt, dest);
@@ -2537,7 +2541,6 @@ static int jfr2htm_run_write(void)
   unsigned short c, i, e;
   unsigned char *pc;
   int a, fu, first;
-  char *w;
   struct jfg_var_desc vdesc;
   struct jfg_statement_desc sdesc;
   struct jfg_fzvar_desc fzvdesc;
@@ -2696,12 +2699,13 @@ static int jfr2htm_run_write(void)
               if (a > 0)
               { if (strcmp(jfr2htm_words[0], jfr2htm_t_java) == 0)
                 { if (a > 1)
-                  { w = jfr2htm_words[1];
+                  { char *w = strdup(jfr2htm_words[1]);
                     if (w[0] == '"')
                       w++;
                     if (w[strlen(w) - 1] == '"')
                       w[strlen(w) - 1] = '\0';
                     fprintf(jfr2htm_op, "%s;\n", w);
+                    free(w);
                   }
                 }
                 else
@@ -2954,7 +2958,7 @@ static int jfr2htm_head_write(void)
   return 0;          
 }
 
-static int jfr2htm_subst(char *d, char *s, char *ds, char *ss)
+static int jfr2htm_subst(char *d, const char *s, const char *ds, const char *ss)
 {
   /* copies <s> to <d> with all occurences of <ss> replaced by <ds> */
 
@@ -3003,15 +3007,7 @@ static int jfr2htm_subst(char *d, char *s, char *ds, char *ss)
   return 0;
 }
 
-static void jfr2c_sub_print(FILE *fp, char *t)
-{
-  char ttxt[JFR2HTM_MAX_TEXT];
-
-  jfr2htm_subst(ttxt, t, jfr2htm_prefix_txt, "PREFIX");
-  fprintf(fp, ttxt);
-}
-
-static void jfr2htm_t_write(char **txts)
+static void jfr2htm_t_write(const char **txts)
 {
   char ttxt[JFR2HTM_MAX_TEXT];
   int m, slut;
@@ -3198,7 +3194,7 @@ static int jfr2htm_program_write(char *jfname)
   return 0;
 }
 
-static int jfr2htm_buf_cmp(char *t)
+static int jfr2htm_buf_cmp(const char *t)
 {
   int tid, bid, res;
 

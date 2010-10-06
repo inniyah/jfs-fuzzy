@@ -35,37 +35,38 @@
 #endif
 
 //---------------------------------------------------------------------------
-char usage_1[] =
+const char usage_1[] =
 "usage: jffam [-D dm] [-d df] [-f fs] [-o of] [-Mp ps] [-Md ds]";
-char usage_2[] =
+const char usage_2[] =
 "            [-rf df] [-iw wgt] [-c m] [-r ru] [-ms s] [-nf]";
-char usage_3[] =
+const char usage_3[] =
 "            [-w] [-a] [-so sf] [-tt tm]                             jfrf";
-struct jf_option_desc { char *option;
-                     			int argc;      /* -1: variabelt */
-		                    };               /* -2: sidste argument */
 
-struct jf_option_desc jf_options[] =
-		{     {"-f",  1},        /*  0 */
-		      {"-s",  0},        /*  1 */
-		      {"-D",  1},        /*  2 */
-		      {"-d", -1},        /*  3 */
-		      {"-o",  1},        /*  4 */
-		      {"-Mp", 1},        /*  5 */
-		      {"-Md", 1},        /*  6 */
-		      {"-rf", 1},        /*  7 */
-		      {"-iw", -1},       /*  8 */
-		      {"-c",  1},        /*  9 */
-		      {"-r",  1},        /* 10 */
-		      {"-ms", 1},        /* 11 */
-		      {"-nf", 0},        /* 12 */
-        {"-a",  0},        /* 13 */
-        {"-so", 1},        /* 14 */
-        {"-w",  0},        /* 15 */
-        {"-tt", 1},        /* 16 */
-		      {"-?",  0},        /* 17 */
-		      {"?",   0},        /* 18 */
-		      {" ",  -2}
+struct jf_option_desc {
+	const char *option;
+	int argc;      /* -1: variabelt */
+};               /* -2: sidste argument */
+
+struct jf_option_desc jf_options[] = {     {"-f",  1},        /*  0 */
+	{"-s",  0},        /*  1 */
+	{"-D",  1},        /*  2 */
+	{"-d", -1},        /*  3 */
+	{"-o",  1},        /*  4 */
+	{"-Mp", 1},        /*  5 */
+	{"-Md", 1},        /*  6 */
+	{"-rf", 1},        /*  7 */
+	{"-iw", -1},       /*  8 */
+	{"-c",  1},        /*  9 */
+	{"-r",  1},        /* 10 */
+	{"-ms", 1},        /* 11 */
+	{"-nf", 0},        /* 12 */
+	{"-a",  0},        /* 13 */
+	{"-so", 1},        /* 14 */
+	{"-w",  0},        /* 15 */
+	{"-tt", 1},        /* 16 */
+	{"-?",  0},        /* 17 */
+	{"?",   0},        /* 18 */
+	{" ",  -2}
   };
 
 

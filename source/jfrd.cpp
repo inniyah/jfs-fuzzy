@@ -36,11 +36,11 @@ USEUNIT("..\..\COMMON\jfg_lib.cpp");
 #pragma argsused
 #endif
 
-char usage_1[] =
+const char usage_1[] =
 "usage: jfrd [-D dm] [-d df] [-f fs] [-o of] [-Mp pb] [-S] [-so s]";
-char usage_2[] =
+const char usage_2[] =
 "            [-Md db] [-Mt t] [-r m] [-iw wgt] [-b] [-c m] [-e] {-a] [-w] jfrf";
-struct jf_option_desc { char *option;
+struct jf_option_desc { const char *option;
                         int argc;      /* -1: variabelt */
                       };               /* -2: sidste argument */
 
@@ -82,14 +82,14 @@ struct jf_tmap_desc jf_im_texts[] =        /* input-modes */
   { -1,                        ""}
 };
 
-static int isoption(char *s);
+static int isoption(const char *s);
 static int jf_getoption(char *argv[], int no, int argc);
 static int jf_tmap_find(struct jf_tmap_desc *map, char *txt);
 static void ext_subst(char *d, char *e, int forced);
 static int jf_about(void);
 static int us_error(void);
 
-int isoption(char *s)
+int isoption(const char *s)
 {
   if (s[0] == '-' || s[0] == '?')
     return 1;

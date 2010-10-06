@@ -54,7 +54,7 @@ static char jfg_t_wset[]   = "wset";
 
 
 struct jfg_dfunc_desc
-        { char *name;
+        {       const char *name;
                 int type;
                 int precedence;
         };
@@ -141,7 +141,7 @@ static  int jfg_err;      /* 301: statement longer than text.  */
                           /* 303: stack-overflow.              */
                           /* 304: Illegal program-counter.     */
 
-static void jfg_print(char *dtext, char *text);
+static void jfg_print(char *dtext, const char *text);
 static void jfg_p_float(char *dtext, float arg, int learn);
 static void jfg_p_fzvar(char *dtext, struct jfr_head_desc *jfr_head,
                         unsigned short fzvar_no);
@@ -175,7 +175,7 @@ static void jfg_p_expr(char *text, struct jfr_head_desc *jfr_head,
 /***********************************************************************/
 
 
-static void jfg_print(char *dtext, char *text)
+static void jfg_print(char *dtext, const char *text)
 
    /*  concatenate text to dtext. If len(dtext) > 78 add newline, tab. */
 {
@@ -1773,7 +1773,7 @@ int jfg_t_statement(char *text, int maxtext, int aspaces,
   return jfg_err;
 }
 
-int jfg_a_statement(char *argv[], int maxargc,
+int jfg_a_statement(const char *argv[], int maxargc,
       void *head, unsigned char *pc)
 {
   int argc, m;

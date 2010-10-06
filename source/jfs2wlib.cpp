@@ -103,27 +103,27 @@ static int jfc_ff_def_names = 0;
 /************************************************************************/
 
 
-static char jfc_t_hedge[]     = "hedge";
-static char jfc_t_conf[]      = "conf";
-static char jfc_t_is[]        = "is";
-static char jfc_t_type[]      = "type";
-static char jfc_t_plf[]       = "plf";
-static char jfc_t_confidence[]= "confidence";
+static const char jfc_t_hedge[]     = "hedge";
+static const char jfc_t_conf[]      = "conf";
+static const char jfc_t_is[]        = "is";
+static const char jfc_t_type[]      = "type";
+static const char jfc_t_plf[]       = "plf";
+static const char jfc_t_confidence[]= "confidence";
 
-struct jfc_t_table_desc { char *name;
+struct jfc_t_table_desc { const char *name;
                           int  argc;
                         };
 
-static char jfc_dn_fbool[]      = "fbool";      /* 0 */
-static char jfc_dn_float[]      = "float";      /* 1 */
+static const char jfc_dn_fbool[]      = "fbool";      /* 0 */
+static const char jfc_dn_float[]      = "float";      /* 1 */
 
-static char jfc_hn_not[]        = "not";        /* 0 */
+static const char jfc_hn_not[]        = "not";        /* 0 */
 
-static char jfc_on_caseop[]     = "caseop";     /* 0 */
-static char jfc_on_weightop[]   = "weightop";   /* 1 */
-static char jfc_on_and[]        = "and";        /* 2 */
-static char jfc_on_or[]         = "or";         /* 3 */
-static char jfc_on_whileop[]    = "whileop";    /* 4 */
+static const char jfc_on_caseop[]     = "caseop";     /* 0 */
+static const char jfc_on_weightop[]   = "weightop";   /* 1 */
+static const char jfc_on_and[]        = "and";        /* 2 */
+static const char jfc_on_or[]         = "or";         /* 3 */
+static const char jfc_on_whileop[]    = "whileop";    /* 4 */
 
 static struct jfc_t_table_desc jfc_t_domargs[] =
      {{ "text",         0},  /* 0 */
@@ -256,7 +256,7 @@ static char jfc_empty[] = " "; /* tom streng til fejlmeddellelser.    */
 
 static int jfc_gl_error_mode;  /* global error mode */
 
-static char *jfc_err_modes[] =
+static const char *jfc_err_modes[] =
    { "NONE",
      "WARNING",
      "ERROR",
@@ -268,7 +268,7 @@ static int jfc_err_message_mode; /* 0: normal error-messages,           */
                                  /* 1: compact error-messages.          */
 
 struct jfc_err_desc { int eno;
-                      char *text;
+                      const char *text;
                     };
 
 static struct jfc_err_desc jfc_err_texts[] =
@@ -285,15 +285,15 @@ static struct jfc_err_desc jfc_err_texts[] =
 
    {103, "Adjectiv value out of domain range:"},
    {104, "Argument-id < 0:"},
-   {105, "To many words in sentence."},
-   {106, "To many domains (max 255)."},
-   {107, "To many limits in pl-function (max 255)."},
-   {108, "To many relations (max 255)."},
+   {105, "Too many words in sentence."},
+   {106, "Too many domains (max 255)."},
+   {107, "Too many limits in pl-function (max 255)."},
+   {108, "Too many relations (max 255)."},
    {109, "Unknown operator:"},
    {110, "Undefined domain:"},
    {111, "Unknown hedge-mode:"},
    {113, "Undefined hedge:"},
-   {114, "To many operators (max 255)."},
+   {114, "Too many operators (max 255)."},
    {115, "Illegal second operator-type:"},
    {120, "Unknown hedge type:"},
    {121, "Constant out of range [0.0, 1.0]:"},
@@ -304,17 +304,17 @@ static struct jfc_err_desc jfc_err_texts[] =
    {126, "Colon (:) expected."},
    {127, "Wrong number off arguments."},
    {128, "Multiple declaration of:"},
-   {129, "To many hedges (max 255)."},
+   {129, "Too many hedges (max 255)."},
    {131, "Unknown defuzificationfunction: "},
    {133, "Too many errors."},
    {134, "Text or number expected."},
    {142, "Sentence to long."},
    {144, "Illegal placed comment. Comment ignored."},
    {146, "Unknown domain-type:"},
-   {147, "to many arrays."},
+   {147, "too many arrays."},
    {148, "Illegal array-size:"},
-   {149, "To many (max 128) adjectives bound to:"},
-   {151, "To many default-names (max 128)"},
+   {149, "Too many (max 128) adjectives bound to:"},
+   {151, "Too many default-names (max 128)"},
    {152, "Unknown default-adjectiv in variable:"},
    {155, "Trapez start-point > end-point."},
    {156, "Both trapez and plf in adjectiv."},
@@ -329,15 +329,15 @@ static struct jfc_err_desc jfc_err_texts[] =
   static int jfc_error(int eno, char *name, int mode);
   static int jfc_tcut(int argno, int alen);
   static float jfc_atof(int v);
-     static int jf_atof(float *d, char *a);
+  static int jf_atof(float *d, char *a);
   static int jfc_afind(char *tab[], int argc, char *arg);
 
   static int jfc_table_find(int *argc, struct jfc_t_table_desc *tab,
                             char *arg);
   static int jfc_getline(void);
-    static void jfc_skipline(void);
-    static int jfc_gettoken(void);
-      static int jfc_getchar(void);
+  static void jfc_skipline(void);
+  static int jfc_gettoken(void);
+  static int jfc_getchar(void);
 
   static int jfc_domain_find(char *name);
   static int jfc_array_find(char *arrname);
@@ -351,23 +351,23 @@ static struct jfc_err_desc jfc_err_texts[] =
 
 /* jfc_comp */
   static int jfc_comp(void);
-    static int jfc_plf_insert(int *id);
-    static void jfc_comment_handle(int cstate);
-    static void jfc_init(void);
-    static int jfc_syn_ins(void);
-    static int jfc_domain_ins(void);
-    static void jfc_first_domains(void);
-    static int jfc_adjectiv_ins(void);
-    static int jfc_var_ins(int var_type);
-    static void jfc_first_vars(void);
-    static int jfc_hedge_ins(void);
-    static void jfc_first_hedges(void);
-    static int jfc_relation_ins(void);
-    static int jfc_operator_ins(void);
-    static void jfc_first_operators(void);
-    static int jfc_array_ins(void);
-    static int jfc_progline_ins(void);
-    static void jfc_var_def_handle(void);
+  static int jfc_plf_insert(int *id);
+  static void jfc_comment_handle(int cstate);
+  static void jfc_init(void);
+  static int jfc_syn_ins(void);
+  static int jfc_domain_ins(void);
+  static void jfc_first_domains(void);
+  static int jfc_adjectiv_ins(void);
+  static int jfc_var_ins(int var_type);
+  static void jfc_first_vars(void);
+  static int jfc_hedge_ins(void);
+  static void jfc_first_hedges(void);
+  static int jfc_relation_ins(void);
+  static int jfc_operator_ins(void);
+  static void jfc_first_operators(void);
+  static int jfc_array_ins(void);
+  static int jfc_progline_ins(void);
+  static void jfc_var_def_handle(void);
 
   static int jfc_close(void);
   static void jfc_mem_set(void);

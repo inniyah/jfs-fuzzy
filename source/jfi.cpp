@@ -104,14 +104,15 @@ char jfi_t_jfi[] =
 /* Option-data                                                           */
 /*************************************************************************/
 
-char usage_1[] =
+const char usage_1[] =
 "usage: jfi [-D dm] [-d df] [-f fs] [-o of] [-Et min] [-Ee er] [-pm p] ";
-char usage_2[] =
+const char usage_2[] =
 "           [-I ic] [-EI i] [-sm m] [-s] [-r] [-so s] [-a] [-w]        jfrf ";
 
-struct jf_option_desc { char *option;
-                int argc;      /* -1: variabelt */
-                };                /* -2: sidste argument */
+struct jf_option_desc {
+	const char *option;
+	int argc;      /* -1: variabelt */
+};                /* -2: sidste argument */
 
 struct jf_option_desc jf_options[] =
   {     {"-f",  1},        /*  0 */
@@ -229,11 +230,11 @@ struct jfr_err_desc jfr_err_texts[] =
          {  13, "Undefined adjective: "},
          {  14, "Missing start/end of interval."},
          {  15, "No value for variable:"},
-         {  16, "To many values in a record (max 255)."},
+         {  16, "Too many values in a record (max 255)."},
          {  17, "Illegal jft-file-mode."},
          {  18, "Token to long (max 255 chars)."},
          {  19, "Penalty-matrix and more than one output-variable."},
-         {  20, "To many penalty-values (max 64)."},
+         {  20, "Too many penalty-values (max 64)."},
          {  21, "No values in first data-line."},
          {401, "jfp cannot insert this type of statement"},
          {402, "Statement to large."},

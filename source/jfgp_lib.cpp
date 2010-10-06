@@ -216,7 +216,7 @@ static int jfgp_tournament_size = 5;
 #define JFGP_IT_REPLACE 1
 #define JFGP_IT_DELETE  2
 
-struct jfgp_kw_desc { char *name;
+struct jfgp_kw_desc { const char *name;
                       int  value;
                     };
 
@@ -258,29 +258,29 @@ static struct jfgp_kw_desc jfgp_kw_sfunc[] =
           {" ",   -1}
         };
 
-static char jfgp_t_gp[]        = "JFGP";
-static char jfgp_t_operators[] = "OPERATORS";
-static char jfgp_t_integer[]   = "INTEGER";
-static char jfgp_t_float[]     = "FLOAT";
-static char jfgp_t_hedges[]    = "HEDGES";
-static char jfgp_t_functions[] = "FUNCTIONS";
-static char jfgp_t_fzvars[]    = "FZVARS";
-static char jfgp_t_vars[]      = "VARS";
-static char jfgp_t_arrays[]    = "ARRAYS";
-static char jfgp_t_then[]      = "THEN";
-static char jfgp_t_iif[]       = "IIF";
-static char jfgp_t_assign[]    = "ASSIGN";
-static char jfgp_t_case[]      = "CASE";
-static char jfgp_t_return[]    = "RETURN";
+static const char jfgp_t_gp[]        = "JFGP";
+static const char jfgp_t_operators[] = "OPERATORS";
+static const char jfgp_t_integer[]   = "INTEGER";
+static const char jfgp_t_float[]     = "FLOAT";
+static const char jfgp_t_hedges[]    = "HEDGES";
+static const char jfgp_t_functions[] = "FUNCTIONS";
+static const char jfgp_t_fzvars[]    = "FZVARS";
+static const char jfgp_t_vars[]      = "VARS";
+static const char jfgp_t_arrays[]    = "ARRAYS";
+static const char jfgp_t_then[]      = "THEN";
+static const char jfgp_t_iif[]       = "IIF";
+static const char jfgp_t_assign[]    = "ASSIGN";
+static const char jfgp_t_case[]      = "CASE";
+static const char jfgp_t_return[]    = "RETURN";
 
-static int jfgp_stricmp(char *a1, char *a2);
-static int jfgp_find_var(char *vname);
-static int jfgp_find_ufvar(int function_no, char *vname);
-static int jfgp_hedge_find(char *hname);
-static int jfgp_urel_find(char *urname);
-static int jfgp_op_find(char *oname);
-static int jfgp_array_find(char *aname);
-static int jfgp_kw_find(struct jfgp_kw_desc *kws, char *name);
+static int jfgp_stricmp(const char *a1, const char *a2);
+static int jfgp_find_var(const char *vname);
+static int jfgp_find_ufvar(int function_no, const char *vname);
+static int jfgp_hedge_find(const char *hname);
+static int jfgp_urel_find(const char *urname);
+static int jfgp_op_find(const char *oname);
+static int jfgp_array_find(const char *aname);
+static int jfgp_kw_find(struct jfgp_kw_desc *kws, const char *name);
 static int jfgp_adesc_create(void);
 
 static void jfgp_i_judge(int ind_no);
@@ -317,7 +317,7 @@ static int jfgp_pop_create(void);
 /* Create mutaion-types (jfgp_mulige) from call-statement                */
 /*************************************************************************/
 
-static int jfgp_stricmp(char *a1, char *a2)
+static int jfgp_stricmp(const char *a1, const char *a2)
 {
   int m, res;
 
@@ -335,7 +335,7 @@ static int jfgp_stricmp(char *a1, char *a2)
   return res;
 }
 
-static int jfgp_find_var(char *vname)
+static int jfgp_find_var(const char *vname)
 {
   int m, res;
   struct jfg_var_desc vdesc;
@@ -349,7 +349,7 @@ static int jfgp_find_var(char *vname)
   return res;
 }
 
-static int jfgp_find_ufvar(int function_no, char *vname)
+static int jfgp_find_ufvar(int function_no, const char *vname)
 {
   int m, res;
   struct jfg_function_desc fdesc;
@@ -365,7 +365,7 @@ static int jfgp_find_ufvar(int function_no, char *vname)
   return res;
 }
 
-static int jfgp_hedge_find(char *hname)
+static int jfgp_hedge_find(const char *hname)
 {
   int m, res;
   struct jfg_hedge_desc hdesc;
@@ -379,7 +379,7 @@ static int jfgp_hedge_find(char *hname)
   return res;
 }
 
-static int jfgp_ufunc_find(char *ufname)
+static int jfgp_ufunc_find(const char *ufname)
 {
    int m, res;
    struct jfg_function_desc fdesc;
@@ -393,7 +393,7 @@ static int jfgp_ufunc_find(char *ufname)
    return res;
 }
 
-static int jfgp_urel_find(char *urname)
+static int jfgp_urel_find(const char *urname)
 {
   int m, res;
   struct jfg_relation_desc urel;
@@ -407,7 +407,7 @@ static int jfgp_urel_find(char *urname)
   return res;
 }
 
-static int jfgp_op_find(char *oname)
+static int jfgp_op_find(const char *oname)
 {
   int m, res;
   struct jfg_operator_desc opdesc;
@@ -421,7 +421,7 @@ static int jfgp_op_find(char *oname)
   return res;
 }
 
-static int jfgp_array_find(char *aname)
+static int jfgp_array_find(const char *aname)
 {
   int m, res;
   struct jfg_array_desc adesc;
@@ -435,7 +435,7 @@ static int jfgp_array_find(char *aname)
   return res;
 }
 
-static int jfgp_kw_find(struct jfgp_kw_desc *kws, char *name)
+static int jfgp_kw_find(struct jfgp_kw_desc *kws, const char *name)
 {
   int m, res;
 
@@ -453,7 +453,7 @@ static int jfgp_kw_find(struct jfgp_kw_desc *kws, char *name)
 
 static int jfgp_adesc_create(void)
 {
-  char *jfgp_words[128];
+  const char *jfgp_words[128];
   int m, v, state, no, i, j;
   int ff_mt, funo, fv, terminal_c, slut, stype;
   unsigned char *pc;
@@ -937,7 +937,7 @@ static int jfgp_i2p(long ind_no)
   int m, r, res;
   struct jfg_statement_desc jfgp_sdesc;
   struct jfgp_rule_head_desc *ind_rules;
-  char *argv[2];
+  const char *argv[2];
   unsigned char *pc;
 
   argv[0] = jfgp_t_gp;

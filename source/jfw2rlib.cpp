@@ -164,26 +164,26 @@ static struct jfw_synonym_desc *jfc_synonyms = NULL;
 /*  Variables til afkodning af keywords                                 */
 /************************************************************************/
 
-static char jfc_t_then[]      = "then";
-static char jfc_t_true[]      = "true";
-static char jfc_t_false[]     = "false";
-static char jfc_t_eq[]        = "=";
-static char jfc_t_between[]   = "between";
-static char jfc_t_in[]        = "in";
-static char jfc_t_and[]       = "and";
-static char jfc_t_is[]        = "is";
-static char jfc_t_increase[]  = "increase";
-static char jfc_t_decrease[]  = "decrease";
-static char jfc_t_with[]      = "with";
-static char jfc_t_function[]  = "function";
-static char jfc_t_procedure[] = "procedure";
-static char jfc_t_clear[]     = "clear";
-static char jfc_t_return[]    = "return";
-static char jfc_t_extern[]    = "extern";
-static char jfc_t_call[]      = "call";
+static const char jfc_t_then[]      = "then";
+static const char jfc_t_true[]      = "true";
+static const char jfc_t_false[]     = "false";
+static const char jfc_t_eq[]        = "=";
+static const char jfc_t_between[]   = "between";
+static const char jfc_t_in[]        = "in";
+static const char jfc_t_and[]       = "and";
+static const char jfc_t_is[]        = "is";
+static const char jfc_t_increase[]  = "increase";
+static const char jfc_t_decrease[]  = "decrease";
+static const char jfc_t_with[]      = "with";
+static const char jfc_t_function[]  = "function";
+static const char jfc_t_procedure[] = "procedure";
+static const char jfc_t_clear[]     = "clear";
+static const char jfc_t_return[]    = "return";
+static const char jfc_t_extern[]    = "extern";
+static const char jfc_t_call[]      = "call";
 
 struct jfc_t_table_desc
-   { char *name;
+   { const char *name;
      int  argc;
    };
 
@@ -228,17 +228,18 @@ static struct jfc_t_table_desc jfc_t_vfuncs[] =
 
 
 struct jfc_t_func_desc
-  { char *name;
+  { const char *name;
     unsigned char a_type;
     unsigned char arg;
     signed char argc;
   };
 
-struct jfc_t_dop_desc  { char *name;
-                         unsigned char a_type;
-                         unsigned char arg;
-                         signed char precedence;
-                       };
+struct jfc_t_dop_desc
+  { const char *name;
+    unsigned char a_type;
+    unsigned char arg;
+    signed char precedence;
+  };
 
 static struct jfc_t_func_desc jfc_t_funcs[] =
   { {"cos",  JFR_OP_SFUNC, 0, 1},
@@ -304,7 +305,7 @@ static char jfc_empty[] = " "; /* tom streng til fejlmeddellelser.    */
 
 static int jfc_gl_error_mode;
 
-static char *jfc_err_modes[] =
+static const char *jfc_err_modes[] =
    { "NONE",
      "WARNING",
      "ERROR",
@@ -318,9 +319,10 @@ static int jfc_err_line_mode = 1; /* 0: start with line 1,              */
 static int jfc_err_message_mode; /* 0: normal error-messages,           */
                                  /* 1: compact error-messages.          */
 
-struct jfc_err_desc {int eno;
-                     char *text;
-              };
+struct jfc_err_desc {
+	int eno;
+	const char *text;
+	};
 
 struct jfc_err_desc jfc_err_texts[] =
 {  {0, "  "},
@@ -333,11 +335,10 @@ struct jfc_err_desc jfc_err_texts[] =
   {  7, "Syntax error in:"},
   {  8, "Out of memory"},
   {  9, "Illegal number:"},
-
-  {101, "To many arguments in statement (max 255)."},
+  {101, "Too many arguments in statement (max 255)."},
   {102, "Expresion to complex."},
   {103, "Adjectiv value out of domain range:"},
-  {105, "To many words in sentence."},
+  {105, "Too many words in sentence."},
   {116, "Undefined adjective:"},
   {118, "Undefined variable: "},
   {123, "Semicolon (;) or colon (:) expected."},
@@ -347,14 +348,14 @@ struct jfc_err_desc jfc_err_texts[] =
   {133, "Too many errors."},
   {134, "Text or number expected."},
   {135, "Values in wrong order for:"},
-  {136, "To many nested switch-statements (max 64)"},
+  {136, "Too many nested switch-statements (max 64)"},
   {137, "Default-stmt without switch-stmt."},
   {138, "Case-statement without switch-stmt."},
   {139, "End-statement without switch-statement."},
   {140, "Missing end-statement(s)."},
   {142, "Sentence to long."},
   {144, "Illegal placed comment. Comment ignored."},
-  {149, "To many (max 128) adjectives bound to:"},
+  {149, "Too many (max 128) adjectives bound to:"},
   {150, "keyword 'with' expected:"},
   {153, "Illegal placed function/procedure."},
   {154, "Return statement outsize function."},

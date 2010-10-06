@@ -18,12 +18,12 @@ char *jf_err_texts[] =
 		      "Unknown error.",                           /* 12 */
                       "Undefined adjectiv:",                      /* 13 */
                       "Missing start/end of interval.",           /* 14 */
-                      "To many tokens in first data-line (max 256).",  /* 15 */
+                      "Too many tokens in first data-line (max 256).",  /* 15 */
                       "No value for variable in first line.",     /* 16 */
                       "Illegal data-file mode.",                  /* 17 */
                       "Token to long (max 255 chars).",           /* 18 */
                       "Penalty-matrix and more than one output-var." /* 19 */
-                      "To many penalty values (max 64).",         /* 20 */
+                      "Too many penalty values (max 64).",         /* 20 */
                       "No values in first data-line.",            /* 21 */
 		      " "
 		     };

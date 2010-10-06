@@ -14,7 +14,7 @@
 /* jfp-errors:  401: jfp cannot insert this type of statement.         */
 /*              402: Statement to large.                               */
 /*              403: Not enogh extra memory in jfs-program.            */
-/*              404: To many args to call-statement (max 255).         */
+/*              404: Too many args to call-statement (max 255).        */
 
 /* Data-structures are described in 'jfg_lib.h'.                       */
 
@@ -168,12 +168,12 @@ void jfp_d_statement(void *head, unsigned char *pc);
 
 
 int jfp_i_tree(void *head, unsigned char **pc,
-              	struct jfg_statement_desc *stat,
-             		struct jfg_tree_desc *tree,
+               struct jfg_statement_desc *stat,
+               struct jfg_tree_desc *tree,
                unsigned short cond_no,
                unsigned short index_no,
                unsigned short expr_no,
-               char *argv[], int argc);
+               const char *argv[], int argc);
 
 /* Inserts the statement described by <stat> and <tree> at            */
 /* program_address <pc>. <pc> is changed to program-address of next   */

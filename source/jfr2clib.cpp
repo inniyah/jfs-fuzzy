@@ -113,14 +113,14 @@ static int    jfr2c_stacksize;
 static int jfr2c_errcount;
 
 #define JFI_MAX_WORDS 32
-static char *jfr2c_words[JFI_MAX_WORDS];
+static const char *jfr2c_words[JFI_MAX_WORDS];
 
 #define JFR2C_MAX_TEXT 1024
 
 static FILE *jfr2c_op;
 static FILE *jfr2c_dcl;
 static FILE *jfr2c_hfile;
-static char *jfr2c_fixed[] =
+static const char *jfr2c_fixed[] =
 { " ",
   "static float rmm(float v, float mi, float ma)", /* rounds v to [mi, ma] */
   "{ float r; r = v;",
@@ -142,7 +142,7 @@ static char *jfr2c_fixed[] =
   "<!-- JFS END -->"
 };
 
-static char *jfr2c_i_fixed[] =
+static const char *jfr2c_i_fixed[] =
 { " ",
   "inline static float rmm(float v, float mi, float ma)",
   "{ float r; r = v;",
@@ -164,7 +164,7 @@ static char *jfr2c_i_fixed[] =
   "<!-- JFS END -->"
 };
 
-static char *jfr2c_t_minmax[] =
+static const char *jfr2c_t_minmax[] =
 {
   "static float rmin(float v, float mi)",
   "{",
@@ -179,7 +179,7 @@ static char *jfr2c_t_minmax[] =
   "<!-- JFS END -->",
 };
 
-static char *jfr2c_it_minmax[] =
+static const char *jfr2c_it_minmax[] =
 {
   "inline static float rmin(float v, float mi)",
   "{",
@@ -194,7 +194,7 @@ static char *jfr2c_it_minmax[] =
   "<!-- JFS END -->",
 };
 
-static char *jfr2c_t_iif[] =
+static const char *jfr2c_t_iif[] =
 {
   "static float iif(float c,float e1, float e2)",
   "{ return c*e1+(1.0-c)*e2;",
@@ -203,7 +203,7 @@ static char *jfr2c_t_iif[] =
   "<!-- JFS END -->",
 };
 
-static char *jfr2c_t_plcalc[] =
+static const char *jfr2c_t_plcalc[] =
 {
   "static float pl_calc(float xv, int first, int last)",
   "{ float  a, r; int m;",
@@ -227,7 +227,7 @@ static char *jfr2c_t_plcalc[] =
   "<!-- JFS END -->",
 };
 
-static char *jfr2c_t_splcalc[] =      /* if no exclusive in plf's use */
+static const char *jfr2c_t_splcalc[] =      /* if no exclusive in plf's use */
 {
   "static float pl_calc(float xv, int first, int last)",
   "{ float  a, r; int m;",
@@ -248,48 +248,48 @@ static char *jfr2c_t_splcalc[] =      /* if no exclusive in plf's use */
 };
 
 static char jfr2c_t_real[16] = "float";
-static char jfr2c_t_float[]  = "float";
-static char jfr2c_t_double[] = "double";
-static char jfr2c_t_end[]   = "<!-- JFS END -->";
-static char jfr2c_t_stack[] = "stack";
-static char jfr2c_t_c[]     = "c";
+static const char jfr2c_t_float[]  = "float";
+static const char jfr2c_t_double[] = "double";
+static const char jfr2c_t_end[]   = "<!-- JFS END -->";
+static const char jfr2c_t_stack[] = "stack";
+static const char jfr2c_t_c[]     = "c";
 
 #define JFE_WARNING 0
 #define JFE_ERROR   1
 
 struct jfr_err_desc { int eno;
-                      char *text;
+                      const char *text;
                     };
 
-struct jfr_err_desc jfr_err_texts[] =
-       {{   0, " "},
-  		    {   1, "Cannot open file:"},
-		      {   2, "Error reading from file:"},
-		      {   3, "Error writing to file:"},
-		      {   4, "Not a jfr-file:"},
-  		    {   5, "Wrong version:"},
-		      {   6, "Cannot allocate memory to:"},
-		      {   9, "Illegal number:"},
-		      {  10, "Value out of domain-range:"},
-  		    {  11, "Unexpected EOF."},
-		      {  13, "Undefined adjective:"},
-	       { 301, "statement to long."},
-	       { 302, "jfg-tree to small to hold statement."},
-	       { 303, "Stack-overflow (jfg-stack)."},
-	       { 304, "program-id (pc) is not the start of a statement."},
-	       {1002, "To many domain-variables. Max 100."},
-	       {1007, "To many block-levels (switch/while-blocks). Max 64."},
-	       {1008, "Extern-statement ignored."},
-	       {1009, "To many different between-expresions. Max 255."},
-        {1010, "Text-string to long. Max 1024 chars."},
-	       {9999, "unknown error."}
-	      };
+struct jfr_err_desc jfr_err_texts[] = {
+	{   0, " "},
+	{   1, "Cannot open file:"},
+	{   2, "Error reading from file:"},
+	{   3, "Error writing to file:"},
+	{   4, "Not a jfr-file:"},
+	{   5, "Wrong version:"},
+	{   6, "Cannot allocate memory to:"},
+	{   9, "Illegal number:"},
+	{  10, "Value out of domain-range:"},
+	{  11, "Unexpected EOF."},
+	{  13, "Undefined adjective:"},
+	{ 301, "statement to long."},
+	{ 302, "jfg-tree to small to hold statement."},
+	{ 303, "Stack-overflow (jfg-stack)."},
+	{ 304, "program-id (pc) is not the start of a statement."},
+	{1002, "Too many domain-variables. Max 100."},
+	{1007, "Too many block-levels (switch/while-blocks). Max 64."},
+	{1008, "Extern-statement ignored."},
+	{1009, "Too many different between-expresions. Max 255."},
+	{1010, "Text-string to long. Max 1024 chars."},
+	{9999, "unknown error."}
+};
 
-static int jf_error(int eno, char *name, int mode);
+static int jf_error(int eno, const char *name, int mode);
 static void jf_ftoa(char *txt, float f);
-static int jfr2c_subst(char *d, char *s, char *ds, char *ss);
-static void jfr2c_ext_subst(char *d, char *e);
-static void jfr2c_sub_print(FILE *fp, char *t);
+static int jfr2c_subst(char *d, const char *s, const char *ds, const char *ss);
+static void jfr2c_ext_subst(char *d, const char *e);
+static void jfr2c_sub_print(FILE *fp, const char *t);
 static void jfr2c_float(FILE *fp, float f);
 static void jfr2c_pfloat(float f);
 static void jfr2c_fdefuzed_init(void);
@@ -322,7 +322,7 @@ static void jfr2c_init_write(char *funcname);
 static void jfr2c_rules_write(char *funcname);
 static void jfr2c_jfs_write(char *funcname);
 static void jfr2c_head_write(void);
-static void jfr2c_t_write(char **txts);
+static void jfr2c_t_write(const char **txts);
 static int jfr2c_program_write(char *funcname, char *progname, char *hname);
 static int jfr2c_file_append(char *dfname, char *sfname);
 
@@ -331,7 +331,7 @@ static int jfr2c_file_append(char *dfname, char *sfname);
 /* Hjaelpe-funktioner                                                    */
 /*************************************************************************/
 
-static int jf_error(int eno, char *name, int mode)
+static int jf_error(int eno, const char *name, int mode)
 {
   int m, v, e;
 
@@ -354,7 +354,7 @@ static int jf_error(int eno, char *name, int mode)
   return m;
 }
 
-static int jfr2c_subst(char *d, char *s, char *ds, char *ss)
+static int jfr2c_subst(char *d, const char *s, const char *ds, const char *ss)
 {
   /* copies <s> to <d> with all occurences of <ss> replaced by <ds> */
 
@@ -403,7 +403,7 @@ static int jfr2c_subst(char *d, char *s, char *ds, char *ss)
   return 0;
 }
 
-static void jfr2c_ext_subst(char *d, char *e)
+static void jfr2c_ext_subst(char *d, const char *e)
 {
   int m, fundet;
   char punkt[] = ".";
@@ -420,7 +420,7 @@ static void jfr2c_ext_subst(char *d, char *e)
   strcat(d, e);
 }
 
-static void jfr2c_sub_print(FILE *fp, char *t)
+static void jfr2c_sub_print(FILE *fp, const char *t)
 {
   char ttxt[JFR2C_MAX_TEXT];
 
@@ -2502,7 +2502,6 @@ static void jfr2c_rules_write(char *funcname)
   unsigned short c, i, e;
   unsigned char *pc;
   int a, fu, first, use_rmw, assign_statement, rm_optimize, stno;
-  char *w;
   struct jfg_var_desc vdesc;
   struct jfg_statement_desc sdesc;
   struct jfg_fzvar_desc fzvdesc;
@@ -2523,7 +2522,7 @@ static void jfr2c_rules_write(char *funcname)
       fprintf(jfr2c_dcl,"static %s uf%d(", jfr2c_t_real, fu);
       for (a = 0; a < fudesc.arg_c; a++)
       { if (first == 0)
-   	    { fprintf(jfr2c_op, ",");
+        { fprintf(jfr2c_op, ",");
           fprintf(jfr2c_dcl,",");
         }
         first = 0;
@@ -2768,12 +2767,13 @@ static void jfr2c_rules_write(char *funcname)
               if (a > 0)
               { if (strcmp(jfr2c_words[0], jfr2c_t_c) == 0)
                 { if (a > 1)
-                  { w = jfr2c_words[1];
+                  { char *w = strdup(jfr2c_words[1]);
                     if (w[0] == '"')
                       w++;
                     if (w[strlen(w) - 1] == '"')
                     w[strlen(w) - 1] = '\0';
                     fprintf(jfr2c_op, "%s;\n", w);
+                    free(w);
                   }
                 }
                 else
@@ -2830,7 +2830,7 @@ static void jfr2c_rules_write(char *funcname)
                 fprintf(jfr2c_op, " glw = rmw;\n");
               break;
           }
-	      break;
+          break;
         case JFG_ST_CASE:
            jfg_if_tree(jfr2c_tree, jfr2c_maxtree, &c, &i, &e, jfr_head, pc);
            fprintf(jfr2c_op, "  glw = ");
@@ -2922,7 +2922,7 @@ static void jfr2c_jfs_write(char *funcname)
   fprintf(jfr2c_op, "};\n\n");
 }
 
-static void jfr2c_t_write(char **txts)
+static void jfr2c_t_write(const char **txts)
 {
   int m, slut;
   char tmpt[1024];

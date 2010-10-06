@@ -41,47 +41,50 @@ USEUNIT("..\..\COMMON\jfg_lib.cpp");
 //---------------------------------------------------------------------------
 #endif
 
-char *usage[] =
+const char *usage[] =
 { "usage: jfr [-f fs] [-p dec] [-m md] [-c] [-e] [-wa [wm]] [-lm m]",
   "           [-D [dam]] [-O [opm]] [-d {daf}] [-o [opf]] [-l [lf]]",
   "           [-rs ss] [-u [ua]] [-w] [-a] [-uv m] [-pm [mf]]        jfrf"
 };
 
-struct jf_option_desc { char *option;
-         		             int argc;      /* -1: variabelt */
-		                    };               /* -2: sidste argument */
+struct jf_option_desc {
+	const char *option;
+	int argc;      /* -1: variabelt */
+};               /* -2: sidste argument */
 
 struct jf_option_desc jf_options[] =
-{       {"-f",  1},        /*  0 */
-		      {"-p",  1},        /*  1 */
-		      {"-m",  1},        /*  2 */
-		      {"-e",  0},        /*  3 */
-		      {"-wa",-1},        /*  4 */
-		      {"-c",  0},        /*  5 */
-		      {"-D", -1},        /*  6 */
-		      {"-O", -1},        /*  7 */
-		      {"-d", -1},        /*  8 */
-		      {"-o", -1},        /*  9 */
-		      {"-l", -1},        /* 10 */
-		      {"-lm", 1},        /* 11 */
-		      {"-a",  0},        /* 12 */
-        {"-w",  0},        /* 13 */
-        {"-rs", 1},        /* 14 */
-        {"-u", -1},        /* 15 */
-        {"-uv", 1},        /* 16 */
-        {"-pm", -1},       /* 17 */
-		      {"-?",  0},        /* 18 */
-		      {"?",   0},        /* 19 */
-		      {" ",  -2}
+{
+	{"-f",  1},        /*  0 */
+	{"-p",  1},        /*  1 */
+	{"-m",  1},        /*  2 */
+	{"-e",  0},        /*  3 */
+	{"-wa",-1},        /*  4 */
+	{"-c",  0},        /*  5 */
+	{"-D", -1},        /*  6 */
+	{"-O", -1},        /*  7 */
+	{"-d", -1},        /*  8 */
+	{"-o", -1},        /*  9 */
+	{"-l", -1},        /* 10 */
+	{"-lm", 1},        /* 11 */
+	{"-a",  0},        /* 12 */
+	{"-w",  0},        /* 13 */
+	{"-rs", 1},        /* 14 */
+	{"-u", -1},        /* 15 */
+	{"-uv", 1},        /* 16 */
+	{"-pm", -1},       /* 17 */
+	{"-?",  0},        /* 18 */
+	{"?",   0},        /* 19 */
+	{" ",  -2}
 };
 
-char *extensions[]  = { "jfr",     /* 0 */
-        			             "log",     /* 1 */
-			                     "dat",     /* 2 */
-			                     "jfo",     /* 3 */
-                        "pm",      /* 4 */
-                        "plt"      /* 5 */
-			                   };
+const char *extensions[]  = {
+	"jfr",     /* 0 */
+	"log",     /* 1 */
+	"dat",     /* 2 */
+	"jfo",     /* 3 */
+	"pm",      /* 4 */
+	"plt"      /* 5 */
+};
 
 FILE *jfs_ip  = NULL;
 FILE *jfs_op  = NULL;
@@ -294,7 +297,7 @@ char jf_file_txt[256];
 /*******************************************************************/
 
 #define MAX_CALL_ARGS 32
-char *call_args[MAX_CALL_ARGS];
+const char *call_args[MAX_CALL_ARGS];
 
 char call_t_printf[] = "printf";
 char call_t_comma[]  = ",";
@@ -334,45 +337,45 @@ struct jfr_err_desc { int eno;
 		      char *text;
 		    };
 
-struct jfr_err_desc jfr_err_texts[] =
- { {      0, " "},
-	  {      1, "Cannot open file:"},
-	  {      2, "Error reading from file:"},
-	  {      3, "Error writing to file:"},
-	  {      4, "FIle does not contain jfs-program:"},
-	  {      5, "This is JFR version 2. Another version is needed to run:"},
-	  {      6, "Cannot allocate memory to:"},
-	  {      9, "Illegal number:"},
-	  {     10, "Value out of domain-range:"},
-	  {     11, "Unexpected EOF."},
-	  {     13, "Undefined adjective:"},
-   {     14, "missing start/end of interval."},
-   {     15, "No value for variable:"},
-   {     16, "To many values in a record (max 255)."},
-   {     17, "Illegal jft-file-mode."},
-   {     18, "Token to long (max 255 chars)."},
-   {     19, "Penalty-matrix and more than one output-variable."},
-   {     20, "To many penalty-values (max 64)."},
-   {     21, "No values in first data-line."},
-	  {    201, "All values zero, cannot normalise."},
-	  {    202, "Variable-value out of domain range."},
-	  {    203, "Illegal operation."},
-	  {    204, "Cannot defuzificate, all fuzzy variables = 0.0"},
-	  {    205, "Function argument out of range."},
-	  {    206, "Stack overflow."},
-	  {    301, "JFG_LIB: Statement to long (truncated)"},
-	  {    302, "JFG_LIB: No free nodes in tree"},
-	  {    303, "JFG_LIB: Stack overflow"},
-	  {    601, "To many *-inputs (max 8)."},
-	  {    602, "Option '-D ie' is only posible if input from file."},
-	  {    603, "Undefined variable:"},
-	  {    604, "Wrong number of arguments to call-statement."},
-   {    605, "Option '-D' (without 'i') is not posible if input from file."},
-	  {   9999, "Unknown error!"},
- };
+struct jfr_err_desc jfr_err_texts[] = {
+	{      0, " "},
+	{      1, "Cannot open file:"},
+	{      2, "Error reading from file:"},
+	{      3, "Error writing to file:"},
+	{      4, "FIle does not contain jfs-program:"},
+	{      5, "This is JFR version 2. Another version is needed to run:"},
+	{      6, "Cannot allocate memory to:"},
+	{      9, "Illegal number:"},
+	{     10, "Value out of domain-range:"},
+	{     11, "Unexpected EOF."},
+	{     13, "Undefined adjective:"},
+	{     14, "missing start/end of interval."},
+	{     15, "No value for variable:"},
+	{     16, "Too many values in a record (max 255)."},
+	{     17, "Illegal jft-file-mode."},
+	{     18, "Token to long (max 255 chars)."},
+	{     19, "Penalty-matrix and more than one output-variable."},
+	{     20, "Too many penalty-values (max 64)."},
+	{     21, "No values in first data-line."},
+	{    201, "All values zero, cannot normalise."},
+	{    202, "Variable-value out of domain range."},
+	{    203, "Illegal operation."},
+	{    204, "Cannot defuzificate, all fuzzy variables = 0.0"},
+	{    205, "Function argument out of range."},
+	{    206, "Stack overflow."},
+	{    301, "JFG_LIB: Statement to long (truncated)"},
+	{    302, "JFG_LIB: No free nodes in tree"},
+	{    303, "JFG_LIB: Stack overflow"},
+	{    601, "Too many *-inputs (max 8)."},
+	{    602, "Option '-D ie' is only posible if input from file."},
+	{    603, "Undefined variable:"},
+	{    604, "Wrong number of arguments to call-statement."},
+	{    605, "Option '-D' (without 'i') is not posible if input from file."},
+	{   9999, "Unknown error!"},
+};
 
-static void ext_subst(char *d, char *e, int forced);
-static int jf_error(int errno, char *name, int mode);
+static void ext_subst(char *d, const char *e, int forced);
+static int jf_error(int errno, const char *name, int mode);
 int jf_tmap_find(struct jfr_tmap_desc *map, char *txt);
 int jf_getoption(char *argv[], int no, int argc);
 void jf_ftoa(char *txt, float f);
@@ -404,7 +407,7 @@ static int jf_about(void);
 static int us_error(void);
 
 
-static int jf_error(int eno, char *name, int mode)
+static int jf_error(int eno, const char *name, int mode)
 {
   int m, v, e, w;
   char ttxt[82];
@@ -496,7 +499,7 @@ int jf_getoption(char *argv[], int no, int argc)
 }
 
 
-static void ext_subst(char *d, char *e, int forced)
+static void ext_subst(char *d, const char *e, int forced)
 {
   int m, fundet;
   char punkt[] = ".";
@@ -1141,7 +1144,7 @@ static void jfs_op_write(FILE *op, int forced)
   fprintf(op, "\n");
 }
 
-int var_find(char *name)
+int var_find(const char *name)
 {
   int m;
   struct jfg_var_desc vdesc;
@@ -1164,7 +1167,7 @@ void this_call(void)  /* call-statement. Only handles printf/read. */
   int argc, cc, ac, vno, eofvno, slut, ano;
   int state;      /* 0:normal, 1:after %, 2:after \, 10:end */
   char tmp[2];
-  char *fs;
+  const char *fs;
 
   tmp[1] = '\0';
   jfr_statement_info(&dprog_info);
@@ -2306,11 +2309,11 @@ int main(int argc, char *argv[])
     if (ip_medie == IP_FILE)
     { if (dfile_nos[file_no] >= 0)
       { strcpy(ip_fname, argv[dfile_nos[file_no]]);
-	       ext_subst(ip_fname, extensions[2], 0);
+        ext_subst(ip_fname, extensions[2], 0);
       }
       else
       { strcpy(ip_fname, so_fname);
-	       ext_subst(ip_fname, extensions[2], 1);
+        ext_subst(ip_fname, extensions[2], 1);
       }
       slut = jft_fopen(ip_fname, fmode, 0);
       if (slut != 0)

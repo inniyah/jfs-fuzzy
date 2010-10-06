@@ -839,7 +839,7 @@ int jft_getrecord(float *ipvalues, float *ipconfs, float *expvalues,
     }
   }
   return res;
-};
+}
 
 /************************************************************************/
 /* penalty-functions:                                                   */

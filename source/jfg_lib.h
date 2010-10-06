@@ -820,7 +820,7 @@ int jfg_t_statement(char *text, int maxtext, int aspaces,
 
 
 
-int jfg_a_statement(char *argv[], int maxargc,
+int jfg_a_statement(const char *argv[], int maxargc,
                     void *head, unsigned char *pc);
 
 /* returns the arguments from the extern-part of an if-statement of    */

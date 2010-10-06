@@ -197,9 +197,10 @@ static int  jhlp_cur_head_id = -1;
 static int  jhlp_cur_glt_id = -1;
 static int  jhlp_cur_od_id = -1;
 
-struct jhlp_com_desc { int value;
-               		      char *name;
- 		                  };
+struct jhlp_com_desc {
+	int value;
+	const char *name;
+};
 
 #define JHLP_COM_HEAD    0
 #define JHLP_COM_CHEAD   1
@@ -279,21 +280,21 @@ static char jhlp_empty[] = " ";
 
 static int jhlp_error_count = 0;
 
-struct jhlp_err_desc { int eno;
-               		      char *text;
- 		                  };
+struct jhlp_err_desc {
+	int eno;
+	const char *text;
+	};
 
 static struct jhlp_err_desc jhlp_err_texts[] =
  { {      0, " "},
-	  {      1, "Cannot open file:"},
-	  {      2, "Error reading from file:"},
-	  {      3, "Error writing to file:"},
-	  {      6, "Cannot allocate memory to:"},
-	  {      9, "Illegal number:"},
-	  {     11, "Unexpected EOF."},
-
+   {      1, "Cannot open file:"},
+   {      2, "Error reading from file:"},
+   {      3, "Error writing to file:"},
+   {      6, "Cannot allocate memory to:"},
+   {      9, "Illegal number:"},
+   {     11, "Unexpected EOF."},
    {   1100, "Not a JHI-file:"},
-   {   1101, "To many words in text."},
+   {   1101, "Too many words in text."},
    {   1102, "Missing end-qoute in:"},
    {   1103, "Wrong number of arguments to command:"},
    {   1104, "Unknown command:"},
@@ -307,10 +308,10 @@ static struct jhlp_err_desc jhlp_err_texts[] =
    {   1112, "Unknown keyword in gloary-definition:"},
    {   1113, "Unknown label:"},
    {   1114, "No free jfm-node."},
-   {   1115, "To many nested if-statements."},
+   {   1115, "Too many nested if-statements."},
    {   1116, "!else without !if."},
    {   1117, "!end without !if."},
-   {   1118, "To many contents-levels."},
+   {   1118, "Too many contents-levels."},
    {   1119, "Multiple definition of:"},
    {   1120, "Text outside head."},
    {   1121, "Undefined table, list or glosary:"},
@@ -320,10 +321,10 @@ static struct jhlp_err_desc jhlp_err_texts[] =
    {   1125, "label defined twice:"},
    {   1126, "Undefined include-text:"},
    {   1127, "Unknown html-mode:"},
-	  {   9999, "Unknown error!"},
+   {   9999, "Unknown error!"},
  };
 
-static void jhlp_strcpy(char *dest, char *source);
+static void jhlp_strcpy(char *dest, const char *source);
 static int jhlp_stricmp(char *a1, char *a2);
 static void jhlp_fclose(FILE *fp);
 static int jhlp_error(int eno, char *name);
@@ -430,7 +431,7 @@ static void jhlp_fclose(FILE *fp)
   fp = NULL;
 }
 
-static void jhlp_strcpy(char *dest, char *source)
+static void jhlp_strcpy(char *dest, const char *source)
 {
   if (dest != NULL && source != NULL)
     strcpy(dest, source);

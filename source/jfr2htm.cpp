@@ -39,16 +39,16 @@ USEUNIT("..\..\COMMON\jfg_lib.cpp");
 
 static FILE *sout;
 static int jfr2htm_batch = 1;
-char usage_1[] =
+const char usage_1[] =
 "usage: jfr2htm [-g d] [-Ss s] [-St s] [-Sa c] [-j] [-Sh s]";
-char usage_2[] =
+const char usage_2[] =
 "               [-r] [-so sf] [-a] [-w] [-o of] [-ow] [-Nc] [-s]";
-char usage_3[] =
+const char usage_3[] =
 "               {-l m] [-Na] [-c] [-Cm m] [-Ct t] [-p f]         jfrf";
-char coptxt[] =
+const char coptxt[] =
 "JFR2HTM    version 2.04    Copyright (c) 1999-2000 Jan E. Mortensen";
 
-struct jf_option_desc { char *option;
+struct jf_option_desc { const char *option;
                         int argc;  /* -1: variabelt,     */
                                    /* -2: last argument. */
                      };
@@ -80,7 +80,7 @@ struct jf_option_desc jf_options[] =
     {" ",  -2}
 };
 
-static int isoption(char *s);
+static int isoption(const char *s);
 static int us_error(void);
 static int jf_about(void);
 int jf_getoption(char *argv[], int no, int argc);
@@ -93,7 +93,7 @@ int filkopier(char *de_fname, char *so_fname);
 /*************************************************************************/
 
 
-static int isoption(char *s)
+static int isoption(const char *s)
 {
   if (s[0] == '-' || s[0] == '?')
     return 1;

@@ -30,9 +30,10 @@ USEUNIT("..\..\COMMON\jfm_lib.cpp");
   #pragma argsused
 #endif
 
-struct jf_option_desc { char *option;
-                        int argc;      /* -1: variabelt */
-                      };               /* -2: sidste argument */
+struct jf_option_desc {
+	const char *option;
+	int argc;      /* -1: variabelt */
+};               /* -2: sidste argument */
 
 struct jf_option_desc jf_options[] =
   {     {"-e", 1},         /* 0 */
@@ -52,22 +53,22 @@ struct jf_option_desc jf_options[] =
         {" ", -2}
    };
 
-char usage_1[] =
+const char usage_1[] =
  "usage: jhlp [-o dest] [-e ef] [-h head] [-so sout] [-hi hif] [-a] [-w]";
-char usage_2[] =
+const char usage_2[] =
  "            [-s css] [-An n] [-Am m] [-si] {-c]                        hif";
 
-char bslash[] = "\\";
+const char bslash[] = "\\";
 
-char jfh_version[] =
+const char jfh_version[] =
       "JHLP    version  1.02   Copyright (c) 1999-2000 Jan E. Mortensen";
 
-char *extensions[]  = { "jhi",     /* 0 */
+const char *extensions[]  = { "jhi",     /* 0 */
                         "jhc",     /* 1 */
                         "htm"      /* 2 */
                       };
 
-static void ext_subst(char *d, char *e, int forced);
+static void ext_subst(char *d, const char *e, int forced);
 static int isoption(char *s);
 static int us_error(void);
 static int jf_about(void);
@@ -75,7 +76,7 @@ int jf_getoption(char *argv[], int no, int argc);
 
 
 
-static void ext_subst(char *d, char *e, int forced)
+static void ext_subst(char *d, const char *e, int forced)
 {
   int m, fundet;
   char punkt[] = ".";

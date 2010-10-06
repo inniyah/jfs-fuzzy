@@ -38,7 +38,7 @@ USEUNIT("..\..\COMMON\jfs2wlib.cpp");
 #define CM_SR   3
 #define CM_SWR  4
 
-struct jf_option_desc { char *option;
+struct jf_option_desc { const char *option;
                         int argc;      /* -1: variabelt */
                       };               /* -2: sidste argument */
 
@@ -59,21 +59,22 @@ struct jf_option_desc jf_options[] =
         {" ", -2}
    };
 
-char usage_1[] =
+const char usage_1[] =
   "usage: jfc [-o jfrf] [-e errf] [-em emode] [-so sout] [-s] [-a] ";
-char usage_2[] =
+const char usage_2[] =
   "           [-m ctyp] [-mt mc] [-mw wc] [-ms ss] [-w m]           jfs";
 
-char bslash[] = "\\";
+const char bslash[] = "\\";
 
-char jfc_version[] =
+const char jfc_version[] =
       "JFC    version  2.03    Copyright (c) 1999-2000 Jan E. Mortensen";
 
 
-char *extensions[]  = { "jfs",     /* 0 */
-                        "jfw",     /* 1 */
-                        "jfr"      /* 2 */
-                      };
+const char *extensions[] = {
+	"jfs",     /* 0 */
+	"jfw",     /* 1 */
+	"jfr"      /* 2 */
+};
 
 static int jfc_wait_mode = 0;
 
@@ -81,11 +82,11 @@ static void ext_subst(char *d, char *e, int forced);
 static int isoption(char *s);
 static int us_error(int silent_mode);
 static int jf_about(void);
-int jf_getoption(char *argv[], int no, int argc);
+int jf_getoption(const char *argv[], int no, int argc);
 
 
 
-static void ext_subst(char *d, char *e, int forced)
+static void ext_subst(char *d, const char *e, int forced)
 {
   int m, fundet;
   char punkt[] = ".";

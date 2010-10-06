@@ -112,14 +112,15 @@ char jfea_t_jfi[] =
 /* Option-data                                                           */
 /*************************************************************************/
 
-char usage_1[] =
+const char usage_1[] =
 "usage: jfea [-D dm] [-d df] [-f fs] [-o of] [-Et m] [-Ee e] [-fr] [-nd] [-s]";
-char usage_2[] =
+const char usage_2[] =
 "           [-I ic] [-EI i] [-sm m] [-r] [-so s] [-a] [-w] [-R r] [-pm m] jfrf ";
 
-struct jf_option_desc { char *option;
-                int argc;      /* -1: variabelt */
-                };                /* -2: sidste argument */
+struct jf_option_desc {
+	const char *option;
+	int argc;      /* -1: variabelt */
+};                /* -2: sidste argument */
 
 struct jf_option_desc jf_options[] =
   {     {"-f",  1},        /*  0 */
@@ -252,25 +253,25 @@ struct jfr_err_desc jfr_err_texts[] =
          { 13, "Undefined adjectiv:"},
          {  14, "Missing start/end of interval."},
          {  15, "No value for variable:"},
-         {  16, "To many values in a record (max 255)."},
+         {  16, "Too many values in a record (max 255)."},
          {  17, "Illegal jft-file-mode."},
          {  18, "Token to long (max 255 chars)."},
          {  19, "Penalty-matrix and more than one output-variable."},
-         {  20, "To many penalty-values (max 64)."},
+         {  20, "Too many penalty-values (max 64)."},
          {  21, "No values in first data-line."},
          {401, "jfp cannot insert this type of statement"},
          {402, "Statement to large."},
          {403, "Not enogh free memory to insert statement"},
          {504, "Syntax error in jfrd-statement:"},
-         {505, "To many variables in statement (max 64)."},
+         {505, "Too many variables in statement (max 64)."},
          {506, "Undefined variable:"},
-         {519, "To many words in statement (max 255)."},
+         {519, "Too many words in statement (max 255)."},
          {520, "No 'extern jfrd'-statement in program"},
          {522, "'No default'-output, but default not defined."},
          {550, "No min/max domain-values for variable:"},
          {551, "No adjectives bound to:"},
          {552, "Option 'a' or 'v' has to be specified for:"},
-         {553, "To many adjectives (max 24) for 'i'-option to:"},
+         {553, "Too many adjectives (max 24) for 'i'-option to:"},
          {554, "'i'-option without 'a'-option for variable:"},
          {555, "No legal option for variable:"},
          {556, "No Input-variables."},

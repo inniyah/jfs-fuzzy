@@ -148,7 +148,7 @@ static struct jfea_atomd_desc jfea_a_descs[JFEA_MAX_VARS];
 /* jfea_a_descs[1] describes the first input-var and so on. */
 
 #define JFEA_MAX_WORDS 128
-static char *jfea_words[JFEA_MAX_WORDS];
+static const char *jfea_words[JFEA_MAX_WORDS];
 
 static unsigned char *jfea_program_id;
 static int jfea_delete_c;
@@ -184,16 +184,16 @@ struct jfea_error_rec jfea_error_desc;
 static float jfea_jraseed; /* seed til intern random number generator */
 static char jfea_empty[] = " ";
 
-static int jfea_set_error(int no, char *etxt);
+static int jfea_set_error(int no, const char *etxt);
 static unsigned char jfea_cmin(unsigned char a, unsigned char b);
 static unsigned char jfea_cmax(unsigned char a, unsigned char b);
 static int jfea_get_bit(struct jfea_atom_desc *atom, int bitno);
 static void jfea_set_bit(struct jfea_atom_desc *atom, int bitno);
 static void jfea_atom_cp(struct jfea_atom_desc *dest,
                          struct jfea_atom_desc *source);
-static int jfea_var_no(char *text);
-static int jfea_set_adesc(char *opword, char *vname, int input);
-static int jfea_isoption(char *txt);
+static int jfea_var_no(const char *text);
+static int jfea_set_adesc(const char *opword, const char *vname, int input);
+static int jfea_isoption(const char *txt);
 static int jfea_get_command(int argc);
 //static void jfea_pl_create(char type, int address, int limit_c, int mode);
 static int jfea_adesc_create(void);
@@ -231,7 +231,7 @@ static void jfea_pop_create(void);
 /* Generering af konverteringstabel jfea_a_descs                          */
 /*************************************************************************/
 
-static int jfea_set_error(int no, char *etxt)
+static int jfea_set_error(int no, const char *etxt)
 {
   jfea_error_desc.error_no = no;
   strcpy(jfea_error_desc.argument, etxt);
@@ -288,7 +288,7 @@ static void jfea_atom_cp(struct jfea_atom_desc *dest,
   dest->val_2 = source->val_2;
 }
 
-static int jfea_var_no(char *text)
+static int jfea_var_no(const char *text)
 {
   int m, res;
   struct jfg_var_desc vdesc;
@@ -302,7 +302,7 @@ static int jfea_var_no(char *text)
   return res;
 }
 
-static int jfea_set_adesc(char *opword, char *vname, int input)
+static int jfea_set_adesc(const char *opword, const char *vname, int input)
 {
   struct jfg_var_desc vdesc;
   struct jfg_domain_desc ddesc;
@@ -473,7 +473,7 @@ static int jfea_set_adesc(char *opword, char *vname, int input)
 }
 
 
-static int jfea_isoption(char *txt)
+static int jfea_isoption(const char *txt)
 {
   if (txt[0] == '-')
     return 1;
@@ -490,7 +490,7 @@ static int jfea_get_command(int argc)
                /*  3: output                      */
                /*  4: slut                        */
 
-  char *opword;
+  const char *opword;
 
   opword = NULL;
   jfea_rvar_c = 1;  /* number 0: output-var */

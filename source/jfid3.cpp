@@ -40,7 +40,7 @@ char usage_1[] =
 char usage_2[] =
 "             [-Mp pb] [-Md db] [-c m] [-h hf] [-hm m] [-so sf]    jfrf";
 
-struct jf_option_desc { char *option;
+struct jf_option_desc { const char *option;
                         int argc;      /* -1: variabelt */
                       };               /* -2: sidste argument */
 
@@ -65,9 +65,11 @@ struct jf_option_desc jf_options[] =
       {  " ",  -2}
   };
 
-struct jf_tmap_desc { int value;
-                       char *text;
-                     };
+struct jf_tmap_desc {
+	int value;
+	const char *text;
+};
+
 struct jf_tmap_desc jf_im_texts[] =        /* input-modes */
 {
   { JFT_FM_INPUT_EXPECTED,     "ie"},
@@ -80,23 +82,23 @@ struct jf_tmap_desc jf_im_texts[] =        /* input-modes */
   { -1,                        ""}
 };
 
-static int isoption(char *s);
-static int jf_getoption(char *argv[], int no, int argc);
-static int jf_tmap_find(struct jf_tmap_desc *map, char *txt);
+static int isoption(const char *s);
+static int jf_getoption(const char *argv[], int no, int argc);
+static int jf_tmap_find(struct jf_tmap_desc *map, const char *txt);
 static void ext_subst(char *d, char *e, int forced);
 static int jf_about(void);
 static int us_error(void);
 
 
 
-static int isoption(char *s)
+static int isoption(const char *s)
 {
   if (s[0] == '-' || s[0] == '?')
     return 1;
   return 0;
 }
 
-static int jf_getoption(char *argv[], int no, int argc)
+static int jf_getoption(const char *argv[], int no, int argc)
 {
   int m, v, res;
 
@@ -122,7 +124,7 @@ static int jf_getoption(char *argv[], int no, int argc)
   return res;
 }
 
-static int jf_tmap_find(struct jf_tmap_desc *map, char *txt)
+static int jf_tmap_find(struct jf_tmap_desc *map, const char *txt)
 {
   int m, res;
   res = -2;
@@ -193,7 +195,7 @@ static int us_error(void)         /* usage-error. Fejl i kald af jfs */
   return 1;
 }
 
-int main(int argc, char *argv[])
+int main(int argc, const char *argv[])
 {
   int m, i, res;
 

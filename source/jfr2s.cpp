@@ -46,10 +46,11 @@ char usage1[] =
 char usage2[] =
 "             [-Ss ss] [-St ts] [-Sa cs] [-t] [-k] [-w wm] [-n]       rf";
 
-struct jf_option_desc { char *option;
-   int argc;      /* -1: variabelt,     */
-                  /* -2: last argument. */
-        };
+struct jf_option_desc {
+	const char *option;
+	int argc;	/* -1: variabelt,     */
+			/* -2: last argument. */
+};
 
 struct jf_option_desc jf_options[] =
   {
@@ -75,7 +76,7 @@ struct jf_option_desc jf_options[] =
 char t_standard[] = "s";
 char t_extra[]    = "e";
 
-static int isoption(char *s);
+static int isoption(const char *s);
 static int us_error(void);
 static int jf_about(void);
 static int jf_getoption(char *argv[], int no, int argc);
@@ -87,7 +88,7 @@ static void ext_subst(char *d, char *e, int forced);
 /*************************************************************************/
 
 
-static int isoption(char *s)
+static int isoption(const char *s)
 {
   if (s[0] == '-' || s[0] == '?')
     return 1;

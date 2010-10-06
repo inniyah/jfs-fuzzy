@@ -74,7 +74,7 @@ static char jfr2w_t_procedure[]= "procedure";
 static int jfr2w_errmode;
 
 struct jfr_err_desc { int eno;
-                      char *text;
+                      const char *text;
                     };
 
 static struct jfr_err_desc jfr_err_texts[] =

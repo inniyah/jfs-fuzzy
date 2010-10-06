@@ -19,7 +19,7 @@
 /* Domains:                                                            */
 
 /* domain-types:                                                       */
-char *jfs_t_dts[] =
+const char *jfs_t_dts[] =
 			  { "float",          /* 0 */
 			    "integer",        /* 1 */
 			    "categorical"     /* 2 */
@@ -32,14 +32,14 @@ char *jfs_t_dts[] =
 /* Variables:                                                          */
 
 /* variable-types                                                      */
-char *jfs_t_vts[] =
+const char *jfs_t_vts[] =
                { "input",         /* 0 */
                  "output",        /* 1 */
                  "local"          /* 2 */
                };
 
 /* defuz-functions:                                                    */
-char *jfs_t_vds[] =
+const char *jfs_t_vds[] =
 			  { "centroid",        /* 0 */
 			    "cmax",            /* 1 */
 			    "avg",             /* 2 */
@@ -49,7 +49,7 @@ char *jfs_t_vds[] =
 			  };
 
 /* domain-composite function-types:                                    */
-char *jfs_t_vcfs[] =
+const char *jfs_t_vcfs[] =
 			  { "new",           /* 0 */
 			    "avg",           /* 1 */
 			    "max"            /* 2 */
@@ -62,7 +62,7 @@ char *jfs_t_vcfs[] =
 /* Hedges:                                                             */
 
 /* hedge-types:                                                        */
-char *jfs_t_hts[] =
+const char *jfs_t_hts[] =
 			  { "negate",        /* 0 */
 			    "pow",           /* 1 */
 			    "sigmoid",       /* 2 */
@@ -83,7 +83,7 @@ char *jfs_t_hts[] =
 
 
 /* fuzzy operator types:                                               */
-char *jfs_t_fops[] =
+const char *jfs_t_fops[] =
 			{ "#",               /*  0 = op_one */
 			  "min",             /*  1 */
 			  "max",             /*  2 */
@@ -121,7 +121,7 @@ char *jfs_t_fops[] =
      "similar"          /* 34 */
   };
 
-char *jfs_t_oph_modes[] =
+const char *jfs_t_oph_modes[] =
               { "none",          /* 0  */
                 "arg1",          /* 1  */
                 "arg2",          /* 2  */
@@ -134,7 +134,7 @@ char *jfs_t_oph_modes[] =
 /***********************************************************************/
 /* Reserved names:                                                     */
 
-char *jfs_t_reserved[] =
+const char *jfs_t_reserved[] =
               { "fbool",      /* 0  domains  */
                 "float",      /* 1           */
                 "weight",     /* 2  variables*/
@@ -154,7 +154,7 @@ char *jfs_t_reserved[] =
 
 
 /* single-argument functions:                                          */
-char *jfs_t_sfus[] =
+const char *jfs_t_sfus[] =
 { "cos",      /*  0 */
 			"sin",      /*  1 */
 			"tan",      /*  2 */
@@ -174,7 +174,7 @@ char *jfs_t_sfus[] =
 
 
 /* variable functions:                                                 */
-char *jfs_t_vfus[] =
+const char *jfs_t_vfus[] =
  { "dnormal",    /*  0 */
 			"m_fzvar",    /*  1 */
 			"s_fzvar",    /*  2 */
@@ -185,7 +185,7 @@ char *jfs_t_vfus[] =
 
 /* operators/relations/2-arg-functions                                 */
 
-char *jfs_t_dfus[] =
+const char *jfs_t_dfus[] =
  { "+",        /*  0 */
 			"-",        /*  1 */
 			"*",        /*  2 */
@@ -204,7 +204,7 @@ char *jfs_t_dfus[] =
 			"<=",       /* 15 */
   };
 
-int jfst_txt_find(char *txts[], int count, char *name)
+int jfst_txt_find(const char *txts[], int count, const char *name)
 {
   int m;
 
@@ -215,57 +215,57 @@ int jfst_txt_find(char *txts[], int count, char *name)
   return -1;
 }
 
-int jfst_rname_find(char *name)  // find reserved word
+int jfst_rname_find(const char *name)  // find reserved word
 {
   return jfst_txt_find(jfs_t_reserved, JFS_RES_COUNT, name);
 }
 
-int jfst_htype_find(char *name)  // find hedge-type
+int jfst_htype_find(const char *name)  // find hedge-type
 {
   return jfst_txt_find(jfs_t_hts, JFS_HT_COUNT, name);
 }
 
-int jfst_dtype_find(char *name)  // find domain-type
+int jfst_dtype_find(const char *name)  // find domain-type
 {
   return jfst_txt_find(jfs_t_dts, JFS_DT_COUNT, name);
 }
 
-int jfst_defuz_find(char *name)  // find defuz
+int jfst_defuz_find(const char *name)  // find defuz
 {
   return jfst_txt_find(jfs_t_vds, JFS_VD_COUNT, name);
 }
 
-int jfst_otype_find(char *name)  // find operator-type
+int jfst_otype_find(const char *name)  // find operator-type
 {
   return jfst_txt_find(jfs_t_fops, JFS_FOP_COUNT, name);
 }
 
-int jfst_ohmode_find(char *name) // find operator_hedge_mode
+int jfst_ohmode_find(const char *name) // find operator_hedge_mode
 {
   return jfst_txt_find(jfs_t_oph_modes, JFS_OHM_COUNT, name);
 }
 
-int jfst_vtype_find(char *name)  // find variable-type
+int jfst_vtype_find(const char *name)  // find variable-type
 {
   return jfst_txt_find(jfs_t_vts, JFS_VT_COUNT, name);
 }
 
-int jfst_dctype_find(char *name)  // find domain-composite-type
+int jfst_dctype_find(const char *name)  // find domain-composite-type
 {
   return jfst_txt_find(jfs_t_vcfs, JFS_VCF_COUNT, name);
 }
 
-int jfst_sfunc_find(char *name)  // find single-arg-function
+int jfst_sfunc_find(const char *name)  // find single-arg-function
 {
   return jfst_txt_find(jfs_t_sfus, JFS_SFU_COUNT, name);
 }
 
-int jfst_dfunc_find(char *name) // find opertaor/double-funktion
+int jfst_dfunc_find(const char *name) // find opertaor/double-funktion
 {
   return jfst_txt_find(jfs_t_dfus, JFS_DFU_COUNT, name);
 }
 
-int jfst_vfunc_find(char *name) // find variable-function
+int jfst_vfunc_find(const char *name) // find variable-function
 {
   return jfst_txt_find(jfs_t_vfus, JFS_VFU_COUNT, name);
 }

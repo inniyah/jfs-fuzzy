@@ -85,7 +85,7 @@ static char jfw2s_t_size[]     = "size";
 static int jfw2s_errmode;
 
 struct jfr_err_desc { int eno;
-                      char *text;
+                      const char *text;
                     };
 
 
@@ -108,7 +108,7 @@ static struct jfr_err_desc jfr_err_texts[] =
              {  99, "unknown error."}
        };
 
-static int jf_error(int errno, char *name, int mode);
+static int jf_error(int errno, const char *name, int mode);
 static void jf_ftoa(char *txt, float f, int pct);
 static void jfw2s_write(char *text);
 static void jfw2s_qwrite(char *text);
@@ -136,7 +136,7 @@ static void jfw2s_program_handle(void);
 /* Hjaelpe-funktioner                                                    */
 /*************************************************************************/
 
-static int jf_error(int eno, char *name, int mode)
+static int jf_error(int eno, const char *name, int mode)
 {
   int m, v, e;
 

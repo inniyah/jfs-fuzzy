@@ -101,11 +101,11 @@ extern struct jft_dset_record jft_dset_desc; /* describes the opened file */
 {  13, "Undefined adjective: "},
 {  14, "Missing start/end of interval."},
 {  15, "No value for variable:"},
-{  16, "To many values in a record (max 255)."},
+{  16, "Too many values in a record (max 255)."},
 {  17, "Illegal jft-file-mode."},
 {  18, "Token to long (max 255 chars)."},
 {  19, "Penalty-matrix and more than one output-variable."},
-{  20, "To many penalty-values (max 64)."},
+{  20, "Too many penalty-values (max 64)."},
 {  21, "No values in first data-line."},
 */
 

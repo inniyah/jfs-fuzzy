@@ -29,7 +29,7 @@
 
 #ifdef __BCPLUSPLUS__
 //---------------------------------------------------------------------------
-  USEUNIT("..\..\COMMON\jfr_lib.cpp");
+USEUNIT("..\..\COMMON\jfr_lib.cpp");
 USEUNIT("..\..\COMMON\jfg_lib.cpp");
 USEUNIT("..\..\COMMON\jfs_text.cpp");
 USEUNIT("..\..\COMMON\jopt_lib.cpp");
@@ -40,7 +40,7 @@ USEUNIT("..\..\COMMON\jfpltlib.cpp");
 
 static struct jfplt_param_desc params;
 
-char coptxt[] =
+const char coptxt[] =
 "JFPLOT    version 2.02    Copyright (c) 2000 Jan E. Mortensen";
 
 static int batch = 1;
@@ -71,23 +71,23 @@ struct jfr_err_desc { int eno;
                       char *text;
                     };
 
-struct jfr_err_desc jfr_err_texts[] =
-       {{   0, " "},
-  		    {   1, "Cannot open file:"},
-		      {   2, "Error reading from file:"},
-		      {   3, "Error writing to file:"},
-		      {   4, "Not a jfr-file:"},
-  		    {   5, "Wrong version:"},
-		      {   6, "Cannot allocate memory to:"},
-		      {   9, "Illegal number:"},
-		      {  10, "Value out of domain-range:"},
-  		    {  11, "Unexpected EOF."},
-		      {  13, "Undefined adjective:"},
-        {  51, "Illegal option:"},
-        {  52, "To few arguments to option:"},
-        {  53, "To many arguments to option:"},
-	       {9999, "unknown error."}
-	      };
+struct jfr_err_desc jfr_err_texts[] = {
+	{   0, " "},
+	{   1, "Cannot open file:"},
+	{   2, "Error reading from file:"},
+	{   3, "Error writing to file:"},
+	{   4, "Not a jfr-file:"},
+	{   5, "Wrong version:"},
+	{   6, "Cannot allocate memory to:"},
+	{   9, "Illegal number:"},
+	{  10, "Value out of domain-range:"},
+	{  11, "Unexpected EOF."},
+	{  13, "Undefined adjective:"},
+	{  51, "Illegal option:"},
+	{  52, "Too few arguments to option:"},
+	{  53, "Too many arguments to option:"},
+	{9999, "unknown error."}
+};
 
 static int jf_error(int eno, char *name, int mode)
 {

@@ -28,7 +28,6 @@ static unsigned short jfp_ff_cstat;
 
 static int jfp_err_set(int err_no);
 static void jfp_base(struct jfr_head_desc *jfr_head, int var_no, int ano);
-static void jfp_bases(struct jfr_head_desc *jfr_head, int adjectiv_no);
 
 static void jfp_cadd(unsigned char arg);
 static void jfp_fadd(unsigned char op, float f);
@@ -567,13 +566,13 @@ int jfp_i_tree(void *head, unsigned char **program_id,
 	       unsigned short cond_no,
 	       unsigned short index_no,
 	       unsigned short expr_no,
-	       char *argv[], int argc)
+	       const char *argv[], int argc)
 {
   struct jfr_head_desc *jfr_head;
   unsigned char op;
   int m, s, a;
   unsigned char c;
-  char *as;
+  const char *as;
 
   jfr_head = (struct jfr_head_desc *) head;
   jfp_ff_cstat = 0;
