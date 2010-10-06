@@ -12,10 +12,6 @@
   /*                                                                    */
   /**********************************************************************/
 
-#ifdef __BCPLUSPLUS__
-  #pragma hdrstop
-  #include <condefs.h>
-#endif
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -24,16 +20,6 @@
 #include "jfg_lib.h"
 #include "jfr2wlib.h"
 #include "jfw2slib.h"
-
-#ifdef __BCPLUSPLUS__
-USEUNIT("..\..\COMMON\jfs_text.cpp");
-USEUNIT("..\..\COMMON\jfw2slib.cpp");
-USEUNIT("..\..\COMMON\jfr_lib.cpp");
-USEUNIT("..\..\COMMON\jfr2wlib.cpp");
-USEUNIT("..\..\COMMON\jfg_lib.cpp");
-
-#pragma argsused
-#endif
 
 #define CM_RW   0
 #define CM_RS   1

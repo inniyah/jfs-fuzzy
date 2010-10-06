@@ -11,27 +11,12 @@
   /*                                                                        */
   /**************************************************************************/
 
-#ifdef __BCPLUSPLUS__
-  #pragma hdrstop
-  #include <condefs.h>
-  #pragma argsused
-#endif
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
 #include "jft_lib.h"
 #include "jffamlib.h"
-
-#ifdef __BCPLUSPLUS__
-  USEUNIT("..\..\COMMON\jfs_text.cpp");
-  USEUNIT("..\..\COMMON\jft_lib.cpp");
-  USEUNIT("..\..\COMMON\jfg_lib.cpp");
-  USEUNIT("..\..\COMMON\jfp_lib.cpp");
-  USEUNIT("..\..\COMMON\jfr_lib.cpp");
-  USEUNIT("..\..\COMMON\jffamlib.cpp");
-#endif
 
 const char usage_1[] =
 "usage: jffam [-D dm] [-d df] [-f fs] [-o of] [-Mp ps] [-Md ds]";

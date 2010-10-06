@@ -11,12 +11,6 @@
   /*                                                                   */
   /*********************************************************************/
 
-#ifdef __BCPLUSPLUS__
-  #pragma hdrstop
-  #include <condefs.h>
-  #pragma argsused
-#endif
-
 #define JFE_WARNING 0
 #define JFE_ERROR   1
 #define JFE_FATAL   2
@@ -32,14 +26,6 @@
 #include "jfg_lib.h"
 #include "jft_lib.h"
 #include "jfs_cons.h"
-
-#ifdef __BCPLUSPLUS__
-USEUNIT("..\..\COMMON\jfs_text.cpp");
-USEUNIT("..\..\COMMON\jft_lib.cpp");
-USEUNIT("..\..\COMMON\jfr_lib.cpp");
-USEUNIT("..\..\COMMON\jfg_lib.cpp");
-//---------------------------------------------------------------------------
-#endif
 
 const char *usage[] =
 { "usage: jfr [-f fs] [-p dec] [-m md] [-c] [-e] [-wa [wm]] [-lm m]",

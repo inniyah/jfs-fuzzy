@@ -5,12 +5,6 @@
 /* written to the file 'ntruck.jfr'.                                      */
 /*                                                                        */
 /**************************************************************************/
-#ifdef __BCPLUSPLUS__
-  /* The folowing lines are only needed if the program is compiled with */
-  /* Borland C++Builder.                                                */
-  #pragma hdrstop
-  #include <condefs.h>
-#endif
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -20,17 +14,7 @@
 #include "jfg_lib.h";
 #include "jfp_lib.h"
 
-#ifdef __BCPLUSPLUS__
-  /* The folowing lines are only needed if the program is compiled with */
-  /* Borland C++Builder.                                                */
-  USEUNIT("..\..\COMMON\Jfr_lib.cpp");
-  USEUNIT("..\..\COMMON\Jfp_lib.cpp");
-  USEUNIT("..\..\COMMON\Jfg_lib.cpp");
-  #pragma argsused
-#endif
-
 void *head;                   /* jfr-program   */
-
 
 int main(int argc, char *argv[])
 {

@@ -1,4 +1,3 @@
-
   /*********************************************************************/
   /*                                                                   */
   /* jfgp.cpp  Version  2.03  Copyright (c) 1998-2000 Jan E. Mortensen */
@@ -12,10 +11,6 @@
   /*                                                                   */
   /*********************************************************************/
 
-#ifdef __BCPLUSPLUS__
-  #pragma hdrstop
-  #include <condefs.h>
-#endif
 #include <stdio.h>
 #include <ctype.h>
 #include <stdlib.h>
@@ -29,20 +24,9 @@
 #include "jft_lib.h"
 #include "jfgp_lib.h"
 
-#ifdef __BCPLUPLUS__
-  USEUNIT("..\..\COMMON\jft_lib.cpp");
-  USEUNIT("..\..\COMMON\jfgp_lib.cpp");
-  USEUNIT("..\..\COMMON\jfp_lib.cpp");
-  USEUNIT("..\..\COMMON\jfr_lib.cpp");
-  USEUNIT("..\..\COMMON\jfg_lib.cpp");
-  //---------------------------------------------------------------------------
-  #pragma argsused
-#endif
-
 #define JFE_WARNING 0
 #define JFE_ERROR   1
 #define JFE_FATAL   2
-
 
 struct jfgp_hoved_desc
 {
@@ -753,9 +737,7 @@ int main(int argc, const char *argv[])
   int tournament_size = 5;
 
   sout = stdout;
-#ifdef __BCPLUSPLUS__
-  _control87(MCW_EM, MCW_EM);  /* disable floating-point exceptions */
-#endif
+
   srand((unsigned) time(&t));
   jfgp_field_sep[0] = '\0';
 

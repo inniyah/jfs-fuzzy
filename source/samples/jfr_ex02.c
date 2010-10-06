@@ -8,26 +8,11 @@
 /*                                                                   */
 /*********************************************************************/
 
-#ifdef __BCPLUSPLUS__
-  /* The folowing lines are only needed if the program is compiled with */
-  /* Borland C++Builder.                                                */
-  #pragma hdrstop
-  #include <condefs.h>
-#endif
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
 #include "jfr_lib.h"
-
-#ifdef __BCPLUSPLUS__
-  /* The folowing lines are only needed if the program is compiled with */
-  /* Borland C++Builder.                                                */
-  #pragma argsused
-  USEUNIT("..\..\COMMON\Jfr_lib.cpp");
-//---------------------------------------------------------------------------
-#endif
 
 void *head;                  /* the jfs-program  */
 float ip[10];                /* input values     */

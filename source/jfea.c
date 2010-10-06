@@ -1,4 +1,3 @@
-
   /*************************************************************************/
   /*                                                                       */
   /* jfea.cpp    Version  2.03  Copyright (c) 1999-2000 Jan E. Mortensen   */
@@ -12,10 +11,6 @@
   /*                                                                       */
   /*************************************************************************/
 
-#ifdef __BCPLUSPLUS__
-  #pragma hdrstop
-  #include <condefs.h>
-#endif
 #include <stdio.h>
 #include <ctype.h>
 #include <stdlib.h>
@@ -28,17 +23,6 @@
 #include "jfp_lib.h"
 #include "jft_lib.h"
 #include "jfea_lib.h"
-
-#ifdef __BCPLUSPLUS__
-  USEUNIT("..\..\COMMON\jft_lib.cpp");
-USEUNIT("..\..\COMMON\jfg_lib.cpp");
-USEUNIT("..\..\COMMON\jfp_lib.cpp");
-USEUNIT("..\..\COMMON\jfr_lib.cpp");
-USEUNIT("..\..\COMMON\jfea_lib.cpp");
-//---------------------------------------------------------------------------
-#pragma argsused
-#endif
-
 
 #define JFE_WARNING 0
 #define JFE_ERROR   1
@@ -766,9 +750,6 @@ int main(int argc, const char *argv[])
   int no_default;
   struct jfg_var_desc vdesc;
 
-#ifdef __BCPLUSPLUS__
-  _control87(MCW_EM, MCW_EM);
-#endif
   srand((unsigned) time(&t));
   jfea_data = NULL;
   jfea_head.repro_c = 0;

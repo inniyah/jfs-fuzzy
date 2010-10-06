@@ -12,12 +12,6 @@
 /* plot "<varname>.dat"                                                   */
 /*                                                                        */
 /**************************************************************************/
-#ifdef __BCPLUSPLUS__
-  /* The folowing lines are only needed if the program is compiled with */
-  /* Borland C++Builder.                                                */
-  #pragma hdrstop
-#endif
-
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -26,21 +20,9 @@
 #include "jfr_lib.h"
 #include "jfg_lib.h"
 
-#ifdef __BCPLUSPLUS__
-  /* The folowing lines are only needed if the program is compiled with */
-  /* Borland C++Builder.                                                */
-  #include <condefs.h>
-  #pragma argsused
-  USEUNIT("..\..\COMMON\Jfr_lib.cpp");
-  USEUNIT("..\..\COMMON\Jfg_lib.cpp");
-#endif
-
 void *head;                   /* jfs-program   */
 FILE *df;                     /* the plot data file */
 struct jfg_sprog_desc spdesc; /* describes of the jfs-program */
-
-
-
 
 int find_var(char *varname)    /* returns the identification-number of the */
 			       /* variable <varname> or -1 if no variable  */

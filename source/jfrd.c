@@ -11,10 +11,6 @@
   /*                                                                      */
   /************************************************************************/
 
-#ifdef __BCPLUSPLUS__
-  #pragma hdrstop
-  #include <condefs.h>
-#endif
 #include <stdio.h>
 #include <ctype.h>
 #include <stdlib.h>
@@ -23,24 +19,14 @@
 #include "jft_lib.h"
 #include "jfrd_lib.h"
 
-#ifdef __BCPLUSPLUS
-USEUNIT("..\..\COMMON\jfs_text.cpp");
-USEUNIT("..\..\COMMON\jft_lib.cpp");
-USEUNIT("..\..\COMMON\jfp_lib.cpp");
-USEUNIT("..\..\COMMON\jfr_lib.cpp");
-USEUNIT("..\..\COMMON\jfrd_lib.cpp");
-USEUNIT("..\..\COMMON\jfg_lib.cpp");
-
-#pragma argsused
-#endif
-
 const char usage_1[] =
 "usage: jfrd [-D dm] [-d df] [-f fs] [-o of] [-Mp pb] [-S] [-so s]";
 const char usage_2[] =
 "            [-Md db] [-Mt t] [-r m] [-iw wgt] [-b] [-c m] [-e] {-a] [-w] jfrf";
-struct jf_option_desc { const char *option;
-                        int argc;      /* -1: variabelt */
-                      };               /* -2: sidste argument */
+struct jf_option_desc {
+	const char *option;
+	int argc;      /* -1: variabelt */
+};               /* -2: sidste argument */
 
 struct jf_option_desc jf_options[] =
   {    { "-f",  1},        /*  0 */

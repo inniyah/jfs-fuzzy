@@ -12,11 +12,6 @@
   /*                                                                         */
   /***************************************************************************/
 
-#ifdef __BCPLUSPLUS__
-  #pragma hdrstop
-  #include <condefs.h>
-#endif
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -25,17 +20,6 @@
 #include "jfr_lib.h"
 #include "jfg_lib.h"
 #include "jfr2hlib.h"
-
-#ifdef __BCPLUSPLUS__
-  //---------------------------------------------------------------------------
-  USEUNIT("..\..\COMMON\jfs_text.cpp");
-USEUNIT("..\..\COMMON\jfr2hlib.cpp");
-USEUNIT("..\..\COMMON\jfr_lib.cpp");
-USEUNIT("..\..\COMMON\jfg_lib.cpp");
-//---------------------------------------------------------------------------
-#pragma argsused
-#endif
-
 
 static FILE *sout;
 static int jfr2htm_batch = 1;

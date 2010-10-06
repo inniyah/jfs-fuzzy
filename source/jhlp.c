@@ -11,24 +11,11 @@
 /*                                                                         */
 /***************************************************************************/
 
-#ifdef __BCPLUSPLUS__
-  #pragma hdrstop
-  #include <condefs.h>
-#endif
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
 #include "jhlp_lib.h"
-
-#ifdef __BCPLUSPLUS__
-//---------------------------------------------------------------------------
-USEUNIT("..\..\COMMON\jhlp_lib.cpp");
-USEUNIT("..\..\COMMON\jfm_lib.cpp");
-//---------------------------------------------------------------------------
-  #pragma argsused
-#endif
 
 struct jf_option_desc {
 	const char *option;

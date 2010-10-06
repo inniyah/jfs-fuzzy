@@ -11,10 +11,6 @@
   /*                                                                      */
   /************************************************************************/
 
-#ifdef __BCPLUSPLUS__
-  #pragma hdrstop
-  #include <condefs.h>
-#endif
 #include <stdio.h>
 #include <ctype.h>
 #include <stdlib.h>
@@ -28,23 +24,11 @@
 #include "jft_lib.h"
 #include "jfi_lib.h"
 
-#ifdef __BCPLUSPLUS__
-  USEUNIT("..\..\COMMON\jft_lib.cpp");
-  USEUNIT("..\..\COMMON\jfi_lib.cpp");
-  USEUNIT("..\..\COMMON\jfp_lib.cpp");
-  USEUNIT("..\..\COMMON\jfr_lib.cpp");
-  USEUNIT("..\..\COMMON\jfg_lib.cpp");
-  //---------------------------------------------------------------------------
-  #pragma argsused
-#endif
-
-
 #define JFE_WARNING 0
 #define JFE_ERROR   1
 #define JFE_FATAL   2
 
 #define JFI_VMAX 256
-
 
 /************************************************************************/
 /* Traenings-data-set                                                   */
@@ -642,9 +626,6 @@ int main(int argc, const char *argv[])
   struct jfg_var_desc vdesc;
   time_t t;
 
-#ifdef __BCPLUSPLUS__
-  _control87(MCW_EM, MCW_EM);
-#endif
   srand((unsigned) time(&t));
   jfi_data = NULL;
   jfi_head.repro_c = 0;

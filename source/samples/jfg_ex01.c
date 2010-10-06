@@ -5,13 +5,6 @@
 /*                                                                        */
 /**************************************************************************/
 
-#ifdef __BCPLUSPLUS__
-  /* The folowing lines are only needed if the program is compiled with */
-  /* Borland C++Builder.                                                */
-  #pragma hdrstop
-  #include <condefs.h>
-#endif
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -19,19 +12,8 @@
 #include "jfr_lib.h"
 #include "jfg_lib.h"
 
-
-#ifdef __BCPLUSPLUS__
-  /* The folowing lines are only needed if the program is compiled with */
-  /* Borland C++Builder.                                                */
-  #pragma argsused
-  USEUNIT("..\..\COMMON\Jfg_lib.cpp");
-  USEUNIT("..\..\COMMON\Jfr_lib.cpp");
-//---------------------------------------------------------------------------
-#endif
-
 void *head;                   /* jfr-program   */
 struct jfg_sprog_desc spdesc; /* describes of the jfs-program */
-
 
 int main(int argc, char *argv[])
 {

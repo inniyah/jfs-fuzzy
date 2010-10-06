@@ -13,11 +13,6 @@
   /*                                                                   */
   /*********************************************************************/
 
-#ifdef __BCPLUSPLUS__
-  #pragma hdrstop
-  #include <condefs.h>
-#endif
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -26,17 +21,6 @@
 #include "jfg_lib.h"
 #include "jfpltlib.h"
 #include "jopt_lib.h"
-
-#ifdef __BCPLUSPLUS__
-//---------------------------------------------------------------------------
-USEUNIT("..\..\COMMON\jfr_lib.cpp");
-USEUNIT("..\..\COMMON\jfg_lib.cpp");
-USEUNIT("..\..\COMMON\jfs_text.cpp");
-USEUNIT("..\..\COMMON\jopt_lib.cpp");
-USEUNIT("..\..\COMMON\jfpltlib.cpp");
-//---------------------------------------------------------------------------
-#pragma argsused
-#endif
 
 static struct jfplt_param_desc params;
 
