@@ -83,8 +83,8 @@ struct jf_option_desc jf_options[] =
 static int isoption(const char *s);
 static int us_error(void);
 static int jf_about(void);
-int jf_getoption(char *argv[], int no, int argc);
-static void ext_subst(char *d, char *e, int forced);
+int jf_getoption(const char *argv[], int no, int argc);
+static void ext_subst(char *d, const char *e, int forced);
 int filkopier(char *de_fname, char *so_fname);
 
 
@@ -156,7 +156,7 @@ static int jf_about(void)
   return 0;
 }
 
-int jf_getoption(char *argv[], int no, int argc)
+int jf_getoption(const char *argv[], int no, int argc)
 {
   int m, v, res;
 
@@ -183,7 +183,7 @@ int jf_getoption(char *argv[], int no, int argc)
 }
 
 
-static void ext_subst(char *d, char *e, int forced)
+static void ext_subst(char *d, const char *e, int forced)
 {
   int m, fundet;
   char punkt[] = ".";
@@ -224,7 +224,7 @@ int filkopier(char *de_fname, char *so_fname)
   return 0;
 }
 
-int main(int argc, char *argv[])
+int main(int argc, const char *argv[])
 {
   int m, res, mode, option_no;
   int maxtext, maxtree, maxstack, overwrite, js_file;
@@ -240,7 +240,8 @@ int main(int argc, char *argv[])
   char conf_txt[256] = "Conf.";
   char prefix_txt[256] = "";
   char txt[80];
-  char *extensions[]  = { "jfr",     /* 0 */
+  const char *extensions[]  = {
+                          "jfr",     /* 0 */
                           "htm",     /* 1 */
                           "js",      /* 2 */
                           "old",     /* 3 */

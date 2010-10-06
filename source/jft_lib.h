@@ -172,7 +172,7 @@ void jft_close(void);
 
 
 
-int jft_atof(float *f, char *a);
+int jft_atof(float *f, const char *a);
 
 /* Converts the character-string in <a> to a floating-point number     */
 /* in <f> (cannot handle exponential notation).                        */

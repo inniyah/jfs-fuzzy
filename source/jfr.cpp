@@ -252,11 +252,12 @@ int worst_file = 0;  /* fil nr paa filen med worst_value.           */
 
 int df_c; /* if dfile_c == 1 df_f = 1 else df_c = dfile_c + 1.      */
 
-char *c_t[] = { "Datasets                     ",
-                "Used datasets                ",
-                "Datasets with error          ",
-                "Datasets with missing values "
-    		        };
+const char *c_t[] = {
+	"Datasets                     ",
+	"Used datasets                ",
+	"Datasets with error          ",
+	"Datasets with missing values "
+};
 
 char t5[] =     "Avg distance                 ";
 char t6[] =     "Worst distance               ";
@@ -299,9 +300,9 @@ char jf_file_txt[256];
 #define MAX_CALL_ARGS 32
 const char *call_args[MAX_CALL_ARGS];
 
-char call_t_printf[] = "printf";
-char call_t_comma[]  = ",";
-char call_t_read[]   = "read";
+const char call_t_printf[] = "printf";
+const char call_t_comma[]  = ",";
+const char call_t_read[]   = "read";
 
 /*******************************************************************/
 /* Variables to log-printing                                       */
@@ -313,9 +314,11 @@ int jfr_maxtree = 128;
 char jfr_pb[] = " (";
 char jfr_pe[] = ") ";
 
-struct jf_tmap_desc { int value;
-                       char *text;
-                     };
+struct jf_tmap_desc {
+	int value;
+	const char *text;
+};
+
 struct jf_tmap_desc jf_im_texts[] =
 { { JFT_FM_INPUT,              "i"},
   { JFT_FM_INPUT_EXPECTED,     "ie"},
@@ -333,9 +336,10 @@ struct jf_tmap_desc jf_im_texts[] =
   { -1,                        ""}
 };
 
-struct jfr_err_desc { int eno;
-		      char *text;
-		    };
+struct jfr_err_desc {
+	int eno;
+	const char *text;
+	};
 
 struct jfr_err_desc jfr_err_texts[] = {
 	{      0, " "},
@@ -376,8 +380,8 @@ struct jfr_err_desc jfr_err_texts[] = {
 
 static void ext_subst(char *d, const char *e, int forced);
 static int jf_error(int errno, const char *name, int mode);
-int jf_tmap_find(struct jfr_tmap_desc *map, char *txt);
-int jf_getoption(char *argv[], int no, int argc);
+int jf_tmap_find(struct jfr_tmap_desc *map, const char *txt);
+int jf_getoption(const char *argv[], int no, int argc);
 void jf_ftoa(char *txt, float f);
 int closest_adjectiv(int var_no, float val);
 static int kb_ip_get(struct jft_data_record *v, int var_no);
@@ -388,7 +392,7 @@ void jf_align(char *txt, int tlen, int side);
 void jpr_text(FILE *op, int var_no);
 void f_print(FILE *op, float val);
 void i_print(FILE *op, int i);
-void t_print(FILE *op, char *txt);
+void t_print(FILE *op, const char *txt);
 void jpr_var(FILE *op, int var_no, float val, float confidence);
 void jfs_ip_write(FILE *op, int forced);
 static void jfs_op_write(FILE *op, int forced);
@@ -402,7 +406,7 @@ int jfr_ip_first(void);
 int jfr_ip_next(void);
 int jfr_err_judge(void);
 void jfr_opd_stat(void);
-static int isoption(char *s);
+static int isoption(const char *s);
 static int jf_about(void);
 static int us_error(void);
 
@@ -460,7 +464,7 @@ static int jf_error(int eno, const char *name, int mode)
   return m;
 }
 
-int jf_tmap_find(struct jf_tmap_desc *map, char *txt)
+int jf_tmap_find(struct jf_tmap_desc *map, const char *txt)
 {
   int m, res;
   res = -2;
@@ -472,7 +476,7 @@ int jf_tmap_find(struct jf_tmap_desc *map, char *txt)
   return res;
 }
 
-int jf_getoption(char *argv[], int no, int argc)
+int jf_getoption(const char *argv[], int no, int argc)
 {
   int m, v, res;
 
@@ -978,7 +982,7 @@ void i_print(FILE *op, int i)
    fprintf(op, "%s", it);
 }
 
-void t_print(FILE *op, char *txt)
+void t_print(FILE *op, const char *txt)
 {
   /* prints the txt <txt> in a float_field */
   char a[80];
@@ -1957,7 +1961,7 @@ void jfr_opd_stat(void)
   }
 }
 
-static int isoption(char *s)
+static int isoption(const char *s)
 {
   if (s[0] == '-' || s[0] == '?')
     return 1;
@@ -2010,7 +2014,7 @@ static int us_error(void)         /* usage-error. Fejl i kald af jfs */
 {
   char ttxt[82];
 
-  printf("\n%s\n%s\n%s\n", usage[0], usage[1], usage[3]);
+  printf("\n%s\n%s\n%s\n", usage[0], usage[1], usage[2]);
   if (wait_return == 1)
   { printf("\nPress RETURN...");
     fgets(ttxt, 80, stdin);
@@ -2018,7 +2022,7 @@ static int us_error(void)         /* usage-error. Fejl i kald af jfs */
   return 1;
 }
 
-int main(int argc, char *argv[])
+int main(int argc, const char *argv[])
 {
   int m, v, s, err, slut, option_no;
   char ttxt[256];

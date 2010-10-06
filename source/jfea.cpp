@@ -189,9 +189,11 @@ void *jfr_head = NULL;
 /* Diverse                                                               */
 /*************************************************************************/
 
-struct jf_tmap_desc { int value;
-                       char *text;
-                     };
+struct jf_tmap_desc {
+	int value;
+	const char *text;
+};
+
 struct jf_tmap_desc jf_im_texts[] =        /* input-modes */
 {
   { JFT_FM_INPUT_EXPECTED,     "ie"},
@@ -215,15 +217,16 @@ struct jfea_head_desc { unsigned long repro_c;
 
 struct jfea_head_desc jfea_head;
 
-char jfea_t_data[] = "data";
-char jfea_t_atomd[]= "converting-table";
-char jfea_t_individs[]= "individuals";
-char jfea_t_score[] = "score-tables";
-char jfea_t_rules[] = "rules";
-char jfea_t_stack[] = "stacks (jfg-lib)";
-char jfea_t_stat[]  = "statement (jfp-lib)";
+const char jfea_t_data[] = "data";
+const char jfea_t_atomd[]= "converting-table";
+const char jfea_t_individs[]= "individuals";
+const char jfea_t_score[] = "score-tables";
+const char jfea_t_rules[] = "rules";
+const char jfea_t_stack[] = "stacks (jfg-lib)";
+const char jfea_t_stat[]  = "statement (jfp-lib)";
 
-char *jfea_t_methods[] = { "crosover",       /* 0 */
+const char *jfea_t_methods[] = {
+                           "crosover",       /* 0 */
                            "sumcros",        /* 1 */
                            "mutation",       /* 2 */
                            "creation",       /* 3 */
@@ -235,9 +238,10 @@ char *jfea_t_methods[] = { "crosover",       /* 0 */
                            "mincros"         /* 9 */
                          };
 
-struct jfr_err_desc { int eno;
-                      char *text;
-                     };
+struct jfr_err_desc {
+	int eno;
+	const char *text;
+};
 
 struct jfr_err_desc jfr_err_texts[] =
         {{  0, " "},
@@ -281,13 +285,13 @@ struct jfr_err_desc jfr_err_texts[] =
          {9999, "Unknown error!"},
      };
 
-static int jf_error(int eno, char *name, int mode);
-static int jf_tmap_find(struct jf_tmap_desc *map, char *txt);
-static int isoption(char *s);
+static int jf_error(int eno, const char *name, int mode);
+static int jf_tmap_find(struct jf_tmap_desc *map, const char *txt);
+static int isoption(const char *s);
 static int jf_about(void);
-static int us_error(char *argument);
+static int us_error(const char *argument);
 
-static int jf_error(int eno, char *name, int mode)
+static int jf_error(int eno, const char *name, int mode)
 {
   int m, v, e;
 
@@ -331,7 +335,7 @@ static int jf_error(int eno, char *name, int mode)
   return m;
 }
 
-static int jf_tmap_find(struct jf_tmap_desc *map, char *txt)
+static int jf_tmap_find(struct jf_tmap_desc *map, const char *txt)
 {
   int m, res;
   res = -2;
@@ -343,14 +347,14 @@ static int jf_tmap_find(struct jf_tmap_desc *map, char *txt)
   return res;
 }
 
-int isoption(char *s)
+int isoption(const char *s)
 {
   if (s[0] == '-' || s[0] == '?')
     return 1;
   return 0;
 }
 
-int jf_getoption(char *argv[], int no, int argc)
+int jf_getoption(const char *argv[], int no, int argc)
 {
   int m, v, res;
 
@@ -376,7 +380,7 @@ int jf_getoption(char *argv[], int no, int argc)
   return res;
 }
 
-static void ext_subst(char *d, char *e, int forced)
+static void ext_subst(char *d, const char *e, int forced)
 {
   int m, fundet;
   char punkt[] = ".";
@@ -404,7 +408,7 @@ static void ext_subst(char *d, char *e, int forced)
 static int jfea_data_get(int mode)
 {
   int slut, m;
-  long adr;
+  long adr = 0;
   float confs[256];
   char txt[256];
 
@@ -541,8 +545,8 @@ int jfea_test(void)
     fprintf(jfea_stdout, " %10.4f ", jfea_stat.median_score);
     ut = jfea_cur_time - jfea_start_time;
     if (ut != 0)
-    { fprintf(jfea_stdout, "   %3d:", ut / 60);
-      fprintf(jfea_stdout, "%2d", ut % 60);
+    { fprintf(jfea_stdout, "   %3ld:", (long) ut / 60);
+      fprintf(jfea_stdout, "%2ld", (long) ut % 60);
     }
     fprintf(jfea_stdout, "\n");
     jfea_t_mode++;
@@ -688,7 +692,7 @@ static int jfea_set_early_stop(int val_pct)
 }
 
 
-static int us_error(char *argument)         /* usage-error. Fejl i kald af jfs */
+static int us_error(const char *argument)         /* usage-error. Fejl i kald af jfs */
 {
   printf("\n%s\n", usage_1);
   printf("%s\n", usage_2);
@@ -741,14 +745,15 @@ static int jf_about(void)
   return 0;
 }
 
-int main(int argc, char *argv[])
+int main(int argc, const char *argv[])
 {
   int m, val_pct;
   time_t t;
   long size;
   int rule_c;
   int fixed_rules;
-  char *extensions[]  = { "jfr",     /* 0 */
+  const char *extensions[]  = {
+                          "jfr",     /* 0 */
                           "dat",     /* 1 */
                           "pm"       /* 2 */
                         };

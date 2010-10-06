@@ -85,7 +85,7 @@ struct jf_tmap_desc jf_im_texts[] =        /* input-modes */
 static int isoption(const char *s);
 static int jf_getoption(const char *argv[], int no, int argc);
 static int jf_tmap_find(struct jf_tmap_desc *map, const char *txt);
-static void ext_subst(char *d, char *e, int forced);
+static void ext_subst(char *d, const char *e, int forced);
 static int jf_about(void);
 static int us_error(void);
 
@@ -136,7 +136,7 @@ static int jf_tmap_find(struct jf_tmap_desc *map, const char *txt)
   return res;
 }
 
-static void ext_subst(char *d, char *e, int forced)
+static void ext_subst(char *d, const char *e, int forced)
 {
   int m, fundet;
   char punkt[] = ".";
@@ -191,7 +191,7 @@ static int jf_about(void)
 
 static int us_error(void)         /* usage-error. Fejl i kald af jfs */
 {
-  printf("\n%s\n\%s\n", usage_1, usage_2);
+  printf("\n%s\n%s\n", usage_1, usage_2);
   return 1;
 }
 
@@ -199,7 +199,8 @@ int main(int argc, const char *argv[])
 {
   int m, i, res;
 
-  char *extensions[]  = { "jfr",     /* 0 */
+  const char *extensions[]  = {
+                          "jfr",     /* 0 */
                           "dat",     /* 1 */
                           "txt"      /* 2 */
                         };

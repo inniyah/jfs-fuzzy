@@ -166,9 +166,11 @@ char jfi_field_sep[256];   /* 0: brug space, tab etc som felt-seperator, */
        /* andet: kun field_sep er feltsepator. */
 
 
-struct jf_tmap_desc { int value;
-                       char *text;
-                     };
+struct jf_tmap_desc {
+	int value;
+	const char *text;
+};
+
 struct jf_tmap_desc jf_im_texts[] =        /* input-modes */
 {
   { JFT_FM_INPUT_EXPECTED,     "ie"},
@@ -199,22 +201,24 @@ struct jfi_head_desc { unsigned long repro_c;
 
 struct jfi_head_desc jfi_head;
 
-char jfi_t_data[] = "data";
-char jfi_t_atomd[]= "converting-table";
-char jfi_t_individs[]= "individuals";
-char jfi_t_score[] = "score-tables";
-char jfi_t_rules[] = "rules";
-char jfi_t_stack[] = "stacks (jfg-lib)";
-char jfi_t_stat[]  = "statement (jfp-lib)";
+const char jfi_t_data[] = "data";
+const char jfi_t_atomd[]= "converting-table";
+const char jfi_t_individs[]= "individuals";
+const char jfi_t_score[] = "score-tables";
+const char jfi_t_rules[] = "rules";
+const char jfi_t_stack[] = "stacks (jfg-lib)";
+const char jfi_t_stat[]  = "statement (jfp-lib)";
 
-char *jfi_t_methods[] = { "crosover",   /* 0 */
+const char *jfi_t_methods[] = {
+                          "crosover",   /* 0 */
                           "sumcros",    /* 1 */
                           "mutation"    /* 2 */
                         };
 
-struct jfr_err_desc { int eno;
-                      char *text;
-                     };
+struct jfr_err_desc {
+	int eno;
+	const char *text;
+};
 
 struct jfr_err_desc jfr_err_texts[] =
         {{  0, " "},
@@ -246,9 +250,9 @@ struct jfr_err_desc jfr_err_texts[] =
      };
 
 static void jf_close(void);
-static int jf_error(int eno, char *name, int mode);
-static int jf_tmap_find(struct jf_tmap_desc *map, char *txt);
-static int isoption(char *s);
+static int jf_error(int eno, const char *name, int mode);
+static int jf_tmap_find(struct jf_tmap_desc *map, const char *txt);
+static int isoption(const char *s);
 static int jf_about(void);
 static int us_error(void);
 
@@ -266,7 +270,7 @@ static void jf_close(void)
    fclose(jfi_stdout);
 }
 
-static int jf_error(int eno, char *name, int mode)
+static int jf_error(int eno, const char *name, int mode)
 {
   int m, v, e;
 
@@ -297,7 +301,7 @@ static int jf_error(int eno, char *name, int mode)
   return m;
 }
 
-static int jf_tmap_find(struct jf_tmap_desc *map, char *txt)
+static int jf_tmap_find(struct jf_tmap_desc *map, const char *txt)
 {
   int m, res;
   res = -2;
@@ -309,14 +313,14 @@ static int jf_tmap_find(struct jf_tmap_desc *map, char *txt)
   return res;
 }
 
-int isoption(char *s)
+int isoption(const char *s)
 {
   if (s[0] == '-' || s[0] == '?')
     return 1;
   return 0;
 }
 
-int jf_getoption(char *argv[], int no, int argc)
+int jf_getoption(const char *argv[], int no, int argc)
 {
   int m, v, res;
 
@@ -342,7 +346,7 @@ int jf_getoption(char *argv[], int no, int argc)
   return res;
 }
 
-static void ext_subst(char *d, char *e, int forced)
+static void ext_subst(char *d, const char *e, int forced)
 {
   int m, fundet;
   char punkt[] = ".";
@@ -369,14 +373,15 @@ static void ext_subst(char *d, char *e, int forced)
 static int jfi_data_get(int mode)
 {
   int slut, m;
-  long adr;
   float confs[256];
   char txt[256];
 
   slut = 0;
   jfi_data_c = 0;
   while (slut == 0)
-  { if (mode == 0)
+  {
+    long adr = 0;
+    if (mode == 0)
       slut = jft_getrecord(NULL, NULL, NULL, NULL);
     else
     { adr = jfi_data_c * jfi_laes_c;
@@ -487,8 +492,8 @@ int jfi_test(void)
     fprintf(jfi_stdout, " %10.4f ", jfi_stat.median_score);
     ut = jfi_cur_time - jfi_start_time;
     if (ut != 0)
-    { fprintf(jfi_stdout, "   %3d:", ut / 60);
-      fprintf(jfi_stdout, "%2d", ut % 60);
+    { fprintf(jfi_stdout, "   %3ld:", (long) ut / 60);
+      fprintf(jfi_stdout, "%2ld", (long) ut % 60);
     }
     fprintf(jfi_stdout, "\n");
     jfi_t_mode++;
@@ -498,7 +503,7 @@ int jfi_test(void)
 
 float jfi_d_judge(long data_no)
 {
-  float r, dist;
+  float dist;
   int m;
 
   jfi_d_get(data_no);
@@ -510,7 +515,9 @@ float jfi_d_judge(long data_no)
   if (jfi_err_mode == 3)  /* penalty-matrix */
     dist = jft_penalty_calc(jfi_ovalues[0], jfi_expected[0]);
   else
-  { for (m = 0; m < jfi_ovar_c; m++)
+  {
+    float r = 0;
+    for (m = 0; m < jfi_ovar_c; m++)
     { r = jfi_expected[m] - jfi_ovalues[m];
       if (jfi_err_mode == 2)
         r = r * r;
@@ -587,7 +594,7 @@ static int jf_about(void)
   printf("usage: jfi [options] jfrf\n\n");
   printf(
 "JFI improves the jfs-program <jfrf> by changing the values of constants\n");
-  printf("starting with a '%'.\n\n");
+  printf("starting with a '%%'.\n\n");
   printf("OPTIONS\n");
   printf(
 "-f <fs>    : Use <fs> field-separator.    -s:      : silent.\n");
@@ -616,12 +623,13 @@ static int jf_about(void)
   return 0;
 }
 
-int main(int argc, char *argv[])
+int main(int argc, const char *argv[])
 {
   int m;
   long size;
 
-  char *extensions[]  = { "jfr",     /* 0 */
+  const char *extensions[]  = {
+                          "jfr",     /* 0 */
                           "dat",     /* 1 */
                           "pm"       /* 2 */
                         };

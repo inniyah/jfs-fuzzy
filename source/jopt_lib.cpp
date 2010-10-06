@@ -20,7 +20,7 @@ static int jopt_cur_char;
 static char jopt_sign;
 static struct jopt_desc *jopt_options;
 static int jopt_opt_c;
-static char **jopt_argv;
+static const char **jopt_argv;
 static int jopt_argc;
 struct jopt_error_rec jopt_error_desc;
 
@@ -33,7 +33,7 @@ int jopt_error(int emode, int error_no, const char *argument)
 }
 
 int jopt_init(struct jopt_desc *options, int opt_c,
-              char *argv[], int argc)
+              const char *argv[], int argc)
 {
   jopt_error(JOPT_EM_NONE, 0, "no errors");
   jopt_options = options;
@@ -58,7 +58,7 @@ static int jopt_match(char *txt)
   return -1;
 }
 
-static int jopt_get_args(char *aargv[])
+static int jopt_get_args(const char *aargv[])
 {
   int ac, slut;
   char s;
@@ -82,10 +82,10 @@ static int jopt_get_args(char *aargv[])
   return ac;
 }
 
-int jopt_get(unsigned short *value, char *aargv[], int *aargc)
+int jopt_get(unsigned short *value, const char *aargv[], int *aargc)
 {
   int res, ac, id, id1, id2;
-  char *word;
+  const char *word;
   char otxt[4];
 
   res = 2;

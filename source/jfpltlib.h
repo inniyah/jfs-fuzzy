@@ -39,7 +39,7 @@ struct jfplt_param_desc
   int plt_defuz;
   int digits;
   int samples;
-  char **data;
+  const char **data;
   int data_c;
   FILE *sout;
 };

@@ -251,10 +251,6 @@ static int jffam_cel_step(void);
 static void jffam_write(void);
 static int jffam_create(void);
 static int jffam_data(unsigned char *program_id);
-static int no_call(void);
-
-
-
 
 
 static void jffam_close(void)
@@ -1354,12 +1350,6 @@ static int jffam_data(unsigned char *program_id)
     jffam_ff_darea = 0;
   }
   return res;
-}
-
-static int no_call(void)
-{
-   printf("Warning: Call-funktion not executed!\n");
-   return 0;
 }
 
 int jffam_run(char *op_fn, char *ip_fn, char *ru_fn, char *da_fn,

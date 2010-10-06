@@ -79,8 +79,8 @@ char t_extra[]    = "e";
 static int isoption(const char *s);
 static int us_error(void);
 static int jf_about(void);
-static int jf_getoption(char *argv[], int no, int argc);
-static void ext_subst(char *d, char *e, int forced);
+static int jf_getoption(const char *argv[], int no, int argc);
+static void ext_subst(char *d, const char *e, int forced);
 
 
 /*************************************************************************/
@@ -134,7 +134,7 @@ static int jf_about(void)
   return 0;
 }
 
-static int jf_getoption(char *argv[], int no, int argc)
+static int jf_getoption(const char *argv[], int no, int argc)
 {
   int m, v, res;
 
@@ -161,7 +161,7 @@ static int jf_getoption(char *argv[], int no, int argc)
 }
 
 
-static void ext_subst(char *d, char *e, int forced)
+static void ext_subst(char *d, const char *e, int forced)
 {
   int m, fundet;
   char punkt[] = ".";
@@ -182,7 +182,7 @@ static void ext_subst(char *d, char *e, int forced)
 }
 
 
-int main(int argc, char *argv[])
+int main(int argc, const char *argv[])
 {
   int m, res, rm_res, option_no;
   int ndigits, maxtext, maxtree, maxstack, parent_mode, rule_nos;
@@ -194,7 +194,7 @@ int main(int argc, char *argv[])
   char tmp_fname[256]  = "";
   char sout_fname[256] = "";
 
-  char *extensions[]  =
+  const char *extensions[]  =
   { "jfr",     /* 0 */
     "jfs",     /* 1 */
     "jfw"      /* 2 */
@@ -327,7 +327,7 @@ int main(int argc, char *argv[])
       so = fopen(sout_fname, "a");
     if (so == NULL)
     { so = stdout;
-      printf("Cannot open %d\n", sout_fname);
+      printf("Cannot open %s\n", sout_fname);
     }
   }
   switch (conv_mode)

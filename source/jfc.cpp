@@ -78,8 +78,7 @@ const char *extensions[] = {
 
 static int jfc_wait_mode = 0;
 
-static void ext_subst(char *d, char *e, int forced);
-static int isoption(char *s);
+static int isoption(const char *s);
 static int us_error(int silent_mode);
 static int jf_about(void);
 int jf_getoption(const char *argv[], int no, int argc);
@@ -106,7 +105,7 @@ static void ext_subst(char *d, const char *e, int forced)
   }
 }
 
-static int isoption(char *s)
+static int isoption(const char *s)
 {
   if (s[0] == '-' || s[0] == '?')
     return 1;
@@ -152,7 +151,7 @@ static int jf_about(void)
   return 0;
 }
 
-int jf_getoption(char *argv[], int no, int argc)
+int jf_getoption(const char *argv[], int no, int argc)
 {
   int m, v, res;
 
@@ -178,7 +177,7 @@ int jf_getoption(char *argv[], int no, int argc)
   return res;
 }
 
-int main(int argc, char *argv[])
+int main(int argc, const char *argv[])
 {
   int m, option_no, append_mode;
   int el_mode;  /* error_line_mode0: start with line 1, 1: start with fprog */

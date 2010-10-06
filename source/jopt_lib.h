@@ -16,7 +16,7 @@
 
 struct jopt_desc
 {
-  char *txt;
+  const char *txt;
   unsigned short value;
   unsigned short min_argc;
   unsigned short max_argc;
@@ -38,12 +38,12 @@ extern struct jopt_error_rec jopt_error_desc;
 /* functions:                                                          */
 
 int jopt_init(struct jopt_desc *options, int opt_c,
-              char *argv[], int argc);
+              const char *argv[], int argc);
 /*                                                                     */
 /* initialises the option-system, the posible options are in           */
 /* <options>[<opt_c>]. The string to be decoded is in <argv[<argc>].   */
 
-int jopt_get(unsigned short *value, char *aargv[], int *aargc);
+int jopt_get(unsigned short *value, const char *aargv[], int *aargc);
 /*                                                                     */
 /* get the next option and its arguments. Option-value is returned in  */
 /* <value>, arguments in <argv>[<argc>].                               */

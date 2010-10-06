@@ -214,9 +214,11 @@ void *jfr_head = NULL;
 /* DIverse                                                               */
 /*************************************************************************/
 
-struct jf_tmap_desc { int value;
-                       char *text;
-                     };
+struct jf_tmap_desc {
+	int value;
+	const char *text;
+};
+
 struct jf_tmap_desc jf_im_texts[] =        /* input-modes */
 {
   { JFT_FM_INPUT_EXPECTED,     "ie"},
@@ -240,9 +242,10 @@ char jfgp_t_stat[]   = "jfp-statement";
 /*char jfgp_t_jfgp[]   = "jfgp"; */
 char jfgp_t_end[]    = "end";
 
-struct jfr_err_desc { int eno;
-                      char *text;
-                    };
+struct jfr_err_desc {
+	int eno;
+	const char *text;
+};
 
 struct jfr_err_desc jfr_err_texts[] =
      { {  0, " "},
@@ -282,11 +285,10 @@ struct jfr_err_desc jfr_err_texts[] =
 
 static void jf_luk(void);
 static int jf_error(int eno, char *name, int mode);
-static int jf_tmap_find(struct jf_tmap_desc *map, char *txt);
-static int isoption(char *s);
-static int jf_getoption(char *argv[], int no, int argc);
-static void ext_subst(char *d, char *e, int forced);
-static int fl_ip_get(struct jft_data_desc *dd, int var_no);
+static int jf_tmap_find(struct jf_tmap_desc *map, const char *txt);
+static int isoption(const char *s);
+static int jf_getoption(const char *argv[], int no, int argc);
+static void ext_subst(char *d, const char *e, int forced);
 static int jfgp_data_get(int mode);
 int this_compare(float score_1, int count_1,
                         float score_2, int count_2);
@@ -346,7 +348,7 @@ static int jf_error(int eno, char *name, int mode)
   return m;
 }
 
-static int jf_tmap_find(struct jf_tmap_desc *map, char *txt)
+static int jf_tmap_find(struct jf_tmap_desc *map, const char *txt)
 {
   int m, res;
   res = -2;
@@ -358,14 +360,14 @@ static int jf_tmap_find(struct jf_tmap_desc *map, char *txt)
   return res;
 }
 
-int isoption(char *s)
+int isoption(const char *s)
 {
   if (s[0] == '-' || s[0] == '?')
     return 1;
   return 0;
 }
 
-static int jf_getoption(char *argv[], int no, int argc)
+static int jf_getoption(const char *argv[], int no, int argc)
 {
   int m, v, res;
 
@@ -391,7 +393,7 @@ static int jf_getoption(char *argv[], int no, int argc)
   return res;
 }
 
-static void ext_subst(char *d, char *e, int forced)
+static void ext_subst(char *d, const char *e, int forced)
 {
   int m, fundet;
   char punkt[] = ".";
@@ -656,8 +658,8 @@ static int jfgp_test(void)
     fprintf(sout, "        %4ld ",  (long) jfgp_stat.alive_c);
     ut = jfgp_cur_time - jfgp_start_time;
     if (ut != 0)
-    { fprintf(sout, "     %3d:", ut / 60);
-      fprintf(sout, "%2d\n", ut % 60);
+    { fprintf(sout, "     %3ld:", (long) ut / 60);
+      fprintf(sout, "%2ld\n", (long) ut % 60);
     }
     else
       fprintf(sout, "\n");
@@ -731,12 +733,13 @@ static int jf_about(void)
   return 0;
 }
 
-int main(int argc, char *argv[])
+int main(int argc, const char *argv[])
 {
   int m;
   long size;
   time_t t;
-  char *extensions[]  = { "jfr",     /* 0 */
+  const char *extensions[]  = {
+                          "jfr",     /* 0 */
                           "dat",     /* 1 */
                           "pm"       /* 2 */
    };

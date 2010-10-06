@@ -325,17 +325,17 @@ static struct jhlp_err_desc jhlp_err_texts[] =
  };
 
 static void jhlp_strcpy(char *dest, const char *source);
-static int jhlp_stricmp(char *a1, char *a2);
+static int jhlp_stricmp(const char *a1, const char *a2);
 static void jhlp_fclose(FILE *fp);
-static int jhlp_error(int eno, char *name);
+static int jhlp_error(int eno, const char *name);
 static int jhlp_jfm_check(int id);
-static void jhlp_set_length(char *txt, int le);
-static void jhlp_splitpath(char *path, char *dir, char *name, char *ext);
-static void jhlp_ext_subst(char *d, char *e, int forced);
-static int jhlp_ext_cmp(char *fname, char *ext);
+static void jhlp_set_length(char *txt, unsigned int le);
+static void jhlp_splitpath(const char *path, char *dir, char *name, char *ext);
+static void jhlp_ext_subst(char *d, const char *e, int forced);
+static int jhlp_ext_cmp(const char *fname, const char *ext);
 static int jhlp_full_path(char *dfname, char *sfname);
 static void jhlp_url(char *url, char *path);
-static int jhlp_lcmp(char *txt, int fid);
+static int jhlp_lcmp(const char *txt, int fid);
 static int jhlp_licmp(char *txt, int fid);
 static void jhlp_set_filename(char *fname);
 static int jhlp_file_copy(char *dfname, char *sfname);
@@ -358,7 +358,7 @@ static int jhlp_head_insert(int fid, struct jhlp_head_desc *hdesc, int sorted);
 static int jhlp_create_contents(char *name, char *pname, char *sname,
                                char *lname, int sorted, int nowrite);
 static int jhlp_negate(int ibool);
-static void jhlp_cappend(char *s, int c, int ml);
+static void jhlp_cappend(char *s, int c, unsigned int ml);
 static int jhlp_cmp_op(int c1, int c2);
 static int jhlp_find_var(char *name);
 static int jhlp_expr_split(char *expr);
@@ -387,9 +387,9 @@ static int jhlp_etc(void);
 static int jhlp_end_glt(int type);
 static int jhlp_write_table(char *name);
 static int jhlp_write_list(char *name);
-static int jhlp_write_glosary(char *name);
-static int jhlp_write_include(char *name);
-static int jhlp_find_label(int hid, char *name);
+static int jhlp_write_glosary(const char *name);
+static int jhlp_write_include(const char *name);
+static int jhlp_find_label(int hid, const char *name);
 static int jhlp_lab(void);
 static int jhlp_insert_index(void);
 static int jhlp_handle_command(void);
@@ -406,7 +406,7 @@ static void jhlp_prlist(int fid, int prhid, int write, int lev, char *chap);
 static void jhlp_del_tmp(int fid);
 static int jhlp_write_prtext(void);
 
-static int jhlp_stricmp(char *a1, char *a2)
+static int jhlp_stricmp(const char *a1, const char *a2)
 {
   int m, res;
 
@@ -437,7 +437,7 @@ static void jhlp_strcpy(char *dest, const char *source)
     strcpy(dest, source);
 }
 
-static int jhlp_error(int eno, char *name)
+static int jhlp_error(int eno, const char *name)
 {
   int m, v, e;
 
@@ -477,7 +477,7 @@ static int jhlp_jfm_check(int id)
   return 0;
 }
 
-static void jhlp_set_length(char *txt, int le)
+static void jhlp_set_length(char *txt, unsigned int le)
 {
   /* reduces the length of txt to <le> (no change if length(txt) < le.  */
 
@@ -485,7 +485,7 @@ static void jhlp_set_length(char *txt, int le)
     txt[le] = '\0';
 }
 
-static void jhlp_splitpath(char *path, char *dir, char *name, char *ext)
+static void jhlp_splitpath(const char *path, char *dir, char *name, char *ext)
 {
   char txt[JHLP_MAX_PATH];
   int m;
@@ -517,7 +517,7 @@ static void jhlp_splitpath(char *path, char *dir, char *name, char *ext)
   }
 }
 
-static void jhlp_ext_subst(char *d, char *e, int forced)
+static void jhlp_ext_subst(char *d, const char *e, int forced)
 {
   int m, fundet;
   char punkt[] = ".";
@@ -537,7 +537,7 @@ static void jhlp_ext_subst(char *d, char *e, int forced)
   }
 }
 
-static int jhlp_ext_cmp(char *fname, char *ext)
+static int jhlp_ext_cmp(const char *fname, const char *ext)
 {
   /* returns 0 if the extension of <fname> is equal to <ext>  */
   /* ('.' is part extension).                                 */
@@ -615,7 +615,7 @@ static void jhlp_url(char *url, char *path)
   url[d] = '\0';
 }
 
-static int jhlp_lcmp(char *txt, int fid)
+static int jhlp_lcmp(const char *txt, int fid)
 {
   /* compares a char-string to a list of strings. If it matches one in  */
   /* list return <id> for this, else return -1.                         */
@@ -1255,7 +1255,7 @@ static int jhlp_negate(int ibool)
   return res;
 }
 
-static void jhlp_cappend(char *s, int c, int ml)
+static void jhlp_cappend(char *s, int c, unsigned int ml)
 {
   /* tilfoejer tegnet <c> til strengen <s> hvis s[ml] er en lovlig      */
   /* streng.                                                            */
@@ -1816,9 +1816,9 @@ static void jhlp_write_t_idline(int id, int label_id, char *text)
     else
       med = jhlp_chap_no(chap_txt, thdesc->fchild_id, id);
     if (med == 0)
-      fprintf(jhlp_ofp, "<U>ONLINE:%s</U>", (char *) jfm_data_adr(hdesc.txt_id));
+      fprintf(jhlp_ofp, "<U>ONLINE:%s</U>", (const char *) jfm_data_adr(hdesc.txt_id));
     else
-      fprintf(jhlp_ofp, "<U>%s: %s</U> ", chap_txt, jfm_data_adr(hdesc.txt_id));
+      fprintf(jhlp_ofp, "<U>%s: %s</U> ", chap_txt, (const char *) jfm_data_adr(hdesc.txt_id));
   }
 }
 
@@ -1946,7 +1946,7 @@ static int jhlp_write_contents(void)
     fprintf(jhlp_ofp, "<A HREF=\"index.htm\">Index</A>\n");
   }
   fprintf(jhlp_ofp, "</UL>\n");
-  fprintf(jhlp_ofp, "%s\n\%s\n", jhlp_h_ebody, jhlp_h_ehtml);
+  fprintf(jhlp_ofp, "%s\n%s\n", jhlp_h_ebody, jhlp_h_ehtml);
   jhlp_fclose(jhlp_ofp);
   jhlp_ofp = NULL;
   return res;
@@ -2048,7 +2048,7 @@ static void jhlp_write_bottom(int cid)
       fprintf(jhlp_ofp, "<HR>\n");
       jhlp_write_navigation(cid, 1);
       fprintf(jhlp_ofp, "</DIV>\n");
-      fprintf(jhlp_ofp, "%s\n\%s\n", jhlp_h_ebody, jhlp_h_ehtml);
+      fprintf(jhlp_ofp, "%s\n%s\n", jhlp_h_ebody, jhlp_h_ehtml);
     }
     jhlp_fclose(jhlp_ofp);
     jhlp_ofp = NULL;
@@ -2478,17 +2478,21 @@ static int jhlp_write_list(char *name)
   return res;
 }
 
-static int jhlp_write_glosary(char *name)
+static int jhlp_write_glosary(const char *_name)
 {
   int res, id, odid, did;
   struct jhlp_glt_desc *gdesc;
   struct jhlp_odata_desc *odesc;
+  char *name = strdup(_name);
 
   res = 0;
   jhlp_set_length(name, 15);
   id = jhlp_find_glt(JHLP_DM_GLOS, name);
   if (id == -1)
+  {
+    free(name);
     return -1;
+  }
   gdesc = (struct jhlp_glt_desc *) jfm_data_adr(id);
   fprintf(jhlp_ofp, "<DL>\n");
 
@@ -2512,20 +2516,25 @@ static int jhlp_write_glosary(char *name)
       odid = -1;
   }
   fprintf(jhlp_ofp, "</DL>\n");
+  free(name);
   return res;
 }
 
-static int jhlp_write_include(char *name)
+static int jhlp_write_include(const char *_name)
 {
   int res, id, odid, did, skrevet;
   struct jhlp_glt_desc *gdesc;
   struct jhlp_odata_desc *odesc;
+  char *name = strdup(_name);
 
   res = 0;
   jhlp_set_length(name, 15);
   id = jhlp_find_glt(JHLP_DM_INCLUDE, jhlp_t_text);
   if (id == -1)
+  {
+    free (name);
     return id;
+  }
   gdesc = (struct jhlp_glt_desc *) jfm_data_adr(id);
   odid = gdesc->fodata_id;
   skrevet = 0;
@@ -2550,10 +2559,11 @@ static int jhlp_write_include(char *name)
     if (skrevet == 0)
       res = jhlp_error(1126, name);
   }
+  free (name);
   return res;
 }
 
-static int jhlp_find_label(int hid, char *name)
+static int jhlp_find_label(int hid, const char *name)
 {
   int rid, id;
   struct jhlp_label_desc *ld;
@@ -3293,7 +3303,7 @@ static int jhlp_write_index(void)
     fprintf(jhlp_ofp, "<A NAME=\"%s\"></A>\n", txt);
   }
 
-  fprintf(jhlp_ofp, "%s\n\%s\n", jhlp_h_ebody, jhlp_h_ehtml);
+  fprintf(jhlp_ofp, "%s\n%s\n", jhlp_h_ebody, jhlp_h_ehtml);
   jhlp_fclose(jhlp_ofp);
   jhlp_ofp = NULL;
   return res;
@@ -3332,7 +3342,7 @@ static int jhlp_write_glob_glosary(void)
 
   jhlp_write_glosary("glosary");
 
-  fprintf(jhlp_ofp, "%s\n\%s\n", jhlp_h_ebody, jhlp_h_ehtml);
+  fprintf(jhlp_ofp, "%s\n%s\n", jhlp_h_ebody, jhlp_h_ehtml);
   jhlp_fclose(jhlp_ofp);
   jhlp_ofp = NULL;
   return res;
@@ -3452,7 +3462,7 @@ static int jhlp_write_prtext(void)
 
     jhlp_prlist(jhlp_cid, hid, 0, 0, empty);
 
-    fprintf(jhlp_ofp, "%s\n\%s\n", jhlp_h_ebody, jhlp_h_ehtml);
+    fprintf(jhlp_ofp, "%s\n%s\n", jhlp_h_ebody, jhlp_h_ehtml);
     jhlp_fclose(jhlp_ofp);
     jhlp_ofp = NULL;
   }
@@ -3516,7 +3526,7 @@ int jhlp_convert(char *de_fname, char *jhi_fname, char *jhc_fname,
   jhlp_copy_mode = copy_mode;
   jhlp_silent = silent;
   if (jhlp_silent != 1)
-    fprintf(jhlp_sout, "  Allocating memory. %d nodes, %d K\n",
+    fprintf(jhlp_sout, "  Allocating memory. %ld nodes, %ld K\n",
                        inodes, imem / 1024);
   m = jfm_create(inodes, imem);
   if (m != 0)

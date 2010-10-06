@@ -108,9 +108,11 @@ char t_avg[]   = "a";
 char t_minmax[]= "m";
 char t_delta[] = "d";
 
-struct jf_tmap_desc { int value;
-                       char *text;
-                     };
+struct jf_tmap_desc {
+	int value;
+	const char *text;
+};
+
 struct jf_tmap_desc jf_im_texts[] =        /* input-modes */
 {
   { JFT_FM_INPUT_EXPECTED,     "ie"},
@@ -123,23 +125,23 @@ struct jf_tmap_desc jf_im_texts[] =        /* input-modes */
   { -1,                        ""}
 };
 
-static int isoption(char *s);
-static int jf_getoption(char *argv[], int no, int argc);
-static int jf_tmap_find(struct jf_tmap_desc *map, char *txt);
-static void ext_subst(char *d, char *e, int forced);
+static int isoption(const char *s);
+static int jf_getoption(const char *argv[], int no, int argc);
+static int jf_tmap_find(struct jf_tmap_desc *map, const char *txt);
+static void ext_subst(char *d, const char *e, int forced);
 static int jf_about(void);
 static int us_error(void);
 
 
 
-static int isoption(char *s)
+static int isoption(const char *s)
 {
   if (s[0] == '-' || s[0] == '?')
     return 1;
   return 0;
 }
 
-static int jf_getoption(char *argv[], int no, int argc)
+static int jf_getoption(const char *argv[], int no, int argc)
 {
   int m, v, res;
 
@@ -165,7 +167,7 @@ static int jf_getoption(char *argv[], int no, int argc)
   return res;
 }
 
-static void ext_subst(char *d, char *e, int forced)
+static void ext_subst(char *d, const char *e, int forced)
 {
   int m, fundet;
   char punkt[] = ".";
@@ -185,7 +187,7 @@ static void ext_subst(char *d, char *e, int forced)
   }
 }
 
-static int jf_tmap_find(struct jf_tmap_desc *map, char *txt)
+static int jf_tmap_find(struct jf_tmap_desc *map, const char *txt)
 {
   int m, res;
   res = -2;
@@ -224,7 +226,7 @@ static int jf_about(void)
 "-D <d>     : Data order. <d>={i|e|t}|f. i:input,e:expected,t:text,f:firstline.\n");
   printf("-o <of>    : Write the changed jfs-program to the file <of>.\n");
   printf("-rf <rf>   : Write the generated rules to the data-file <rf>.\n");
-  printf("-iw <wgt>  : Generate 'ifw %<wgt> ...' statements.\n");
+  printf("-iw <wgt>  : Generate 'ifw <wgt> ...' statements.\n");
   printf("-c <cr>    : Conflict-resolve: <cr>=s:score, <cr>=c:count.\n");
   printf(
     "-r <ru>    : Rule used by CA. <ru>='a':avg, 'm':minmax, 'd':delta.\n");
@@ -237,11 +239,11 @@ static int jf_about(void)
 
 static int us_error(void)         /* usage-error. Fejl i kald af jfs */
 {
-  printf("\n%s\n\%s\n%s\n", usage_1, usage_2, usage_3);
+  printf("\n%s\n%s\n%s\n", usage_1, usage_2, usage_3);
   return 1;
 }
 
-int main(int argc, char *argv[])
+int main(int argc, const char *argv[])
 {
   int m, res;
 
@@ -251,9 +253,10 @@ int main(int argc, char *argv[])
   char ru_fname[256] = "";
   char so_fname[256] = "";
 
-  char *extensions[]  = { "jfr",     /* 0 */
-                     			  "dat"      /* 1 */
-			                     };
+  const char *extensions[]  = {
+                                "jfr",     /* 0 */
+                                "dat"      /* 1 */
+  };
   int option_no;
 
   field_sep[0] = '\0';

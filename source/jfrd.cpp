@@ -67,9 +67,11 @@ struct jf_option_desc jf_options[] =
        { " ",  -2}
      };
 
-struct jf_tmap_desc { int value;
-                       char *text;
-                     };
+struct jf_tmap_desc {
+	int value;
+	const char *text;
+};
+
 struct jf_tmap_desc jf_im_texts[] =        /* input-modes */
 {
   { JFT_FM_INPUT_EXPECTED,     "ie"},
@@ -83,9 +85,9 @@ struct jf_tmap_desc jf_im_texts[] =        /* input-modes */
 };
 
 static int isoption(const char *s);
-static int jf_getoption(char *argv[], int no, int argc);
-static int jf_tmap_find(struct jf_tmap_desc *map, char *txt);
-static void ext_subst(char *d, char *e, int forced);
+static int jf_getoption(const char *argv[], int no, int argc);
+static int jf_tmap_find(struct jf_tmap_desc *map, const char *txt);
+static void ext_subst(char *d, const char *e, int forced);
 static int jf_about(void);
 static int us_error(void);
 
@@ -96,7 +98,7 @@ int isoption(const char *s)
   return 0;
 }
 
-static int jf_getoption(char *argv[], int no, int argc)
+static int jf_getoption(const char *argv[], int no, int argc)
 {
   int m, v, res;
 
@@ -122,7 +124,7 @@ static int jf_getoption(char *argv[], int no, int argc)
   return res;
 }
 
-static void ext_subst(char *d, char *e, int forced)
+static void ext_subst(char *d, const char *e, int forced)
 {
   int m, fundet;
   char punkt[] = ".";
@@ -142,7 +144,7 @@ static void ext_subst(char *d, char *e, int forced)
   }
 }
 
-static int jf_tmap_find(struct jf_tmap_desc *map, char *txt)
+static int jf_tmap_find(struct jf_tmap_desc *map, const char *txt)
 {
   int m, res;
   res = -2;
@@ -156,7 +158,7 @@ static int jf_tmap_find(struct jf_tmap_desc *map, char *txt)
 
 static int us_error(void)         /* usage-error. Fejl i kald af jfs */
 {
-  printf("\n%s\n\%s\n", usage_1, usage_2);
+  printf("\n%s\n%s\n", usage_1, usage_2);
   return 1;
 }
 
@@ -195,11 +197,12 @@ static int jf_about(void)
   return 0;
 }
 
-int main(int argc, char *argv[])
+int main(int argc, const char *argv[])
 {
   int m;
 
-  char *extensions[]  = { "jfr",     /* 0 */
+  const char *extensions[]  = {
+                          "jfr",     /* 0 */
                           "dat"      /* 1 */
                         };
 

@@ -88,7 +88,7 @@ static int isoption(const char *s)
 
 static int us_error(void)         /* usage-error. Fejl i kald af jfs */
 {
-  printf("\n%s\n&s\n", usage_1, usage_2);
+  printf("\n%s\n%s\n", usage_1, usage_2);
   return 1;
 }
 
@@ -132,7 +132,7 @@ static int jf_about(void)
   return 0;
 }
 
-int jf_getoption(char *argv[], int no, int argc)
+int jf_getoption(const char *argv[], int no, int argc)
 {
   int m, v, res;
 
@@ -159,7 +159,7 @@ int jf_getoption(char *argv[], int no, int argc)
 }
 
 
-static void ext_subst(char *d, char *e, int forced)
+static void ext_subst(char *d, const char *e, int forced)
 {
   int m, fundet;
   char punkt[] = ".";
@@ -179,7 +179,7 @@ static void ext_subst(char *d, char *e, int forced)
   }
 }
 
-int main(int argc, char *argv[])
+int main(int argc, const char *argv[])
 {
   int m, res, option_no, append, batch;
   int maxtree, maxstack;
@@ -192,7 +192,8 @@ int main(int argc, char *argv[])
   char sout_fname[256] = "";
   char func_name[256] = "";
   char txt[80];
-  char *extensions[]  = { "jfr",     /* 0 */
+  const char *extensions[]  = { 
+                          "jfr",     /* 0 */
                           "cpp",     /* 1 */
                           "h"        /* 2 */
                         };

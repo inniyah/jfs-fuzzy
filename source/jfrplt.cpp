@@ -43,7 +43,7 @@ USEUNIT("..\..\COMMON\jopt_lib.cpp");
 //---------------------------------------------------------------------------
 #endif
 
-char *usage[] =
+const char *usage[] =
 {
 "usage: jfrplt [-f fs] [-p dec] [-d df] [-o of] [-i if] [-Ax a] [-Az a]",
 "              [-As] [-w [-wm]] [-a] [-t <t> <e> [<d>]] [-v vn] [-rs ss] jfrf"
@@ -69,11 +69,12 @@ struct jopt_desc options[] =
 };
 #define OPT_COUNT 15
 
-char *extensions[]  = { "jfr",     /* 0 */
+const char *extensions[]  = {
+                        "jfr",     /* 0 */
                         "dat",     /* 1 */
                         "plt",     /* 2 */
                         "gif"      /* 3 */
-			                   };
+};
 
 FILE *jfs_ip   = NULL;
 FILE *jfs_op_d = NULL;
@@ -163,9 +164,10 @@ char jfs_txt[512];
 
 char jf_file_txt[256];
 
-struct jfr_err_desc { int eno;
-		      char *text;
-		    };
+struct jfr_err_desc {
+	int eno;
+	const char *text;
+	};
 
 struct jfr_err_desc jfr_err_texts[] =
 { {      0, " "},
@@ -200,9 +202,9 @@ struct jfr_err_desc jfr_err_texts[] =
   {   9999, "Unknown error!"},
 };
 
-static void ext_subst(char *d, char *e, int forced);
+static void ext_subst(char *d, const char *e, int forced);
 static void ext_rm(char *d);
-static int jf_error(int errno, char *name, int mode);
+static int jf_error(int errno, const char *name, int mode);
 void jf_ftoa(char *txt, float f);
 void jf_ftoit(char *txt, float f);
 int closest_adjectiv(int var_no, float val);
@@ -221,7 +223,7 @@ static int jf_about(void);
 static int us_error(void);
 
 
-static int jf_error(int eno, char *name, int mode)
+static int jf_error(int eno, const char *name, int mode)
 {
   int res, v, e;
   char ttxt[82];
@@ -262,7 +264,7 @@ static int jf_error(int eno, char *name, int mode)
   return -1;
 }
 
-static void ext_subst(char *d, char *e, int forced)
+static void ext_subst(char *d, const char *e, int forced)
 {
   int m, fundet;
   char punkt[] = ".";
@@ -876,12 +878,12 @@ static int us_error(void)         /* usage-error. Fejl i kald af jfs */
   return 1;
 }
 
-int main(int argc, char *argv[])
+int main(int argc, const char *argv[])
 {
-  int m, slut, largc, res, mv_index;
+  int m, slut, largc, res, mv_index = 0;
   unsigned short option_no;
   char ttxt[256];
-  char *largv[128];
+  const char *largv[128];
   struct jfg_var_desc vdesc;
   struct jfg_var_desc multi_vdesc;
   struct jfg_adjectiv_desc adesc;

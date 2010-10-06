@@ -144,7 +144,7 @@ struct jft_dset_record jft_dset_desc;
 /* function-definitions:                                                 */
 /*************************************************************************/
 
-static int jft_set_error(int error_no, char *arg);
+static int jft_set_error(int error_no, const char *arg);
 static int jft_stricmp(char *a1, char *a2);
 static int nchar(int *c);
 static int jft_read_first_line(void);
@@ -155,7 +155,7 @@ static void jft_set_minmax(struct jft_data_record *dd, int var_no);
 /* Lokale funktioner                                                     */
 /*************************************************************************/
 
-static int jft_set_error(int error_no, char *arg)
+static int jft_set_error(int error_no, const char *arg)
 {
   jft_error_desc.error_no = error_no;
   jft_error_desc.line_no = jft_dset_desc.line_no;
@@ -457,7 +457,7 @@ void jft_close(void)
   jft_tok_fp = NULL;
 }
 
-int jft_atof(float *f, char *a)
+int jft_atof(float *f, const char *a)
 {
   int m;
   char c;
@@ -468,8 +468,7 @@ int jft_atof(float *f, char *a)
   state = 0;
   *f = 0.0;
   for (m = 0; a[m] != '\0'; m++)
-  { if (a[m] == ',')  /* Both comma and point is decimal-char */
-      a[m] = '.';
+  {
     c = a[m];
     switch (state)
     { case 0:
@@ -477,7 +476,7 @@ int jft_atof(float *f, char *a)
         { if (c == '-')
             state = 1;
           else
-          if (c == '.')
+          if (c == '.' || c == ',') /* Both comma and point is decimal-char */
             state = 2;
           else
           if (isdigit(c))
@@ -488,7 +487,7 @@ int jft_atof(float *f, char *a)
         break;
       case 1:
         if (!isdigit(c))
-        { if (c == '.')
+        { if (c == '.' || c == ',') /* Both comma and point is decimal-char */
             state = 2;
           else
             return jft_set_error(9, a);

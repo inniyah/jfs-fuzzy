@@ -67,9 +67,10 @@ struct jopt_desc options[] =
 #define JFE_WARNING 0
 #define JFE_ERROR   1
 
-struct jfr_err_desc { int eno;
-                      char *text;
-                    };
+struct jfr_err_desc {
+	int eno;
+	const char *text;
+};
 
 struct jfr_err_desc jfr_err_texts[] = {
 	{   0, " "},
@@ -155,7 +156,7 @@ static int jf_about(void)
 }
 
 
-static void ext_subst(char *d, char *e, int forced)
+static void ext_subst(char *d, const char *e, int forced)
 {
   int m, fundet;
   char punkt[] = ".";
@@ -175,7 +176,7 @@ static void ext_subst(char *d, char *e, int forced)
   }
 }
 
-int main(int argc, char *argv[])
+int main(int argc, const char *argv[])
 {
   int res, append, largc, m;
   unsigned short option_no;
@@ -187,13 +188,14 @@ int main(int argc, char *argv[])
   char op_extension[64] = "";
   char term_name[256] = "";
   char txt[80];
-  char *extensions[]  = { "jfr",     /* 0 */
+  const char *extensions[]  = {
+                          "jfr",     /* 0 */
                           "plt",     /* 1 */
                           "gif"      /* 2 */
                         };
-  char *largv[128];
+  const char *largv[128];
 
-  char *dobjects[128];
+  const char *dobjects[128];
 
   res = 0;
   params.sout = stdout;

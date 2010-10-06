@@ -37,7 +37,7 @@ static char jf_empty[] = " ";
 
 static struct jfg_limit_desc jfplt_limits[256];
 
-static char **jfplt_data;
+static const char **jfplt_data;
 static int jfplt_data_c = 0;
 
 static FILE *jfplt_op;
@@ -63,7 +63,7 @@ static void jfplt_f_hedges(void);
 static void jfplt_hedges(void);
 static void jfplt_f_relations(void);
 static void jfplt_relations(void);
-static void jfplt_op1_write(int op, float arg);
+static void jfplt_op1_write(int op, float arg, char *a, char *b);
 static void jfplt_f_operators(void);
 static void jfplt_operators(void);
 static void jfplt_f_adjectiv(struct jfg_adjectiv_desc *adesc,
