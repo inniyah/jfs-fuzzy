@@ -88,10 +88,11 @@ $(LIB_DIR)/$(LIBRARY).so.$(MAJOR).$(MINOR): $(LIBRARY_SHARED_OBJS)
 		$(LIBRARY_SHARED_OBJS) -o $@ 
 
 $(LIB_DIR)/$(LIBRARY).so: $(LIB_DIR)/$(LIBRARY).so.$(MAJOR).$(MINOR)
-	rm -f $@.$(MAJOR)
-	ln -s $@.$(MAJOR).$(MINOR) $@.$(MAJOR)
-	rm -f $@
-	ln -s $@.$(MAJOR) $@
+	mkdir -p $(LIB_DIR)
+	cd $(LIB_DIR) && rm -fv $(LIBRARY).so.$(MAJOR)
+	cd $(LIB_DIR) && ln -s $(LIBRARY).so.$(MAJOR).$(MINOR) $(LIBRARY).so.$(MAJOR)
+	cd $(LIB_DIR) && rm -fv $(LIBRARY).so
+	cd $(LIB_DIR) && ln -s $(LIBRARY).so.$(MAJOR) $(LIBRARY).so
 
 $(LIB_DIR)/$(LIBRARY).a: $(LIBRARY_STATIC_OBJS)
 	mkdir -p $(LIB_DIR)
@@ -104,10 +105,11 @@ $(LIB_DIR)/$(LIBXTRA).so.$(MAJOR).$(MINOR): $(LIBXTRA_SHARED_OBJS) $(LIB_DIR)/$(
 		$(LIBXTRA_SHARED_OBJS) -o $@ -L$(LIB_DIR) -ljfs-core
 
 $(LIB_DIR)/$(LIBXTRA).so: $(LIB_DIR)/$(LIBXTRA).so.$(MAJOR).$(MINOR)
-	rm -f $@.$(MAJOR)
-	ln -s $@.$(MAJOR).$(MINOR) $@.$(MAJOR)
-	rm -f $@
-	ln -s $@.$(MAJOR) $@
+	mkdir -p $(LIB_DIR)
+	cd $(LIB_DIR) && rm -fv $(LIBXTRA).so.$(MAJOR)
+	cd $(LIB_DIR) && ln -s $(LIBXTRA).so.$(MAJOR).$(MINOR) $(LIBXTRA).so.$(MAJOR)
+	cd $(LIB_DIR) && rm -fv $(LIBXTRA).so
+	cd $(LIB_DIR) && ln -s $(LIBXTRA).so.$(MAJOR) $(LIBXTRA).so
 
 $(LIB_DIR)/$(LIBXTRA).a: $(LIBXTRA_STATIC_OBJS)
 	mkdir -p $(LIB_DIR)
