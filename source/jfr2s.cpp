@@ -181,7 +181,7 @@ static void ext_subst(char *d, char *e, int forced)
 }
 
 
-main(int argc, char *argv[])
+int main(int argc, char *argv[])
 {
   int m, res, rm_res, option_no;
   int ndigits, maxtext, maxtree, maxstack, parent_mode, rule_nos;

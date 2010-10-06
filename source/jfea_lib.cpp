@@ -195,7 +195,7 @@ static int jfea_var_no(char *text);
 static int jfea_set_adesc(char *opword, char *vname, int input);
 static int jfea_isoption(char *txt);
 static int jfea_get_command(int argc);
-static void jfea_pl_create(char type, int address, int limit_c, int mode);
+//static void jfea_pl_create(char type, int address, int limit_c, int mode);
 static int jfea_adesc_create(void);
 static float jfea_rand_dget(void);
 static float jfea_rand_iv_dget(float iinf, float isup);

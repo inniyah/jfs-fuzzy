@@ -116,7 +116,7 @@ int about(void)
   return 1;
 }
 
-main(int argc, char *argv[])
+int main(int argc, char *argv[])
 {
    int res, var_no;
    char fname[80];

@@ -1,6 +1,6 @@
   /************************************************************************/
   /*                                                                      */
-  /* jfr2clib.c   Version  2.03  Copyright (c) 1999-2000 Jan E. Mortensen */
+  /* jfr2clib.c   Version  2.05  Copyright (c) 1999-2001 Jan E. Mortensen */
   /*                                                                      */
   /* JFS library to convert a compiled jfs-program to                     */
   /* C-sourcecode.                                                        */
@@ -867,9 +867,9 @@ static void jfr2c_relations_write(void)
   int m, id;
 
   if (jfr2c_spdesc.relation_c > 0)
-  {   fprintf(jfr2c_dcl,
+  {   fprintf(jfr2c_op,
 "/*---------------------------------------------------------------------*/\n");
-    fprintf(jfr2c_dcl,
+    fprintf(jfr2c_op,
 "/* Relations:                                                          */\n\n");
   }
   for (m = 0; m < jfr2c_spdesc.relation_c; m++)
@@ -1034,6 +1034,11 @@ static void jfr2c_operators_write(void)
   struct jfg_operator_desc odesc;
   int m;
 
+  fprintf(jfr2c_op,
+"/*---------------------------------------------------------------------*/\n");
+  fprintf(jfr2c_op,
+"/* Fuzzy operators:                                                    */\n\n");
+
   for (m = 0; m < jfr2c_spdesc.operator_c; m++)
   { if (jfr2c_fop_use[m] == 1)
     { jfg_operator(&odesc, jfr_head, m);
@@ -1096,6 +1101,11 @@ static void jfr2c_operators_write(void)
 static void jfr2c_sfunc_write(void)
 {
   int m;
+
+  fprintf(jfr2c_op,
+"/*---------------------------------------------------------------------*/\n");
+  fprintf(jfr2c_op,
+"/* Predefined functions and operators:                                 */\n\n");
 
   for (m = 0; m < 20; m++)
   { if (jfr2c_sfunc_use[m] == 1)
@@ -1786,9 +1796,9 @@ static void jfr2c_vround_write(void)
             }
             else
             { if (jfr2c_use_minmax == 1)
-                fprintf(jfr2c_op, "v%d = min(v%d, ", vno, vno);
+                fprintf(jfr2c_op, "v%d = max(v%d, ", vno, vno);
               else
-                fprintf(jfr2c_op, "v%d = rmin(v%d, ", vno, vno);
+                fprintf(jfr2c_op, "v%d = rmax(v%d, ", vno, vno);
               jfr2c_float(jfr2c_op, ddesc.dmin);
             }
             fprintf(jfr2c_op, ");");
@@ -1796,9 +1806,9 @@ static void jfr2c_vround_write(void)
           else
           { if (ddesc.flags & JFS_DF_MAXENTER)
             { if (jfr2c_use_minmax == 1)
-                fprintf(jfr2c_op, "v%d = max(v%d, ", vno, vno);
+                fprintf(jfr2c_op, "v%d = min(v%d, ", vno, vno);
               else
-                fprintf(jfr2c_op, "v%d = rmax(v%d, ", vno, vno);
+                fprintf(jfr2c_op, "v%d = rmin(v%d, ", vno, vno);
               jfr2c_float(jfr2c_op, ddesc.dmax);
               fprintf(jfr2c_op, ");");
             }
@@ -2051,20 +2061,20 @@ static void jfr2c_leaf_fuzdefuz_check(unsigned short id)
       jfr2c_leaf_fuzdefuz_check(leaf->sarg_1);
       break;
     case JFG_TT_VAR:
-      jfr2c_varuse[leaf->sarg_1].expr_use += 2;
+      jfr2c_varuse[leaf->sarg_1].expr_use |= 2;
       break;
     case JFG_TT_FZVAR:
       jfg_fzvar(&fzvdesc, jfr_head, leaf->sarg_1);
-      jfr2c_varuse[fzvdesc.var_no].expr_use += 1;
+      jfr2c_varuse[fzvdesc.var_no].expr_use |= 1;
       break;
     case JFG_TT_BETWEEN:
-      jfr2c_varuse[leaf->sarg_1].expr_use += 1;
+      jfr2c_varuse[leaf->sarg_1].expr_use |= 1;
       break;
     case JFG_TT_VFUNC:
       if (leaf->op == JFS_VFU_DNORMAL)
-	       jfr2c_varuse[leaf->sarg_1].expr_use += 1;
+	       jfr2c_varuse[leaf->sarg_1].expr_use |= 1;
       if (leaf->op == JFS_VFU_M_FZVAR || leaf->op == JFS_VFU_S_FZVAR)
-	       jfr2c_varuse[leaf->sarg_1].expr_use += 3;
+	       jfr2c_varuse[leaf->sarg_1].expr_use |= 3;
       break;
     default:
       break;
@@ -2075,7 +2085,6 @@ static void jfr2c_fuzdefuz_check(unsigned char *pc)
 {
   int m, res;
   unsigned short c, i, e;
-  /* struct jfg_var_desc vdesc; */
   struct jfg_statement_desc sdesc;
   struct jfg_fzvar_desc fzvdesc;
 
@@ -2092,12 +2101,12 @@ static void jfr2c_fuzdefuz_check(unsigned char *pc)
       switch (sdesc.sec_type)
       { case JFG_SST_FZVAR:
           jfg_fzvar(&fzvdesc, jfr_head, sdesc.sarg_1);
-          jfr2c_varuse[fzvdesc.var_no].expr_use += 1;
+          jfr2c_varuse[fzvdesc.var_no].expr_use |= 1;
           jfr2c_leaf_fuzdefuz_check(c);
           break;
         case JFG_SST_VAR:
         case JFG_SST_INC:
-          jfr2c_varuse[sdesc.sarg_1].expr_use += 2;
+          jfr2c_varuse[sdesc.sarg_1].expr_use |= 2;
           jfr2c_leaf_fuzdefuz_check(c);
           jfr2c_leaf_fuzdefuz_check(e);
           break;
@@ -2392,7 +2401,7 @@ static void jfr2c_leaf_write(int id)
 
 static void jfr2c_init_write(char *funcname)
 {
-  int m, a;
+  int m, a, fu;
   struct jfg_var_desc vdesc;
   struct jfg_domain_desc ddesc;
   /* struct jfg_adjectiv_desc adesc; */
@@ -2417,6 +2426,14 @@ static void jfr2c_init_write(char *funcname)
   fprintf(jfr2c_op, "  %s t, r;\n", jfr2c_t_real);
   if (jfr2c_spdesc.array_c > 0)
     fprintf(jfr2c_op, "int ac;\n");
+
+  fu = jfr2c_spdesc.function_c; /* main-function */
+  if (jfr2c_switch_use == 1 && jfr2c_max_levels[fu] > 0)
+    fprintf(jfr2c_op, "%s sw[%d];\n %s rw[%d];\n",
+            jfr2c_t_real, jfr2c_max_levels[fu] + 1,
+            jfr2c_t_real, jfr2c_max_levels[fu] + 1);
+
+
   for (m = 0; m < jfr2c_spdesc.var_c; m++)
   { jfg_var(&vdesc, jfr_head, m);
     if (m >= jfr2c_spdesc.f_ivar_no
@@ -2525,10 +2542,7 @@ static void jfr2c_rules_write(char *funcname)
     else
     { jfr2c_init_write(funcname);
       pc = jfr2c_spdesc.pc_start;
-      if (jfr2c_switch_use == 1 && jfr2c_max_levels[fu] > 0)
-        fprintf(jfr2c_op, "%s sw[%d];\n %s rw[%d];\n",
-                    jfr2c_t_real, jfr2c_max_levels[fu] + 1,
-                    jfr2c_t_real, jfr2c_max_levels[fu] + 1);
+
       jfr2c_ff_ltypes = 0;
       for (a = 0; a < jfr2c_spdesc.ivar_c; a++)
       { jfg_var(&vdesc, jfr_head, jfr2c_spdesc.f_ivar_no + a);

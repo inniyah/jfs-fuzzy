@@ -142,7 +142,7 @@ void log_write(int mode)      /* Simplified version of the log-writing */
   }
 }
 
-main(int argc, char *argv[])
+int main(int argc, char *argv[])
 {
   char fname[80];
   char iptext[80];

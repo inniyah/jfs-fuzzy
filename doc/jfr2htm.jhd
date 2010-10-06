@@ -52,7 +52,7 @@ desire to make various changes for aesthetic reasons.
 Using combinations of options, domain variable argument values, and
  'extern' statements  JFR2HTM can:
 <UL>
-<LI>Control the contens and placement of field-labels and the field types.
+<LI>Control the contents and placement of field-labels and the field types.
 <LI>Create and write output to HTML text areas.
 <LI>Use a cascading style sheet to format the generated HTML file.
 </UL>

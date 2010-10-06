@@ -2015,7 +2015,7 @@ static int us_error(void)         /* usage-error. Fejl i kald af jfs */
   return 1;
 }
 
-main(int argc, char *argv[])
+int main(int argc, char *argv[])
 {
   int m, v, s, err, slut, option_no;
   char ttxt[256];

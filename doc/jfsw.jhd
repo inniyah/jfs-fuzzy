@@ -104,8 +104,8 @@ JFS uses web pages (html-files) for all documentation. The commands in the
 help menu open web pages in the user's browser. The menu contains the
 commands:
 <P>
-<B>Contens: </B>
-Opens the contens page.
+<B>Contents: </B>
+Opens the contents page.
 <P>
 <B>Index: </B>
 Opens the index page.
@@ -1196,9 +1196,9 @@ properties, is with the arrow keys.
 !eli
 !li jfsw_li_bugs edit
 When a text-field in the object-editor is entered, it is in replace-mode.
-Text entered replaces the original contens. By pressing the enter-key or
+Text entered replaces the original contents. By pressing the enter-key or
 clicking with the mouse, the field's mode is changed to edit-mode, where
-its contens can be changed, but unlike standard text-fields the left/right
+its contents can be changed, but unlike standard text-fields the left/right
 arrow keys don't change the mode.
 !eli
 !li jfsw_li_bugs errlines

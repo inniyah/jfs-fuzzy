@@ -30,7 +30,7 @@ float op[10];                /* output values */
 char fname[] = "truck.jfr";  /* filename      */
 void *head;                  /* jfs-program   */
 
-main(int argc, char *argv[])
+int main(int argc, char *argv[])
 {
    int res;
 

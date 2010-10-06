@@ -608,7 +608,7 @@ struct jfg_oc_desc  /* low-level information about a single command in */
 			  /* <sarg_1> = domain-var-no.                 */
 			  /* <op>  is one of: JFG_VFU_DNORMAL..        */
 
-/* JFG_TT_UFUNC           /* user-function:                            */
+/* JFG_TT_UFUNC              user-function:                            */
 			  /* <op>     = function-no.                   */
 
 /* JFG_TT_UF_VAR             userfunction variable:                    */

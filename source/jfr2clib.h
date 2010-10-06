@@ -1,5 +1,5 @@
   /**************************************************************************/
-  /* jfr2clib.h  Version  2.03 Copyright (c) 1999-2000 Jan E. Mortensen     */
+  /* jfr2clib.h  Version  2.05 Copyright (c) 1999-2001 Jan E. Mortensen     */
   /*                                                                        */
   /* Functions to convert a compiled jfs-program to C-sourcecode.           */
   /*                                                                        */

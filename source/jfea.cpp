@@ -185,7 +185,7 @@ char jfea_field_sep[256];   /* 0: brug space, tab etc som felt-seperator, */
 void *jfr_head = NULL;
 
 /*************************************************************************/
-/* DIverse                                                               */
+/* Diverse                                                               */
 /*************************************************************************/
 
 struct jf_tmap_desc { int value;
@@ -396,6 +396,7 @@ static void ext_subst(char *d, char *e, int forced)
 }
 
 /************************************************************************/
+/* Functions for reading in from a file                                 */
 /* Funktioner til indlaesning fra fil                                   */
 /************************************************************************/
 
@@ -739,7 +740,7 @@ static int jf_about(void)
   return 0;
 }
 
-main(int argc, char *argv[])
+int main(int argc, char *argv[])
 {
   int m, val_pct;
   time_t t;

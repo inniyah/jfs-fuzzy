@@ -2,7 +2,7 @@
   /*                                                                   */
   /* jfw2slib.h  Version 2.01  Copyright (c) 1999-2000 Jan E. Mortensen*/
   /*                                                                   */
-  /* JFS Invers Compiler-functions. Converts a JFW-file to a JFS-file. */
+  /* JFS Inverse Compiler-functions. Converts a JFW-file to a JFS-file. */
   /*                                                                   */
   /* by Jan E. Mortensen     email:  jemor@inet.uni2.dk                */
   /*    Lollandsvej 35 3.tv.                                           */

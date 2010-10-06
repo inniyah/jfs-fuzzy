@@ -221,10 +221,10 @@ The first step is to find the header-name for the documentation about JHLP:
 !if !UNIX
 Select 'Contens' in the help-menu to open a web-browser on the documentation.
 !else
-Start a web-browser. Open the contens-page of the jfs-documentation
-( <jfshome>/doc/html/contens.htm),
+Start a web-browser. Open the contents-page of the jfs-documentation
+( <jfshome>/doc/html/contents.htm),
 !endif
- jump to the contens-page, and jump to the page about JHLP
+ jump to the contents-page, and jump to the page about JHLP
 ('JHLP: the documentation creater' under 'programs', 'Miscellaneous programs').
 The header name is the filename of the web page without path and extension. In
 this case the header-name is 'jhlp' (the full file name is something like
@@ -306,10 +306,10 @@ First write the note and save it as a text file (extension '.txt') or a HTML fil
 <P>
 The first step is to find the header-name for the documentation about JHLP:
 !if UNIX
-Start a web-browser. Open the jfs-contens-file ('<jfsdir>/doc/html/contens.htm'),
+Start a web-browser. Open the jfs-contents-file ('<jfsdir>/doc/html/contents.htm'),
 !else
 Start the program JFS. Select 'Contens' in the help menu to open a web browser
-on the documentation. jump to the contens page,
+on the documentation. jump to the contents page,
 !endif
 and jump to the page about JHLP
 ('JHLP: the documentation creater' under 'programs', 'Miscellaneous programs').

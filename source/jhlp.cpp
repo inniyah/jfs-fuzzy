@@ -158,7 +158,7 @@ int jf_getoption(char *argv[], int no, int argc)
   return res;
 }
 
-main(int argc, char *argv[])
+int main(int argc, char *argv[])
 {
   int m, option_no, append_mode;
   int wait_mode, silent, copy_mode;

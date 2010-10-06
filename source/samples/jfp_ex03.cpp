@@ -25,6 +25,9 @@
 #include "jfg_lib.h";
 #include "jfp_lib.h"
 
+#include <ctime>    // For time()
+#include <cstdlib>  // For srand() and rand()
+
 #ifdef __BCPLUSPLUS__
   /* The folowing lines are only needed if the program is compiled with */
   /* Borland C++Builder.                                                */
@@ -41,13 +44,18 @@ unsigned char *pcs[100];  /* Remember program-addresses of 'ifw %'-      */
                      			  /*  statements.                                */
 int ff_pcs;               /* First free post in pcs[].                   */
 
+static double random (const int limit)
+{
+	return (((double)rand () / RAND_MAX) * limit);
+}
+
 void w_change(void)       /* randomly change a weight.                   */
 {
   struct jfg_statement_desc sdesc;
   int sno;
   float w, a;
 
-  sno = random(ff_pcs);
+  sno = (int) random(ff_pcs);
   jfg_statement(&sdesc, head, pcs[sno]);
   w = sdesc.farg;
   a = ((float) random(1000) - 500.0) / 10000.0;  /* a random number in  */
@@ -63,7 +71,7 @@ void w_change(void)       /* randomly change a weight.                   */
 }
 
 
-main(int argc, char *argv[])
+int main(int argc, char *argv[])
 {
   struct jfg_statement_desc sdesc;
   struct jfg_function_desc fudesc;
@@ -71,6 +79,8 @@ main(int argc, char *argv[])
   int m, res, funcno;
   unsigned char *pc;
   char fname[256];
+
+  srand(time(0));  // Initialize random number generator.
 
   if (argc != 2)
   { printf("Usage: jfp_ex03 jfrf\n");

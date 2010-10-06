@@ -224,7 +224,7 @@ int filkopier(char *de_fname, char *so_fname)
   return 0;
 }
 
-main(int argc, char *argv[])
+int main(int argc, char *argv[])
 {
   int m, res, mode, option_no;
   int maxtext, maxtree, maxstack, overwrite, js_file;

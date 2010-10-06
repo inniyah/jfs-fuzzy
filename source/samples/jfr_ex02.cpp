@@ -67,7 +67,7 @@ void errchk(int place)
   }
 }
 
-main(int argc, char *argv[])
+int main(int argc, char *argv[])
 {
    int res;
 

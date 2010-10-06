@@ -663,7 +663,7 @@ int write_plt_data(int ov_no)
   if (plt_2_gif == 1)
   { fprintf(jfs_op_p, "set output '");
     if (strlen(op_dir) > 0)
-#ifdef OS_UNIX
+#ifndef _WIN32
       fprintf(jfs_op_p, "%s/",  op_dir);
 #else
       fprintf(jfs_op_p, "%s\\", op_dir);
@@ -876,7 +876,7 @@ static int us_error(void)         /* usage-error. Fejl i kald af jfs */
   return 1;
 }
 
-main(int argc, char *argv[])
+int main(int argc, char *argv[])
 {
   int m, slut, largc, res, mv_index;
   unsigned short option_no;

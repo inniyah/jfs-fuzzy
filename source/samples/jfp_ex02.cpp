@@ -45,7 +45,7 @@ void *head;                       /* jfs-program   */
 struct jfg_sprog_desc spdesc;
 char ext[] = ".jfr";
 
-main(int argc, char *argv[])
+int main(int argc, char *argv[])
 {
   struct jfg_var_desc vdesc;
   struct jfg_adjectiv_desc adesc;

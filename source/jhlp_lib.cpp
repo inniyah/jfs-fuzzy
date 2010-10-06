@@ -11,7 +11,7 @@
 /*                                                                         */
 /***************************************************************************/
 
-#ifdef OS_UNIX
+#ifndef _WIN32
   #include <unistd.h>
 #else
   #include <dir.h>
@@ -118,7 +118,7 @@ struct jhlp_expr_desc jhlp_expr;
 #define JHLP_CT_CMP     4
 
 static int jhlp_fid;  /* list of (full) file-names. */
-static int jhlp_cid;  /* list of contens-headers.   */
+static int jhlp_cid;  /* list of contents-headers.   */
 static int jhlp_iid;  /* list of indexes.           */
 static int jhlp_lid;  /* list of labels.            */
 static int jhlp_gltid;  /* list of glt's.            */
@@ -126,7 +126,7 @@ static int jhlp_vid;  /* list of variables.         */
 
 static int jhlp_jhi_exists = 0;
 
-static int jhlp_contens_c = 0;
+static int jhlp_contents_c = 0;
 static int jhlp_glosary_c = 0;
 static int jhlp_index_c = 0;
 
@@ -310,7 +310,7 @@ static struct jhlp_err_desc jhlp_err_texts[] =
    {   1115, "To many nested if-statements."},
    {   1116, "!else without !if."},
    {   1117, "!end without !if."},
-   {   1118, "To many contens-levels."},
+   {   1118, "To many contents-levels."},
    {   1119, "Multiple definition of:"},
    {   1120, "Text outside head."},
    {   1121, "Undefined table, list or glosary:"},
@@ -354,7 +354,7 @@ static int jhlp_init(void);
 static int jhlp_load_jhi(char *jhc_fname);
 static int jhlp_save_jhi(void);
 static int jhlp_head_insert(int fid, struct jhlp_head_desc *hdesc, int sorted);
-static int jhlp_create_contens(char *name, char *pname, char *sname,
+static int jhlp_create_contents(char *name, char *pname, char *sname,
                                char *lname, int sorted, int nowrite);
 static int jhlp_negate(int ibool);
 static void jhlp_cappend(char *s, int c, int ml);
@@ -368,10 +368,10 @@ static int jhlp_write_line(void);
 static int jhlp_chap_no(char *chap_txt, int f_pid, int sid);
 static void jhlp_write_t_idline(int id, int label_id, char *text);
 static void jhlp_write_idline(int id, int label_id);
-static int jhlp_rred_contens(int fid);
-static int jhlp_reduce_contens(void);
-static void jhlp_contens_list(int hid);
-static int jhlp_write_contens(void);
+static int jhlp_rred_contents(int fid);
+static int jhlp_reduce_contents(void);
+static void jhlp_contents_list(int hid);
+static int jhlp_write_contents(void);
 static void jhlp_write_navigation(int hid, int invers);
 static void jhlp_write_bottom(int cid);
 static void jhlp_write_bottoms(int hid);
@@ -554,7 +554,7 @@ static int jhlp_full_path(char *dfname, char *sfname)
   /* Copies the full file-name of <sfname> to <dfname>. If <sfname>   */
   /* already contains a full path returns 1, else return 0.           */
   int res;
-#ifdef OS_UNIX
+#ifndef _WIN32
   int m, i;
   char txt[JHLP_MAX_PATH];
 #endif
@@ -566,7 +566,7 @@ static int jhlp_full_path(char *dfname, char *sfname)
   }
   else
   {
-#ifdef OS_UNIX
+#ifndef _WIN32
     getcwd(txt, JHLP_MAX_PATH);
     m = 0;
     while (sfname[m] == '.')
@@ -1112,7 +1112,7 @@ static int jhlp_save_jhi(void)
 }
 
 /**************************************************************************/
-/* jhlp_create_contens:                                                  */
+/* jhlp_create_contents:                                                  */
 
 static int jhlp_head_insert(int fid, struct jhlp_head_desc *hdesc, int sorted)
 {
@@ -1168,7 +1168,7 @@ static int jhlp_head_insert(int fid, struct jhlp_head_desc *hdesc, int sorted)
   return rid;
 }
 
-static int jhlp_create_contens(char *name, char *pname, char *sname,
+static int jhlp_create_contents(char *name, char *pname, char *sname,
                                char *lname, int sorted, int nowrite)
 {
   int id, pid, fid, res, psorted;
@@ -1230,7 +1230,7 @@ static int jhlp_create_contens(char *name, char *pname, char *sname,
         res = 1;
     }
     if (res == 0)
-      jhlp_contens_c++;
+      jhlp_contents_c++;
   }
   return res;
 }
@@ -1827,9 +1827,9 @@ static void jhlp_write_idline(int id, int label_id)
 }
 
 /*************************************************************************/
-/* reduce-contens:                                                       */
+/* reduce-contents:                                                       */
 
-static int jhlp_rred_contens(int fid)
+static int jhlp_rred_contents(int fid)
 {
   /* removes empty heads and subhead for all heads in the list */
   /* starting in <fid>. Returns (new) first id.                */
@@ -1840,7 +1840,7 @@ static int jhlp_rred_contens(int fid)
   id = fid;
   while (id != -1)
   { memcpy(&hdesc, jfm_data_adr(id), JHLP_HEAD_SIZE);
-    hdesc.fchild_id = jhlp_rred_contens(hdesc.fchild_id);
+    hdesc.fchild_id = jhlp_rred_contents(hdesc.fchild_id);
     if (hdesc.fchild_id == -1 && hdesc.status == JHLP_HST_EMPTY)
     { nid = jfm_delete(id);
       if (id == newfid) /* if first id in list is deleted */
@@ -1853,7 +1853,7 @@ static int jhlp_rred_contens(int fid)
         else
           id = nid;
       }
-      jhlp_contens_c--;
+      jhlp_contents_c--;
     }
     else
     { hdesc.status = JHLP_HST_EMPTY;
@@ -1866,18 +1866,18 @@ static int jhlp_rred_contens(int fid)
   return newfid;
 }
 
-static int jhlp_reduce_contens(void)
+static int jhlp_reduce_contents(void)
 {
   if (jhlp_silent != 1)
-    fprintf(jhlp_sout, "  Reducing contens..\n");
-  jhlp_cid = jhlp_rred_contens(jhlp_cid);
+    fprintf(jhlp_sout, "  Reducing contents..\n");
+  jhlp_cid = jhlp_rred_contents(jhlp_cid);
   return 0;
 }
 
 /************************************************************************/
-/* write_contens:                                                       */
+/* write_contents:                                                       */
 
-static void jhlp_contens_list(int hid)
+static void jhlp_contents_list(int hid)
 {
   /* writes a list of index-lines for hid with sub-headers */
 
@@ -1893,7 +1893,7 @@ static void jhlp_contens_list(int hid)
       cid = hdesc->fchild_id;
       if (cid != -1)
       { fprintf(jhlp_ofp, "<UL>\n");
-        jhlp_contens_list(cid);
+        jhlp_contents_list(cid);
         fprintf(jhlp_ofp, "</UL>\n");
       }
       id = jfm_next(id);
@@ -1903,16 +1903,16 @@ static void jhlp_contens_list(int hid)
   }
 }
 
-static int jhlp_write_contens(void)
+static int jhlp_write_contents(void)
 {
   int res;
   char fname[256];
 
   res = 0;
-  if (jhlp_contens_c <= 1 || jhlp_gmode == JHLP_GM_TEXT)
+  if (jhlp_contents_c <= 1 || jhlp_gmode == JHLP_GM_TEXT)
     return 0;
   strcpy(fname, jhlp_dest_dir);
-  strcat(fname, "contens.htm");
+  strcat(fname, "contents.htm");
   jhlp_ofp = fopen(fname, "w");
   if (jhlp_ofp == NULL)
     return jhlp_error(1, fname);
@@ -1920,9 +1920,9 @@ static int jhlp_write_contens(void)
    /* write head */
   fprintf(jhlp_ofp, "%s\n", jhlp_h_bhtml);
   fprintf(jhlp_ofp, "%s\n", jhlp_h_bhead);
-  fprintf(jhlp_ofp, "%sContens%s\n", jhlp_h_btitle, jhlp_h_etitle);
+  fprintf(jhlp_ofp, "%sContents%s\n", jhlp_h_btitle, jhlp_h_etitle);
   if (strlen(jhlp_stylesheet) != 0)
-#ifdef OS_UNIX
+#ifndef _WIN32
     fprintf(jhlp_ofp, "<LINK REL=STYLESHEET TYPE=TEXT/CSS HREF=\"%s\">\n",
                       jhlp_stylesheet);
 #else
@@ -1932,10 +1932,10 @@ static int jhlp_write_contens(void)
   fprintf(jhlp_ofp, "%s\n", jhlp_h_ehead);
 
   fprintf(jhlp_ofp, "%s\n", jhlp_h_bbody);
-  fprintf(jhlp_ofp, "%sContens%s\n", jhlp_h_bh, jhlp_h_eh);
+  fprintf(jhlp_ofp, "%sContents%s\n", jhlp_h_bh, jhlp_h_eh);
 
   fprintf(jhlp_ofp, "<UL>\n");
-  jhlp_contens_list(jhlp_cid);
+  jhlp_contents_list(jhlp_cid);
   if (jhlp_glosary_c > 0)
   { fprintf(jhlp_ofp, "<LI>");
     fprintf(jhlp_ofp, "<A HREF=\"glosary.htm\">Glosary</A>\n");
@@ -1962,9 +1962,9 @@ static void jhlp_write_navigation(int hid, int invers)
     if ((n == 0 && invers == 0) || (n == 1 && invers == 1))
     { /* write navigation-line: */
       fprintf(jhlp_ofp, "Jump:");
-      if (jhlp_contens_c > 1)
+      if (jhlp_contents_c > 1)
         fprintf(jhlp_ofp,
-                "[<A HREF=\"contens.htm\" ACCESSKEY=\"c\">Contens</A>]\n");
+                "[<A HREF=\"contents.htm\" ACCESSKEY=\"c\">Contents</A>]\n");
       if (jhlp_index_c > 1)
         fprintf(jhlp_ofp, "[<A HREF=\"index.htm\" ACCESSKEY=\"i\">Index</A>]\n");
       nid = jhlp_prev_id(hid);
@@ -2084,7 +2084,7 @@ static int jhlp_write_head(char *hname)
   jhlp_set_length(hname, 15);
   id = jhlp_find_head(hname);
   if (id == -1)
-    return 0;  /* head fjernet af check-contens */
+    return 0;  /* head fjernet af check-contents */
 
   jhlp_cur_head_id = id;
   res = jhlp_fopen(id);
@@ -2105,7 +2105,7 @@ static int jhlp_write_head(char *hname)
   fprintf(jhlp_ofp, "%s\n", jhlp_h_bhead);
   fprintf(jhlp_ofp, "%s%s%s\n", jhlp_h_btitle, htxt, jhlp_h_etitle);
   if (strlen(jhlp_stylesheet) != 0)
-#ifdef OS_UNIX
+#ifndef _WIN32
     fprintf(jhlp_ofp, "<LINK REL=STYLESHEET TYPE=TEXT/CSS HREF=\"%s\">\n",
                       jhlp_stylesheet);
 #else
@@ -2689,7 +2689,7 @@ static int jhlp_handle_command(void)
             jhlp_error(1109, jhlp_argv[5]);
         }
         if (jhlp_fase == 1)
-          res = jhlp_create_contens(jhlp_argv[1], jhlp_argv[2], jhlp_argv[3],
+          res = jhlp_create_contents(jhlp_argv[1], jhlp_argv[2], jhlp_argv[3],
                                     jhlp_argv[4], sorted, nowrite);
         else
           res = jhlp_write_head(jhlp_argv[1]);
@@ -2716,7 +2716,7 @@ static int jhlp_handle_command(void)
         else
           p = jhlp_argv[4];  /* p2-id */
         if (jhlp_fase == 1)
-          res = jhlp_create_contens(jhlp_argv[1], p, jhlp_argv[5],
+          res = jhlp_create_contents(jhlp_argv[1], p, jhlp_argv[5],
                                     jhlp_argv[6], sorted, nowrite);
         else
           res = jhlp_write_head(jhlp_argv[1]);
@@ -3233,7 +3233,7 @@ static int jhlp_write_index(void)
   fprintf(jhlp_ofp, "%s\n", jhlp_h_bhead);
   fprintf(jhlp_ofp, "%sIndex%s\n", jhlp_h_btitle, jhlp_h_etitle);
   if (strlen(jhlp_stylesheet) != 0)
-#ifdef OS_UNIX
+#ifndef _WIN32
     fprintf(jhlp_ofp, "<LINK REL=STYLESHEET TYPE=TEXT/CSS HREF=\"%s\">\n",
                       jhlp_stylesheet);
 #else
@@ -3317,7 +3317,7 @@ static int jhlp_write_glob_glosary(void)
   fprintf(jhlp_ofp, "%s\n", jhlp_h_bhead);
   fprintf(jhlp_ofp, "%sGlosary%s\n", jhlp_h_btitle, jhlp_h_etitle);
   if (strlen(jhlp_stylesheet) != 0)
-#ifdef OS_UNIX
+#ifndef _WIN32
     fprintf(jhlp_ofp, "<LINK REL=STYLESHEET TYPE=TEXT/CSS HREF=\"%s\">\n",
                       jhlp_stylesheet);
 #else
@@ -3438,7 +3438,7 @@ static int jhlp_write_prtext(void)
     fprintf(jhlp_ofp, "%s%s%s\n", jhlp_h_btitle,
                      (char *) jfm_data_adr(prhead->txt_id),jhlp_h_etitle);
     if (strlen(jhlp_stylesheet) != 0)
-#ifdef OS_UNIX
+#ifndef _WIN32
       fprintf(jhlp_ofp, "<LINK REL=STYLESHEET TYPE=TEXT/CSS HREF=\"%s\">\n",
                       jhlp_stylesheet);
 #else
@@ -3531,7 +3531,7 @@ int jhlp_convert(char *de_fname, char *jhi_fname, char *jhc_fname,
     }
     jhlp_fase = 1;
     if (jhlp_silent != 1)
-      fprintf(jhlp_sout, "  Creating contens..\n");
+      fprintf(jhlp_sout, "  Creating contents..\n");
     if (res == 0)
       res = jhlp_handle();
     if (jhlp_error_count > 0)
@@ -3541,9 +3541,9 @@ int jhlp_convert(char *de_fname, char *jhi_fname, char *jhc_fname,
         res = 1;
     }
     if (res == 0)
-      res = jhlp_reduce_contens();
+      res = jhlp_reduce_contents();
     if (res == 0)
-      res = jhlp_write_contens();
+      res = jhlp_write_contents();
     if (res == 0)
       jhlp_read_notes();
     jhlp_fase = 2;

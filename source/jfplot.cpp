@@ -175,7 +175,7 @@ static void ext_subst(char *d, char *e, int forced)
   }
 }
 
-main(int argc, char *argv[])
+int main(int argc, char *argv[])
 {
   int res, append, largc, m;
   unsigned short option_no;

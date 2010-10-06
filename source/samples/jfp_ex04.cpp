@@ -141,7 +141,7 @@ int insert_fam()
 }
 
 
-main(int argc, char *argv[])
+int main(int argc, char *argv[])
 {
   struct jfg_statement_desc sdesc;
   int m, res, ins;

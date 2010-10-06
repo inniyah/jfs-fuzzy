@@ -32,7 +32,7 @@
 void *head;                   /* jfr-program   */
 
 
-main(int argc, char *argv[])
+int main(int argc, char *argv[])
 {
   char fname[] = "truck.jfr";     /* filename                 */
   char nname[] = "ntruck.jfr";    /* filename changed program */

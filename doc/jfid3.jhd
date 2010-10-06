@@ -76,7 +76,7 @@ the form:
       extern jfrd input {<vname>} output <vname>;
 </PRE>
 If JFID3 is called without options, data is read from the file <jfrf>.dat and
-the changed program is written to <jfrf> (overwriting the original contens).
+the changed program is written to <jfrf> (overwriting the original contents).
 <P>
 JFID3 takes the options:
 <P>

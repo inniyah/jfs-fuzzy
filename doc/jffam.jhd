@@ -101,7 +101,7 @@ the form:
 </PRE>
 If JFFAM is called without options, then data is read from the file <jfrf>.dat,
 and the changed program is written to <jfrf> (overwriting its original
-contens).
+contents).
 <P>
 JFFAM accepts the options:
 <P>

@@ -152,7 +152,7 @@ void decode(int tree_adr)
   }
 }
 
-main(int argc, char *argv[])
+int main(int argc, char *argv[])
 {
    int res, finished;
    unsigned char *pc;

@@ -22,7 +22,7 @@ The help menu has three commands 'Row help', 'contens' and 'about jfrw'.
 gives help for the selected variable in the input section. The help message is build from
 (a) the comment to the variable, and (b) domain information about
 the variable (min-value and max-value).
-<BR>&bull; <STRONG>contens:</STRONG>
+<BR>&bull; <STRONG>contents:</STRONG>
 displays the title comment in the jfs-program or opens a help file. A help file
 is opened if JFRW was called with a help file in the command-line (see below).
 <BR>&bull; <STRONG>about jfrw:</STRONG>
@@ -39,7 +39,7 @@ If a filename is specified JFRW runs this jfs-program.
 If no filename is specified JFRW starts with an empty screen.
 <BR>&bull;
 If <help-file-name> is specified, then that file is opened when the menu command
- help|contens is executed. How the file is opened depends on its
+ help|contents is executed. How the file is opened depends on its
 extension (.hlp opens winhelp, .htm opens a web browser and so on).
 
 !head jfrw_changes jfrw changes "Changes in JFRW version 2"

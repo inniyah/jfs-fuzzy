@@ -1,7 +1,7 @@
 
   /************************************************************************/
   /*                                                                      */
-  /* jfr2c.cpp   Version  2.03   Copyright (c) 1999-2000 Jan E. Mortensen */
+  /* jfr2c.cpp   Version  2.05   Copyright (c) 1999-2001 Jan E. Mortensen */
   /*                                                                      */
   /* Program  to convert a compiled jfs-program to                        */
   /* C-sourcecode.                                                        */
@@ -44,7 +44,7 @@ char usage_2[] =
 "             [-ur] [-um] [-ui] [-n nm] [-so s] [-d] [-a] [-w] [-s] jfrf";
 
 char coptxt[] =
-"JFR2C  version 2.03  Copyright (c) 1999-2000 Jan E. Mortensen";
+"JFR2C  version 2.05  Copyright (c) 1999-2001 Jan E. Mortensen";
 
 struct jf_option_desc { char *option;
                         int argc;  /* -1: variabelt,     */
@@ -180,7 +180,7 @@ static void ext_subst(char *d, char *e, int forced)
   }
 }
 
-main(int argc, char *argv[])
+int main(int argc, char *argv[])
 {
   int m, res, option_no, append, batch;
   int maxtree, maxstack;

@@ -177,7 +177,7 @@ int jf_getoption(char *argv[], int no, int argc)
   return res;
 }
 
-main(int argc, char *argv[])
+int main(int argc, char *argv[])
 {
   int m, option_no, append_mode;
   int el_mode;  /* error_line_mode0: start with line 1, 1: start with fprog */

@@ -4,7 +4,7 @@
   /*                                                                   */
   /* JFS-Tokeniser and penalty-functions. Tokenizer is user to         */
   /* read jfs-values from an ascii-file or from text-strings.          */
-  /* Tokenizer-functions is used
+  /* Tokenizer-functions is used                                       */
   /*                                                                   */
   /* by Jan E. Mortensen     email:  jemor@inet.uni2.dk                */
   /*    Lollandsvej 35 3.tv.                                           */

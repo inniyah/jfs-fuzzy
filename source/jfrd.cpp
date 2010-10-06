@@ -195,7 +195,7 @@ static int jf_about(void)
   return 0;
 }
 
-main(int argc, char *argv[])
+int main(int argc, char *argv[])
 {
   int m;
 

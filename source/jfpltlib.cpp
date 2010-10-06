@@ -203,7 +203,7 @@ static void jfplt_set_output(char *name)
   if (jfplt_2_gif == 1)
   { fprintf(jfplt_op, "set output '");
     if (strlen(jfplt_op_dir) > 0)
-#ifdef OS_UNIX
+#ifndef _WIN32
       fprintf(jfplt_op, "%s/",  jfplt_op_dir);
 #else
       fprintf(jfplt_op, "%s\\", jfplt_op_dir);

@@ -33,7 +33,7 @@ void *head;                   /* jfr-program   */
 struct jfg_sprog_desc spdesc; /* describes of the jfs-program */
 
 
-main(int argc, char *argv[])
+int main(int argc, char *argv[])
 {
   char fname[] = "truck.jfr";  /* filename      */
   int res;
