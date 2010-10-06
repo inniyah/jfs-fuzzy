@@ -1,0 +1,1764 @@
+!head JFL jfs language "Language manual"
+
+This chapter gives a detailed description of the JFL language.
+It describes the syntax of source code programs (jfs-files) and the
+execution of a jfs program.
+
+!head JFL_syntax JFL syntax "Syntax"
+!head JFL_syntax_bn JFL_syntax bn "Syntax overview"
+
+!ind "Syntax of JFL"
+!ind "JFL, syntax"
+
+<P>
+Here is the syntax of JFL in extended Backus-Naur form:
+<PRE>
+JFL          ::= {<def_block>}
+                 program {<func_proc>} {<statement>}
+def_block    ::= title "<text>"; [<comment>]
+                | synonyms {<syn_decl>}
+                | hedges {<hedge_decl>}
+                | relations {<rel_decl>}
+                | operators {<operator_decl>}
+                | domains {<domain_decl>}
+                | input {<var_decl>}
+                | output {<var_decl>}
+                | local {<var_decl>}
+                | arrays {<array_decl>}
+                | adjectives {<adj_decl>}
+
+comment      ::=  /* <text> */
+
+syn_decl     ::= <sname> [<name>];
+
+hedge_decl   ::= <hname> <hedge_arg>; [<comment>]
+hedge_arg    ::= type <hedge_type>
+hedge_type   ::= negate | bell [%]<val> | sigmoid [%]<val>
+                | round [%]<val> | pow [%]<val> | yager_not [%]<val>
+                | tcut [%]<val> | bcut [%]<val> | <pl_function>
+
+rel_decl     ::= <rname> {<rel_arg>}; [<comment>]
+rel_arg      ::= <pl_function> | hedge <hname>
+
+operator_decl::= <opname> {<op_arg>}; [<comment>]
+op_arg       ::= type <op_type> | hedge <hname> | hedgemode <hmode>
+                | precedence <level>
+op_type      ::= <s_operator> | <d_operator> [%]<val>
+                | <s_operator> <s_operator> [%]<compensate>
+d_operator   ::= ham_and | ham_or | yager_and | yager_or
+s_operator   ::= min | max | prod | psum | avg | bsum | new | mxor
+                | r0 | r1 | r2 | r3 | r4 | r5 | r6 | r7 |r8 | r9
+                | r10 | r11 | r12 | r13 | r14 | r15 | sptrue
+                | spfalse | smtrue | smfalse | bunion | similar
+hmode        ::= arg1 | arg2 | arg12 | post
+
+domain_decl  ::= <dname> {<domain_arg>}; [<coment>]
+domain_arg   ::= text "<text>" | min <minval> | max <maxval>
+                 | type <dom_type>
+dom_type     ::= float | integer | categorical
+
+adj_decl     ::= <dvname> <aname> <adj_arg>}; [<comment>]
+adj_arg      ::= base [%]<val> | hedge <hname> | center [%]<val>
+                | trapez [%]<val> [%]<val> | <pl_function>
+
+pl_function  ::= plf {[%]<val>[x]:[%]<val>}
+
+var_decl     ::= <vname> {<var_arg>}; [<comment>]
+var_arg      ::= f_comp <opname> | d_comp <dc_type> | defuz <defuz_func>
+                | acut [%]<val> | default <def_val> | normal [<normval>]
+                | argument <num> | domain <dname> | text "<text>"
+dc_type      ::= new | avg | max
+defuz_func   ::= <s_defuz> | <s_defuz> <s_defuz> [%]<compensate>
+s_defuz      ::= centroid | cmax | avg | first | firstmax | lastmax
+normval      ::= confidence | [%]<val>
+def_val      ::= <val> | <adj_name>
+
+array_decl   ::= <aname> {<array_args>}; [<comment>]
+array_arg    ::= (<size>) | size <size>
+
+func_proc    ::= procedure <fp_def> | function <fp_def>
+fp_def       ::= <fname>(<name> {, <name>}); [<comment>]
+                 {<statement>} end;
+
+statement    ::= <s_statement>; [<comment>]
+s_statement  ::=  if <cond> then <then_arg>
+                | ifw [%]<weight> <cond> then <then_arg>
+                | while <cond>
+                | switch [<vname>] | case <case_arg> | default
+                | wset [<cond>]
+                | end
+case_arg     ::= <cond> | <adj_name>
+cond         ::= <vname> {<hname>} <adj_name>
+                | <vname> between <adj_name> and <adj_name>
+                | <vname> | [%]<val> | true | false | (<cond>)
+                | <arrname>(<cond>)
+                | <cond> <op> <cond>
+                | <sfunc>(<cond>) | <dfunc>(<cond>,<cond>)
+                | <vfunc>(<vname>)
+                | <ufunc>(<cond> {,<cond>})
+                | iif(<cond>,<cond>,<cond>)
+then_arg     ::= <vname> <adj_name>
+                | <vname> = <cond>
+                | <arrname>(<cond>) = <cond>
+                | increase <vname> with <cond>
+                | decrease <vname> with <cond>
+                | <proc_name>(<cond> {, <cond>})
+                | extern {<text>}
+                | clear <vname>
+                | return <cond>
+op           ::= <oname> | <rname> | + | - | * | / | > | < | >= | <=
+                | == | !=
+dfunc        ::= pow | min | max | cut
+sfunc        ::= cos | sin | tan | acos | asin | atan | log | fabs | floor
+                 | ceil | random | sqr | sqrt | wget
+vfunc        ::= dnormal | m_fzvar | s_fzvar | default | confidence
+
+text         ::= {<char>}
+sname, opname, dname, vname, dvname, proc_name,
+aname, hname, rname                   ::= <identifier>
+notmlav, weight, value, val, weight,
+minval, maxval                        ::= <float>
+level, num, size                      ::= <integer>
+</PRE>
+JFL is case-sensitive. All keywords are lower-case.
+<P>
+An <identifier> is a sequence of letters and digits. The first character
+must be a letter. Only the first 15 characters are significant.
+<P>
+Numeric constants are written as in other programming languages. Exponential
+notation is not allowed. Examples of legal constants:
+<PRE>
+            117  -0.26   23.00
+</PRE>
+The character '%' can be placed in front of most constants. It don't affect
+the execution of a jfs-program.
+<P>
+!ind "Comments"
+
+The character '#' starts a comment. The rest of the line is ignored by the
+compiler. '#'-comments and comments of the type /*<text>*/ differ in the
+way they are treated by the compiler. '#'-comments are simply ignored, but
+'/*'-comments are copied to the compiled program. They don't affect execution,
+but if source-code is extracted from the compiled programs (inverse compiling),
+then the '/*'-comments are extracted to.
+<P>
+!ind "|, extra-space"
+In JFL the character '|' is a space-character.
+<P>
+!ind "keywords, optional"
+Some of the keywords in the basic syntax can be omitted. These are:
+!dlist JFL_kyomit
+!li JFL_kyomit 1
+ in 'hedge_arg' and 'operator_arg': the keyword 'type' is optional.
+!eli
+!li JFL_kyomit 2
+ in 'adj_arg': the keyword 'center' is optional.
+!eli
+!li JFL_kyomit 3
+ in 'pl_function': the keyword 'plf' is optional.
+!eli
+!li JFL_kyomit 4
+ in 'domain_arg': the keywords 'text', 'type', 'min' and 'max' are optional.
+!eli
+!li JFL_kyomit 5
+ in 'var-arg': the keywords 'text' and 'domain' are optional.
+!eli
+!li JFL_kyomit 6
+ in 's_statement' of the type 'if <cond> then <expr>'. If <cond> is 'true'
+then
+      'if true then' is optional.
+!eli
+
+!ind "Keywords, alternative"
+JFL allows some alternatives to keywords:
+!dlist JFL_keysubst
+!li JFL_keysubst 1
+ 'rules' instead of 'program',
+!eli
+!li JFL_keysubst 2
+ ':' instead of ';' (program-block only),
+!eli
+!li JFL_keysubst 3
+ '[' instead of '(' and ']' instead of ')',
+!eli
+!li JFL_keysubst 4
+ '=' instead of '==',
+!eli
+!li JFL_keysubst 5
+ '<>' instead of '!='
+!eli
+!li JFL_keysubst 6
+ 'call' instead of 'extern'.
+!eli
+
+!head JFL_syntax_syn JFL_syntax synonyms "Synonyms"
+
+!ind "Synonyms"
+Synonyms are used to make a JFL-program more readable (i.e., more like natural language).
+<UL>
+<LI>
+A synonym declaration is either two words or a single word.
+<LI>A one-word synonym is ignored in the rest of the program. (That is to say, the word specified is allowable but in fact, superfluous.)
+<LI>After a two-word synonym declaration,
+all occurrences of the first word is replaced by the second word.
+<LI>The words 'is' and 'variables' are predefined one-word synonyms.
+</UL>
+The following is an example of a synonym block:
+<PRE>
+synonyms
+   make;
+   to;
+   than;
+   VAT 25.0;
+   greater gt;
+</PRE>
+With these synonyms the following statement:
+<PRE>
+  if x is greater than 100 or x is equal to 75
+    then make top = y + y * VAT / 100;
+</PRE>
+is translated to:
+<PRE>
+  if x gt 100 or x equal 75 then top = y + y * 25.0 / 100;
+</PRE>
+Note that the words
+<STRONG>is</STRONG> and <STRONG>make</STRONG> are dropped. Note also
+that only whole words (tokens) are replace. The  'to' in 'top' is not
+changed.
+
+
+!head JFL_declarations JFL declarations "Declarations"
+
+The declaration blocks are: 'hedges', 'relations', 'operators', 'domains',
+'input', 'output', 'local', 'arrays', and 'adjectives'.
+The scope of an object is from its declaration to the end of the program.
+
+
+!head JFL_decl_plf JFL_declarations plfs "Pl-functions"
+
+!ind "Plf, definition"
+!ind "Plf, algorithm"
+Pl-functions (plf's) are used in definition of hedges, relations and
+adjectives. A plf is a function defined by a series of values and
+function-values:
+<PRE>
+plf <name> <x_1[x]>:<y_1> <x_2[x]>:<y_2> ... <x_n>[x]:<y_n>;
+</PRE>
+where <x_1> <= <x_2> <= ... <= <x_n>.
+ <x_i> = <x_i+1> is only allowed if either <x_i> or <x_i+1> is followed by
+an 'x' (exclusive).
+<P>
+A plf maps a float-number to a float-number.
+<UL>
+<LI>
+If the input to a plf is equal to one of the values <x_j> (without 'x') then
+the output is the value <y_j>.
+<LI>
+If the input x is between two x-points
+<x_j> and <x_j+1>, the output is the y-value of the linear function from
+(<x_j>,<y_j>) to (<x_j+1>,<y_j+1>).
+</UL>
+More formally the pl-function value f(x) is calculated by the following algorithm:
+<PRE>
+plf(x) =
+{ float op;
+  if x <= x_1 or (x == x_1 and x_1.exclusiv) then
+    op = y_1;
+  else
+  if x > x_n then
+    op = y_n;
+  else
+  {
+    let i be such that x >= x_i and (x < x_i+1
+                                     or (x == x_i+1 and not(x_i+1.exclusive)));
+    if x_i == x_i+1 then
+      op = y_i+1;
+    else
+    { a = (y_i+1 - y_i) / (x_i+1 - x_i);
+      b = y_i  - a * x_i;
+      op = a * x + b;
+    }
+  }
+  return op;
+}
+</PRE>
+Example: given the following plf:
+<PRE>
+     f  0.2:0.1  0.5x:0.2  0.5:0.6  0.5x:0.2  0.6:0.8  0.8:0.2;
+</PRE>
+then
+<PRE>
+     f(0.0) = 0.1, f(0.2) = 0.1, f(0.3) = 0.133, f(0.5) = 0.6,
+     f(0.55) = 0.5, f(0.9) = 0.2.
+</PRE>
+
+!head JFL_decl_hedges JFL_declarations hedges "Hedges"
+
+!ind "Hedges"
+!ind "Not"
+!ind "Hedge-types"
+A hedge is a user-defined function. It takes a real number as input, and
+returns a real number. Ordinarily both input and output are fuzzy values
+(numbers between zero and one). For example:
+<PRE>
+hedges
+  not        type yager_not 0.5;
+  very       pow 2.0;
+  around     pow %0.5;
+  positively plf 0.1:0.0 0.9:1.0;
+  cround     round 0.5;
+</PRE>
+Hedges can be used in program-statements, and in the definition of
+relations,
+operators and adjectives. Hedges are typical used in if-statements as:
+<PRE>
+     if speed very low then brake hard;
+     if not(speed high and distance very short) then brake normal;
+</PRE>
+A hedge is defined as a PLF or as one of the predefined hedge types:
+<P>
+!lab htypes
+<TABLE BORDER>
+<CAPTION><STRONG>Hedges<STRONG></CAPTION>
+<TR>
+<TD>
+<STRONG>
+  hedge type
+</STRONG>
+</TD>
+<TD>
+<STRONG>
+  arglimits
+</STRONG>
+</TD>
+<TD>
+<STRONG>
+  function(x)
+</STRONG>
+</TD>
+</TR>
+<TR>
+<TD NOWRAP>
+negate
+</TD>
+<TD>
+</TD>
+<TD>
+<CODE>
+f(x) = 1.0 - x;
+</CODE>
+</TD>
+</TR>
+<TR>
+<TD NOWRAP>
+pow a
+</TD>
+<TD>
+  a in ]0,inf[
+</TD>
+<TD>
+<CODE>
+f(x) = power(x, a);
+</CODE>
+</TD>
+</TR>
+<TR>
+<TD NOWRAP>
+round a
+</TD>
+<TD>
+         a in [0,1]
+</TD>
+<TD>
+<CODE>
+x < a: f(x) = 0.0,
+<BR>
+x >= a: f(x) = 1.0;
+</CODE>
+</TD>
+</TR>
+<TR>
+<TD NOWRAP>
+tcut a
+</TD>
+<TD>
+ a in [0,1]
+</TD>
+<TD>
+<CODE>
+x <= a: f(x) = x,
+<BR>
+x >  a: f(x) = 1.0;
+</CODE>
+</TD>
+</TR>
+<TR>
+<TD NOWRAP>
+bcut a
+</TD>
+<TD>
+          a in [0,1]
+</TD>
+<TD>
+<CODE>
+x <  a: f(x) = 0.0,
+<BR>
+x >= a: f(x) = x;
+</CODE>
+</TD>
+</TR>
+<TR>
+<TD NOWRAP>
+yager_not a
+</TD>
+<TD>
+    a in ]0,inf[
+</TD>
+<TD>
+<CODE>
+f(x) = power(1.0 - power(x, a), 1.0 / a);
+</CODE>
+</TD>
+</TR>
+<TR>
+<TD NOWRAP>
+bell a
+</TD>
+<TD>
+a in ]0,1[
+</TD>
+<TD>
+<CODE>
+x <= a: f(x) = power(x,2.0 - (x / a)),
+<BR>
+x >  a: f(x) = power(x,(x + a - 2.0) / (2.0 * x - 2.0));
+</CODE>
+</TD>
+</TR>
+<TR>
+<TD NOWRAP>
+sigmoid a
+</TD>
+<TD>
+       a in [0,1]
+</TD>
+<TD>
+<CODE>
+f(x) = 1.0 / (1. + power(2.71828, -(20 * x - 10) * a));
+</CODE>
+</TD>
+</TR>
+</TABLE>
+<P>
+Before calculating a hedge based on one of the predefined function types,
+the argument is rounded to a value between zero and one.
+<P>
+Examples: given the hedge-definitions above and "speed low" = 0.7, then
+<PRE>
+not(speed low) = 0.3;
+very(speed low) = 0.49;
+around(speed low) = 0.84;
+positively(speed low) = 0.75;
+cround(speed low) = 1.0;
+</PRE>
+The hedge 'not' is always defined. The default definition is:
+<PRE>
+     not negate;
+</PRE>
+The default definition can be changed by redefining the hedge.
+
+
+!head JFL_decl_ops JFL_declarations operators "Operators"
+
+!ind "Operators, defining"
+!ind "Fuzzy operators"
+!ind "Logical operators"
+!ind "Precedence, operators"
+!ind "And, definition"
+!ind "Or, definition"
+!ind "Hedgemode, in operator-definition"
+A user-defined operator is a function taking two fuzzy values as
+input, and returning a fuzzy-value ([0,1]x[0,1]->[0,1]). The operators are
+defined in the operator block. For example:
+<PRE>
+operators
+  and  type min;
+  or   yager_or 2;
+  nand prod hedgemode arg12 hedge not;
+  xor  r6 precedence 25;
+  sop  max avg %0.333;
+</PRE>
+Operators are used in conditional statements and in the definition of
+fuzzy-composite operators. Here are examples of conditional statements with
+operators:
+<PRE>
+if speed low and distance high then brake none;
+if (speed low or speed high) sop distance medium then brake = 27;
+</PRE>
+There are two operator types: (a) simple and (b) complex. The simple operator types
+are described in the following table (If the operator is a generalization
+of a boolean operator, the name of the boolean operator is written in the
+column 'bfunc'):
+<P>
+<TABLE BORDER>
+<CAPTION>Operator-types</CAPTION>
+<TR>
+<TD>
+<STRONG>
+name
+</STRONG>
+</TD>
+<TD>
+<STRONG>
+   bfunc
+</STRONG>
+</TD>
+<TD>
+<STRONG>
+  function
+</STRONG>
+</TD>
+</TR>
+<TR>
+<TD NOWRAP>
+min
+</TD>
+<TD>
+            and
+</TD>
+<TD>
+<CODE>
+f(x,y) = min(x, y);
+</CODE>
+</TD>
+</TR>
+<TR>
+<TD NOWRAP>
+max
+</TD>
+<TD>
+             or
+</TD>
+<TD>
+<CODE>
+f(x,y) = max(x, y);
+</CODE>
+</TD>
+</TR>
+<TR>
+<TD NOWRAP>
+prod
+</TD>
+<TD>
+           and
+</TD>
+<TD>
+<CODE>
+f(x,y) = x * y;
+</CODE>
+</TD>
+</TR>
+<TR>
+<TD NOWRAP>
+psum
+</TD>
+<TD>
+           or
+</TD>
+<TD>
+<CODE>
+f(x,y) = x + y - (x * y);
+</CODE>
+</TD>
+</TR>
+<TR>
+<TD NOWRAP>
+avg
+</TD>
+<TD>
+<CODE>
+
+</CODE>
+</TD>
+<TD>
+<CODE>
+f(x,y) = (x + y) / 2.0;
+</CODE>
+</TD>
+</TR>
+<TR>
+<TD NOWRAP>
+bsum
+</TD>
+<TD>
+           or
+</TD>
+<TD>
+<CODE>
+f(x,y) = min(x + y, 1);
+</CODE>
+</TD>
+</TR>
+<TR>
+<TD NOWRAP>
+bunion
+</TD>
+<TD>
+          and
+</TD>
+<TD>
+<CODE>
+f(x,y) = max(0, x + y - 1);
+</CODE>
+</TD>
+</TR>
+<TR>
+<TD NOWRAP>
+similar
+</TD>
+<TD>
+         eq
+</TD>
+<TD>
+<CODE>
+x = y: f(x,y) = 1.0,
+<BR>
+else:  f(x,y) = min(x,y) / max(x,y);
+</CODE>
+</TD>
+</TR>
+<TR>
+<TD NOWRAP>
+new
+</TD>
+<TD>
+y
+</TD>
+<TD>
+<CODE>
+f(x,y) = y;
+</CODE>
+</TD>
+</TR>
+<TR>
+<TD NOWRAP>
+mxor
+</TD>
+<TD>
+           xor
+</TD>
+<TD>
+<CODE>
+x >= y: f(x,y) = x - y,
+<BR>
+x <  y: f(x,y) = y - x;
+</CODE>
+</TD>
+</TR>
+<TR>
+<TD NOWRAP>
+sptrue
+</TD>
+<TD>
+          true
+</TD>
+<TD>
+<CODE>
+f(x,y) = power(2 * x - 1, 2) * power(2 * y - 1, 2);
+</CODE>
+</TD>
+</TR>
+<TR>
+<TD NOWRAP>
+spfalse
+</TD>
+<TD>
+        false
+</TD>
+<TD>
+<CODE>
+f(x,y) = 1 - power(2 * x - 1, 2) * power(2 * y - 1, 2);
+</CODE>
+</TD>
+</TR>
+<TR>
+<TD NOWRAP>
+smtrue
+</TD>
+<TD>
+         true
+</TD>
+<TD>
+<CODE>
+f(x,y) = 1 - 16 * (x - x * x) * (y - y * y);
+</CODE>
+</TD>
+</TR>
+<TR>
+<TD NOWRAP>
+smfalse
+</TD>
+<TD>
+         false
+</TD>
+<TD>
+<CODE>
+f(x,y) = 16 * (x - x * x) * (y - y * y);
+</CODE>
+</TD>
+</TR>
+<TR>
+<TD NOWRAP>
+r0
+</TD>
+<TD>
+              false
+</TD>
+<TD>
+<CODE>
+f(x,y) = 0;
+</CODE>
+</TD>
+</TR>
+<TR>
+<TD NOWRAP>
+r1
+</TD>
+<TD>
+           nor
+</TD>
+<TD>
+<CODE>
+f(x,y) = x * y - x - y + 1;
+</CODE>
+</TD>
+</TR>
+<TR>
+<TD NOWRAP>
+r2
+</TD>
+<TD>
+<CODE>
+
+</CODE>
+</TD>
+<TD>
+<CODE>
+f(x,y) = y - x * y;
+</CODE>
+</TD>
+</TR>
+<TR>
+<TD NOWRAP>
+r3
+</TD>
+<TD>
+             not x
+</TD>
+<TD>
+<CODE>
+f(x,y) = 1 - x;
+</CODE>
+</TD>
+</TR>
+<TR>
+<TD NOWRAP>
+r4
+</TD>
+<TD>
+<CODE>
+
+</CODE>
+</TD>
+<TD>
+<CODE>
+f(x,y) = x - x * y;
+</CODE>
+</TD>
+</TR>
+<TR>
+<TD NOWRAP>
+r5
+</TD>
+<TD>
+            not y
+</TD>
+<TD>
+<CODE>
+f(x,y) = 1 - y;
+</CODE>
+</TD>
+</TR>
+<TR>
+<TD NOWRAP>
+r6
+</TD>
+<TD>
+        xor
+</TD>
+<TD>
+<CODE>
+f(x,y) = x + y - 2 * x * y;
+</CODE>
+</TD>
+</TR>
+<TR>
+<TD NOWRAP>
+r7
+</TD>
+<TD>
+           nand
+</TD>
+<TD>
+<CODE>
+f(x,y) = 1 - x * y;
+</CODE>
+</TD>
+</TR>
+<TR>
+<TD NOWRAP>
+r8
+</TD>
+<TD>
+           and
+</TD>
+<TD>
+f(x,y) = x * y;
+</CODE>
+</TD>
+</TR>
+<TR>
+<TD NOWRAP>
+r9
+</TD>
+<TD>
+           eq
+</TD>
+<TD>
+<CODE>
+f(x,y) = 1 - x - y + 2 * x * y;
+</CODE>
+</TD>
+</TR>
+<TR>
+<TD NOWRAP>
+r10
+</TD>
+<TD>
+           y
+</TD>
+<TD>
+<CODE>
+f(x,y) = y;
+</CODE>
+</TD>
+</TR>
+<TR>
+<TD NOWRAP>
+r11
+</TD>
+<TD>
+           imp
+</TD>
+<TD>
+<CODE>
+f(x,y) = 1 - x + x * y;
+</CODE>
+</TD>
+</TR>
+<TR>
+<TD NOWRAP>
+r12
+</TD>
+<TD>
+           x
+</TD>
+<TD>
+<CODE>
+f(x,y) = x;
+</CODE>
+</TD>
+</TR>
+<TR>
+<TD NOWRAP>
+r13
+</TD>
+<TD>
+</TD>
+<TD>
+<CODE>
+f(x,y) = x * y - y + 1;
+</CODE>
+</TD>
+</TR>
+<TR>
+<TD NOWRAP>
+r14
+</TD>
+<TD>
+           or
+</TD>
+<TD>
+<CODE>
+f(x,y) = x + y - x * y;
+</CODE>
+</TD>
+</TR>
+<TR>
+<TD NOWRAP>
+r15
+</TD>
+<TD>
+            true
+</TD>
+<TD>
+<CODE>
+f(x,y) = 1;
+</CODE>
+</TD>
+</TR>
+</TABLE>
+<P>
+
+Complex operators takes an argument. They are:
+<P>
+!dtab JFL_ops_2 "complex operators"
+!tab JFL_ops_2 head
+<STRONG>
+name
+</STRONG>
+!etc
+<STRONG>
+arglimits
+</STRONG>
+!etc
+<STRONG>
+bfunc
+</STRONG>
+!etc
+<STRONG>
+function
+</STRONG>
+!etab
+!tab JFL_ops_2 ham_or
+ham_or a
+!etc
+    a in ]0,inf]
+!etc
+   or
+!etc
+<CODE>
+f(x,y) = (x + y - (2 - a) * x * y) / (1 - (1 - a) * x * y)
+</CODE>
+!etab
+!tab JFL_ops_2 ham_and
+ham_and a
+!etc
+   a in ]0,inf]
+!etc
+  and
+!etc
+<CODE>
+f(x,y) = (x * y) / (a + (1 - a) * (x + y - x * y));
+</CODE>
+!etab
+!tab JFL_ops_2 yager_or
+yager_or a
+!etc
+  a in ]0,inf]
+!etc
+   or
+!etc
+<CODE>
+f(x,y) = min(1, power(power(x, a) + power(y, a)), 1,0 / a);
+</CODE>
+!etab
+!tab JFL_ops_2 yager_and
+yager_and a
+!etc
+a in ]0,inf]
+!etc
+ and
+!etc
+<CODE>
+f(x,y) = 1 - min(1, power(power(1 - x, a) + power(1 - y, a)),
+<BR>
+                          1.0 / a)));
+</CODE>
+!etab
+<P>
+New operator types can be created by combining two simple operators:
+<PRE>
+      <name> <op_1> <op_2> <a>
+</PRE>
+where a is a number between 0.0 and 1.0 (the compensation-value). The
+operator 'sop' in the example is defined this way. The combined operator is
+calculated by:
+<PRE>
+f(x,y) = (1.0 - a) * op_1(x, y) + a * op_2(x, y).
+</PRE>
+A hedge can be added to the definition of an operator ('nand' in the
+example).
+If the operator <op> is defined with the hedge <hed>, its calculation
+depends on the hedgemode. If no hedgemode is specified,
+the hedgemode='post'. If
+<PRE>
+hedgemode = 'arg1':   f(x,y) = op(hed(x),y),
+            'arg2':   f(x,y) = op(x, hed(y)),
+            'arg12':  f(x,y) = op(hed(x), hed(y)),
+            'post':   f(x,y) = hed(op(x,y)).
+</PRE>
+A precedence can be added to the operator. A precedence is a number between
+1 and 255. The use of the precedence is described in the chapter about
+evaluation of expressions. If no precedence is given the operator gets the
+precedence 19. The following operators are always declared: 'caseop',
+'weightop', 'and', 'or' and 'whileop'. By default they are defined as:
+<PRE>
+caseop   prod;
+weightop prod;
+and      min precedence 30;
+or       max precedence 20;
+whileop  prod;
+</PRE>
+Example: Given the following operator declarations:
+<PRE>
+operators
+   and min;
+   nor  psum hedge not;
+   hand ham_and 2;
+   sop avg max 0.25;
+</PRE>
+then:
+<PRE>
+  0.7 and 0.3      = 0.3.
+  0.7 nor 0.5      = 0.15  (= not(0.7 + 0.5 - 0.7 * 0.5) = not(0.85) = 0.15).
+  0.7 hand 0.3     = 0.174 (= (0.7*0.3) / (2 + (1-2)*(0.7+0.3-0.7*0.3)).
+  0.7 sop 0.3      = 0.55  (= (1-0.25)*avg(0.7,0.3)+0.25*max(0.7,0.3).
+</PRE>
+
+!head JFL_decl_rels JFL_declarations relations "Relations"
+
+!ind "Fuzzy relations"
+!ind "Relations, user-defined"
+User-defined relations are defined in a relations block.
+A user-defined relation is a function from 2 real numbers to a
+fuzzy-value (RxR -> [0.0,1.0]). It is defined using a plf and an optional
+hedge. Relations are used in expressions, often as fuzzy
+variants of equivalence and order relations.
+<P>For example:
+<PRE>
+relations
+   equal -1.0:0.0  0.0:1.0  1.0:0.0;
+   greater 0.0:0.0  0.2:1.0;
+   dif  -5.0:1.0 0.0:0.0 5.0:1.0 hedge very;
+</PRE>
+Given a relation: '<rname> <plf> hedge <h>'. The expression:
+'<e1> <rname> <e2>' is calculated as: h(plf(e1 - e2)).
+<P>
+If 'equal' is defined as above then:
+<PRE>
+'3.0 equal 5.0' gives 0.0 (=equal(-2.0)),
+'2.5 equal 2.2' gives 0.7 (=equal(0.3)) and
+'2.0 equal 2.0' gives 1.0 (=equal(0.0)).
+</PRE>
+
+!head JFL_decl_vars JFL_declarations variables "Variables"
+
+!ind "Variables, defining"
+The variables are declared in five blocks. The variable-types are declared in
+the block 'domains'. The domain variables are declared in the blocks
+'input', 'output' and 'local'. The fuzzy variables are declared in the
+block 'adjectives'. The fuzzification-functions and
+defuzzification-functions are declared together with the domain variables.
+
+!head JFL_decl_domains JFL_decl_vars domains "Domains"
+
+!ind "Domains"
+!ind "Domain types"
+!ind "Fbool, predefined domain"
+!ind "Float, predefined domain"
+The type and range of domain variables are declared in the domains block.
+For example:
+<PRE>
+domains
+  speed text "mph" type float min 0.0 max 200.0;
+  percent "%" 0 100;
+  age "year old" integer;
+  sextype  categorical;
+</PRE>
+The syntax of a domain declaration is:
+<PRE>
+ <domain-name> {<domain-arg>};
+</PRE>
+The possible domain arguments are:
+!dtab domain_arg "Domain arguments"
+!tab domain_arg text
+text "<utext>"
+!etc
+The unit text is not used during the execution of a jfs-program.
+It is just used in help messages delivered by some run-programs.
+!etab
+!tab domain_arg type
+type <type>
+!etc
+The possible types are: 'float', 'integer' and 'categorical'.
+If no type is specified, it is assumed to be 'float'.
+<BR>
+<STRONG>float:</STRONG>
+ The value of variables bound to the domain are floating point values.
+<BR><STRONG>integer:</STRONG>
+ The value of variables bound to the domain are whole numbers (rounded floats).
+<BR><STRONG>categorical:</STRONG> the variables bound to the domain, can
+only take a fixed set of float values. The possible values are
+the center values of adjectives bound to the variable (see
+the chapter
+!ref JFL_decl_fzvars
+for details).
+!etab
+!tab domain_arg min
+min <minval>
+!etc
+Specifies a minimum value for variables bound to the domain. If no
+minimum is specified, there is no lower limit in the domain.
+!etab
+!tab domain_arg max
+max <minval>
+!etc
+Specifies a maximum value for variables bound to the domain. If no
+maximum is specified, there is no upper limit in the domain.
+!etab
+<P>
+The following domains are always defined:
+<PRE>
+     fbool type float min 0.0 max 1.0;
+     float type float;
+</PRE>
+
+!head JFL_decl_domvars JFL_decl_vars domain_variables "Domain variables"
+
+!ind "Domain-variables, defining"
+!ind "Variables, domain"
+!ind "Confidence, variable"
+!ind "Acut, alfacut"
+!ind "Fcomp, fuzzy composite operator"
+!ind "Dcomp, domain composite operator"
+!ind "Normal, variable-argument"
+!ind "Default, variable-argument"
+A domain variable is a variable that bound to a domain. It has a
+variable-value and a confidence value. The possible values of the
+variable is defined by the domain (type, minimum and type), but internally a
+variable's value is a always a float. The confidence value is a floating point
+number between zero and one. The domain variable also has a hidden value
+called conf_sum.
+<P>
+The domain variables are declared in the: input, output, and
+local blocks. The only difference between variables from the different blocks is
+how they are treated by the executing programs.
+<P>
+If the domains from the previous chapter (
+!ref JFL_decl_domain
+) are used, the variables could be:
+<PRE>
+input
+  x_speed text "Speed in x-direction" domain speed  defuz cmax;
+  y_speed "Speed in y-direction" speed normal conf;
+  car_age "Car age" age defuz avg;
+  dsex "Drivers sex" default female;
+local
+  tspeed "total speed" speed d_comp new;
+output
+  risk "Risk" percent  defuz centroid cmax %0.25  f_comp or acut 0.2
+       default 50;
+</PRE>
+A domain variable is defined by a name followed by arguments.
+The possible arguments are:
+<P>
+!dtab JFL_dvar_args "Variable arguments"
+!tab JFL_dvar_args text
+text "<txt>"
+!etc
+This text is not used in execution of a jfs-program. It is typical used by
+run-programs when asking for input values or while writing output values.
+!etab
+!tab JFL_dvar_args domain
+domain <domain-name>
+!etc
+This specifies the domain to which the domain variable is bound. If no domain is
+specified, the domain-variable is bound to the predefined domain named
+<STRONG>float</STRONG>.
+!etab
+!tab JFL_dvar_args f_comp
+f_comp <opname>
+!etc
+This defines the fuzzy composite operator used in the
+execution of if-statements (see
+!ref JFL_prog_thenfz
+). <opname> is the name of a defined operator. If it is not
+otherwise specified for a variable, the fuzzy composite
+operator for this variable is
+<STRONG>or</STRONG>.
+!etab
+!tab JFL_dvar_args d_comp
+d_comp <d_opname>
+!etc
+This defines the domain composite operator (see
+!ref JFL_prog_thenva
+) The possible values are
+<STRONG>new, avg,</STRONG> and <STRONG>max</STRONG>.
+If d_comp is not specified the domain composite operator is
+<STRONG>new</STRONG>.
+!etab
+!tab JFL_dvar_args acut
+acut [%]<value>
+!etc
+The alfacut value is used in defuzzification (see
+!ref JFL_decl_defuz
+). <value> is a number between 0.0 and 1.0.
+!etab
+!tab JFL_dvar_args defuz
+defuz <defuz_func>
+!etc
+This specifies the defuzzification function (see
+!ref JFL_decl_defuz
+). The <defuz_func> can be a single or a double function.
+<BR>
+A single function can be one of:
+<STRONG>centroid, cmax, avg, first, firstmax</STRONG> and <STRONG>lastmax</STRONG>.<BR>
+A double function is made of two simple functions followed
+by a number between 0.0 and 1.0; for example: 'cmax avg 0.2'.
+<BR>
+If no defuz is specified, the default defuzzification function is
+<STRONG>centroid</STRONG>.
+!etab
+!tab JFL_dvar_args default
+default <value>
+!etc
+A variables default value is used if the variable has
+not been assigned a value, or if it impossible to
+calculate the domain variable's value in defuzzification. It can be
+either a number or the name of an adjective bound to the variable.
+If no default value is specified, the default value will be
+the domain's minimum value. If no minval is specified for the domain,
+the default value will be 0.0.
+!etab
+!tab JFL_dvar_args normal
+normal <normval>
+!etc
+The normalization value is used in fuzzification (see
+!ref JFL_decl_fuzz
+). <normval> is either (a) a number between 0.0 and 1.0,  or (b)
+the constant 'confidence'. If it isn't specified, no normalization
+is done in fuzzification.
+!etab
+!tab JFL_dvar_args argument
+argument <num>
+!etc
+The argument is a number between 0 and 65535. It is not
+used in execution of a jfs-program.
+!etab
+
+!head JFL_decl_fzvars JFL_decl_vars fuzzy_vars "Fuzzy variables (and adjectives)"
+
+!ind "Fuzzy variables, defining"
+!ind "Adjectives"
+!ind "Base, adjective argument"
+!ind "Center, adjective argument"
+!ind "Trapez, adjective argument"
+A fuzzy-variable has a floating-point value between zero and one.
+The fuzzy-variables are created from the adjectives defined in
+the adjective block. The adjectives are also used to define the
+fuzzification and defuzzification functions.
+<P>
+Example: Given the domains and domain variables from last 2 chapters (
+!ref JFL_decl_domain
+ and
+!ref JFL_decl_domvar
+) an adjective block could look like this:
+<PRE>
+adjectives
+  car_age new    center 0;
+  car_age medium center 5;
+  car_age old           10;  # 'center' is optional
+
+  speed low plf 0:1 30:1 50:0;
+  speed medium 30:0 45:0.3 50:1 70:1 80:0 center 60;
+  speed fast 70:0 80:1.0 100:0;
+  speed very_fast 80:0 100:1;
+
+  tspeed s 0;
+  tspeed m 70 hedge very around;
+  tspeed l 120;
+
+  dsex m 0;
+  dsex f 1;
+
+  risk xs  0 base  50;
+  risk  s  25;
+  risk  m  trapez 40 60  base 25;
+  risk  l  75;
+  risk  xl 100 base 50;
+</PRE>
+Adjectives are defined by statements of the form:
+<PRE>
+     <d/v-name> <aname> {<aargs>};
+</PRE>
+where  <d/v-name> is the name of a domain or the name of a domain-variable. The
+name of an adjective is the combination: <d/v-name> <aname>.  Two
+adjectives
+can have the same <aname>, but is it illegal for two adjectives to have the
+same combined name. The possible <aargs> are:
+<P>
+!dtab JFL_fzvar_args "Fuzzy variable arguments"
+!tab JFL_fzvar_args base
+base [%]<value>
+!etc
+This is a positive number defining the base-value
+(used in centroid-defuzzification). If no base-value
+is specified the base-value is calculated (see
+!ref JFL_decl_fzvars JFL_fzv_calc below
+).
+!etab
+!tab JFL_fzvar_args center
+center [%]<value>
+!etc
+This is a number defining the adjective's center value. It is used in
+defuzzification and in fuzzification with triangular shaped functions
+(a short form of a plf, see
+!ref JFL_decl_fzvars JFL_fzv_calc below
+). If no center-value is specified, then the center-value is
+calculated (see
+!ref JFL_decl_fzvars JFL_fzv_calc  below
+ ).
+!etab
+!tab JFL_fzvar_args trapez
+trapez [%]<arg1> [%]<arg2>
+!etc
+This defines a trapez-shaped fuzzification function. This
+is a short form of a plf-function (see
+!ref JFL_decl_fzvars JFL_fzv_calc below
+).
+!etab
+!tab JFL_fzvar_args plf
+plf <pl-function>
+!etc
+The plf defines the fuzzification-function.
+!etab
+!tab JFL_fzvar_args hedge
+hedge <h1name> [<h2name>]
+!etc
+ <h1name> and <h2name> are names of defined
+hedges. The hedges are used to modify the plf in
+fuzzification (see
+!ref JFL_decl_fuzz
+).
+!etab
+<P>
+!lab JFL_fzv_calc
+Every adjective has the following properties: pl-function, center-value,
+ and base-value. The properties not specified, are calculated using the following
+algorithm:
+<P>
+<PRE>
+Let 'dvn' be the name of a domain or variable and let a[1], ... , a[count]
+be the adjectives defined with dvn as <d/v-name> in:
+
+if (count == 1)
+  return error('At least 2 adjectives are needed');
+for n = 1  to count  /* calculate center-values */
+{ if (a[n].center is not defined)
+  { if (a[n].trapez is defined)
+      a[n].center = a[n].trapez_start
+                    + (a[n].trapez_end - a[n].trapez_start) / 2.0;
+    else
+    if (a[n].plf is defined)
+      a[n].center = cog(a[n].plf); /* cog is defined below */
+    else
+    { if (domain_min is defined)
+        a[n].center = domain_min + n - 1.0;
+      else a[n].center = n - 1.0;
+    }
+  }
+}
+for n = 1 to count  /* calculate plf (and bases if plf is defined) */
+{ if (a[n].plf is not defined)
+  { if (a[n].trapez is not defined)
+      a[n].trapez_start = a[n].trapez_end = a[n].center;
+    if (n == 1)
+       a[n].plf = 'a[n].trapez_end:1.0 a[n+1].trapez_start:0.0';
+    else
+    if (n == count)
+      a[n].plf = 'a[n-1].trapez_end:0.0 a[n].trapez_start:1.0';
+    else
+    { if (a[n].trapez_start != a[n].trapez_end)
+        a[n].plf = 'a[n-1].trapez_end:0.0 a[n].trapez_start:1.0
+                    a[n].trapez_end:1.0 a[n+1].trapez_start:0.0';
+      else
+        a[n].plf = 'a[n-1].trapez_end:0.0 a[n].trapez_start:1.0
+                    a[n+1].trapez_start:0.0';
+    }
+  }
+  else /* plf is defined */
+  if a[n].base is not defined then
+    a[n].base = abs(a[n].plf[last].x - a[n].plf[1].x);
+};
+
+for n = 1 to count /* calculate bases */
+{
+  if (a[n].base is not defined)
+  { /* base = next_adj.center - prev_adj.center */
+    if (n == 1)
+    { if (dvd.domain_min_value is defined)
+        pre = dvd.domain_min_value;
+      else
+        pre = a[n].center;
+      post = a[n+1].center;
+    }
+    else
+    if (n == count)
+    { if (dvd.domain_max_value is defined)
+        post = domain_max_value;
+      else
+        post = a[n].center;
+      pre = a[n-1].center;
+    }
+    else
+    { pre = a[n-1].center;
+      post = a[n+1].center;
+    };
+    a[n].base = post - pre;
+  };
+};
+
+where:
+
+function cog(pl: pl-function) return number is
+begin
+      /* calculates the center of gravity for the pl-function */
+  cog := (integral( x * pl(x)) / integral(pl(x)), x in [pl[1].x,
+                                                        pl[last].x]);
+end;
+</PRE>
+If the automatically created parameters are added to the example
+adjective block, the result is:
+<PRE>
+adjectives
+  car_age new    0:1 5:0 center 0 base 5;
+  car_age medium 0:0 5:1 10:0 center 5 base 10;
+  car_age old    5:0 10:1 center 10 base 5;
+
+  speed low       0:1  30:1 50:0 center 20.4127 base 50;
+  speed medium    30:0 45:0.3 50:1 70:1 80:0 center 60 base 50;
+  speed fast      70:0 80:1.0 100:0 center 83.333 base 30;
+  speed very_fast 80:0 100:1 center 93.333 base 20;
+
+  tspeed s 0:1 70:0 center 0 base 70;
+  tspeed m 0:0 70:1 120:0 center 70 base 120 hedge very around;
+  tspeed l 70:0 120:1 center 120 base 50;
+
+  dsex m 0:1 1:0 center 0 base 1;
+  dsex f 0:0 1:1 center 1 base 1;
+
+  risk xs  0:1 25:0 center 0 base  50;
+  risk  s  0:0 25:1 40:0 center 25 base 50;
+  risk  m  25:0 40:1 60:1 75:0 center 50 base 25;
+  risk  l  60:0 75:1 100:0 center 75 base 50;
+  risk  xl 75:0 100:1 center 100 base 50;
+</PRE>
+
+!lab JFL_fzv_def
+!ind "Fuzzy variables" JFL_fzv_def
+The fuzzy variables are automatically created from the domain variables and
+the adjectives. Like the adjectives, the fuzzy variables are unique
+identified by two words, (a) a domain-variable-name and (b) an adjective-name. The
+fuzzy variables are created by this algorithm (a fuzzy variable is created from every
+variable-adjective. If no variable-adjectives are specified for a given variable,
+then fuzzy variables are created from the variable's domain):
+<PRE>
+for each domain-variable dv
+{
+  let a[1],.., a[acount] be the adjectives with d/v-name = dv.name;
+  for n = 1 to acount
+    create a fuzzy-variable with the name: 'dv.name a[n].aname';
+  if (acount == 0)
+  {
+    let dom be the domain with dom.name = dv.domain_name;
+    let a[1], ..., a[dcount] be the adjectives with d/v-name = dom.name;
+    for n = 1 to dcount
+      create a fuzzy-variable with the name  'dv.name a[n].aname';
+  };
+};
+</PRE>
+<P>
+In the example, the following fuzzy variables are created:
+<PRE>
+x_speed low;
+x_speed medium;
+x_speed fast;
+x_speed very_fast;
+
+y_speed low;
+y_speed medium;
+y_speed fast;
+y_speed very_fast;
+
+car_age new;
+car_age medium;
+car_age old;
+
+dsex m;
+dsex f;
+
+tspeed s;
+tspeed m;
+tspeed l;
+
+risk xs;
+risk s;
+risk l;
+risk xl;
+</PRE>
+A fuzzy variable is bound to the adjective from which it was created. In
+the
+example the fuzzy variable 'x_speed medium' is bound to the adjective
+'speed medium' and the fuzzy variable 'risk l' is bound to the adjective
+'risk l'.
+<P>
+A fuzzy variable is said to be bound to the domain variable from which it
+was created. In the example the fuzzy variable 'x_speed medium' is bound to
+the domain variable 'x_speed'.
+
+
+!head JFL_decl_fuzz JFL_decl_vars fuzzification "Fuzzification"
+
+!ind "Fuzzification, algorithm"
+Every time a domain variable is assigned a new value, the values of all
+fuzzy variables bound to the domain variable are recalculated. This process is
+called fuzzification (in practice, fuzzification is only done when a fuzzy-variable's
+value is needed). Fuzzification is not done when the value of a
+domain-variable is changes by defuzzification. Here is the fuzzification algorithm:
+<PRE>
+fuzzificate(dv: domain-variable) is
+{
+  sum = 0;
+  for each fuzzy-variable fv bound to dv
+  {
+    let a be the adjective bound to fv;
+    fv.value = afuzz(a, dv.value);    /* afuzz is defined below */
+    sum = sum + fv.value;
+  };
+  if (dv.normal and sum != 0.0)
+  { if (dv.normal_arg == 'conf')
+      t = dv.confidence;
+    else
+      t = dv.normal_arg;
+    for each fuzzy-variable fv bound to dv
+      fv.value = fv.value * t / sum;
+  }
+};
+
+function afuzz(a: adjective, v: float) return float:
+{
+  r = a.plf(v);
+  if (a.hedge_1)
+    if (a.hedge_2 and v > a.center)
+      r = a.hedge_2(v);
+    else
+      r = a.hedge_1(v);
+   return r;
+ };
+</PRE>
+The following examples are based on the variables defined in the example in:
+!ref JFL_decl_fzvars
+. The example shows the values of the fuzzy variables when a
+domain variable is assigned a new value. Only fuzzy variables with
+values != 0.0 are shown. When no confidence are provided, confidence is assumed
+to be 1.0.
+<PRE>
+domain_var (val:conf)   fuzzy_var (calculated)  Comment
+---------------------------------------------------------------------------
+car_age = 4             car_age new    = 0.2    Calculated by pl-function.
+                        car_age medium = 0.8
+
+car_age = 5             car_age medium = 1.0
+
+x_speed =  0.0          x_speed low    = 1.0
+
+x_speed = 46.0          x_speed low    = 0.2
+                        x_speed medium = 0.44
+
+y_speed = 46.0:1.0      y_speed low    = 0.3125 (= x_speed, but normalized
+                        y_speed medium = 0.6875   with sum = 1.0).
+
+y_speed = 46.0:0.5      y_speed low    = 0.15625 (= x_speed, but normalized
+                        y_speed medium = 0.34375   with sum = 0.5).
+
+tspeed = 60             tspeed s       = 0.1429
+                        tspeed m       = 0.7347  (=very(plf(60))
+                                                  =very(0.857).
+
+tspeed = 80             tspeed m       = 0.8944  (=around(plf(80))
+                                                  = around(0.8).
+                        tspeed l       = 0.2
+
+tspeed = 120            tspeed l       = 1.0
+
+</PRE>
+
+!head JFL_decl_defuz JFL_decl_vars defuzzification "Defuzzification"
+
+!ind "Defuzification, algorithm"
+Let 'fzv' be a fuzzy variable bound to the domain variable 'dv'. When 'fzv'
+is assigned a new value, the value and confidence of 'dv' is
+recalculated.
+This process is called defuzzification (in practice the value of the
+domain variables is calculated when it is needed).
+<P>
+Domain variables are not
+changed if the value of a fuzzy variable is changed by fuzzification. In
+defuzzification the domain variable's value is calculated from the
+center value of the adjectives, and the values of the fuzzy variables.
+For example if the 'avg'-defuzzification method is used, the value is
+calculated as the weighted average of the center values, where the weights
+are the fuzzy variables' values.
+<P>
+The defuzzification algorithm:
+<PRE>
+defuzzificate(dv: domain-variable) is
+{
+  let a[1], ..., a[acount] be the adjectives bound to dv;
+  let fv[1], ..., fv[acount] be the fuzzy-variables bound to dv;
+                               /* ( and a[n] is bound to fv[n]) */
+  let t[1],...,t[acount] be an array of float;
+
+  for n = 1 to acount
+  {
+    if (dv.acut) /* alfacut fuzzy-variables */
+    { if (fv[n] >= dv.acut)
+        t[n] = fv[n]
+      else
+        t[n] = 0;
+    }
+    else
+      t[n] = fv[n];
+  };
+
+  total = t[1] +...+ t[acount];
+  if total = 0 then
+  {
+    dv.value = dv.default_value;
+    dv.confidence = 0.0;
+    error_code = 204; /* defuzzification not possible */
+  }
+  else
+  { for n = 1 to acount
+      t[n] = t[n] / sum;
+    /* now t[1] +...+ t[acount] = 1.0 */
+
+    if (dv.defuz_2 is not defined)
+      res = df(dv.defuz_1, dv, t);   /* df() is defined below */
+    else
+      res =(dv.defuz_value * df(dv.defuz_1, dv, t) + df(dv.defuz_2, dv, t)
+             / ( dv.defuz_value + 1.0);
+  end;
+  dv.confidence = max(fv[1],...,f[acount]);
+  dv.value = vround(dv, res);     /* vround is defined below */
+};
+
+where
+
+function df(defuz: defuz-func, dv: var, t: array[1..acount] of float)
+       return float
+{
+  if (defuz == 'firstmax')
+  { n = min{ i | t[i] = max(t[1], ..., t[acount])};
+    res = a[n].center;
+  }
+  else
+  if (defuz == 'lastmax')
+  { n = max{ i | t[i] = max(t[1],...,t[acount])};
+    res = a[n].center;
+  {
+  else
+  if (defuz == 'cmax')  /* center of maximas */
+  { i_min = min{ i | t[i] = max(t[1], ..., t[acount])};
+    i_max = max{ i | t[i] = max(t[1], ..., t[acount])};
+    res = a[i_min].center + (a[i_min].center + a[i_max].center) / 2.0);
+  }
+  else
+  if (defuz == 'first')
+    res = a[1].center
+  else
+  if (defuz == 'avg')
+    res = t[1] * a[1].center + ... + t[acount] * a[acount].center;
+  else
+  if (defuz == 'centroid')
+    res = (t[1] * a[1].center * a[1].base + ...
+          + t[acount] * a[acount].center * a[acount].base)
+         / (t[1] * a[1].base + ... + t[acount] * a[acount].base);
+
+  return res;
+};
+
+function vround(dv :domain_var, val: float) return float is
+{
+  let d be the domain with d.name = dv.domain_name;
+  if (d.type == 'float')
+    res = val
+  else
+  if (d.type == 'integer')
+    res = round(dv.value)
+  else
+  if (dv.domain_type == 'categorical')
+  { /* res = center for closest adj */
+    let n = min { i | abs(dv.value - a[i].center)
+                  = min(abs(dv.value - a[x].center)) };
+     res = a[n].center;
+  };
+  return res;
+};
+</PRE>
+Here are examples based on the domain variables and fuzzy variables from the chapters:
+!ref JFL_decl_domvar
+and
+!ref JFL_decl_fzvars
+ :
+<PRE>
+                                    calculated
+fuzzy-var            normalized     domain_var  comment
+---------------------------------------------------------------------------
+x_speed low    = 0.2    0.14
+x_speed medium = 0.7    0.50        60.00   = 'x_speed medium'.center
+x_speed fast   = 0.5    0.36                   (defuz='cmax').
+
+x_speed low    = 0.4    0.4
+x_speed medium = 0.4    0.4         39.92   = midpoint(low, medium)
+x_speed fast   = 0.2    0.2                 = midpoint(20.41, 60.0).
+
+car_age new    = 0.4    0.29
+car_age medium = 0.8    0.57         4.00   = round(0.29*0+0.57*5+0.14*10)
+car_age old    = 0.2    0.14                = round(4.25) = 4.00.
+
+risk s         = 0.15   0.0 (acut)          cmax-res=50.0, centroid-res=
+risk m         = 0.6    0.55         73.27  (0.55*50*25+0.45*100*50)
+risk xl        = 0.5    0.45                 / (0.55*25+0.45*50) = 81.03,
+                                             res=(1-0.25)*81.03+0.25*50.
+</PRE>
+
+!head JFL_decl_array JFL_decl_vars arrays "Arrays"
+
+!ind "Arrays, defining"
+Arrays are declared in an array block. For example:
+<PRE>
+arrays
+  digits[10];
+  days size 31;
+</PRE>
+An array   'a size n;' defines n variables a[0], a[1], ... a[n-1]. All
+variables are of the type
+<STRONG>float</STRONG>
+ with no min/max and no fuzzy variables bound to the array variable.
+Array elements are initialized to 0.0. The composite domain operator is
+<STRONG>new</STRONG> (i.e. arrays in JFL are just like arrays in traditional
+programming languages).
+
+

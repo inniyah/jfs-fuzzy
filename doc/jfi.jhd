@@ -1,0 +1,360 @@
+!head jfi learn jfi "JFI: a program improver"
+
+!ind JFI
+!ind "Improving a jfs-program"
+JFI improves the accuracy a compiled jfs-program
+by changing the values of constants in the program. JFI changes only the values
+of constants prefaced by a '%' character. The idea is to make use of a data
+file that contains a set of input and ountput case values relevant to the
+jfs-program, the goal being th minimize the difference between (a) the output values
+contained in the data file and (b) the output values estimates calculated by the
+jfs-program. A new jfs-program, reflecting the imporvements. is eventually spawned
+(see a worked example at
+!ref started learn
+).
+<P>
+JFI uses an evolutionary algorithm (genetic algorithm) to search for the "best" values
+for the affected constants. It uses a variant of steady state EA with rank-selection.
+The child-creation methods are: 2-point crossover, arithmetic crossover
+and float mutation (all described in:
+!ref jfs mich
+).
+<P>
+A score is calculated for a jfs-program by running the program with all the
+data sets in the data file. For each data set the difference between calculated
+and output and expected output are calculated. The ultimate score for the jfs-program
+is the sum of the differences (see
+!ref err_measures
+for details).
+<P>
+The data file must be a field-separated ascii-file as described in
+!ref prog_input
+.
+<P>
+JFS comes with several sample application that can be improved via JFI . See:
+!ref ap_examples
+.
+!head jfi_options jfi options "Running JFI from the command line"
+
+To invoke JFI from the command line type 'jfi' at the prompt and
+follow it with a set of command line arguments. The command line format is:
+<PRE>
+      jfi {<option>} <jfrf>
+</PRE>
+where <jfrf> is the compiled jfs-program to be improved. If called without
+options JFI reads data from the file <jfrf>.dat, and the changed jfs-program
+is written to <jfrf> (overwriting the original program).
+JFI recognizes the following option:
+<P>
+!dtab jfi_options "JFI options"
+!tab jfi_options -f
+-f <fs>
+!etc
+Use the characters in <fs> as field-separators in the data file.
+!etab
+!tab jfi_options -D
+-D <dam>
+!etc
+Data file order. <dam> is one of:
+<BR>'ie' : input values before expected values,
+<BR>'ei' : expected values  before input values,
+<BR>'tie': identifier before input before expected,
+<BR>'tei': identifier before expected before input,
+<BR>'iet': input values before expected values before identifier,
+<BR>'eit': expected values before input values before identifier,
+<BR>'f'  : the order of the variables are taken from the variable-names
+in the first line.
+<BR>See
+!ref prog_input
+for details.
+!etab
+!tab jfi_options -d
+-d <df>
+!etc
+Read data from the file <df>.
+!etab
+!tab jfi_options -o
+-o <of>
+!etc
+Write the changed jfs-program to the file <of>.
+!etab
+!tab jfi_options -Et
+-Et <et>
+!etc
+Stop after <et> minutes (default is 60 minutes).
+!etab
+!tab jfi_options -Ee
+-Ee <ee>
+!etc
+Stop if error <= <ee> (default <ee> = 0).
+!etab
+!tab jfi_options -Ei
+-Ei <i>
+!etc
+Stop after <i> individuals has been created and tested (default
+ 10000).
+!etab
+!tab jfi_options -I
+-I  <ic>
+!etc
+ <ic> is the population-size (default 40).
+!etab
+!tab jfi_options -sm
+-sm  <s>
+!etc
+Score calculating-method.
+<BR>
+ <s> ='a': the score is the avg-difference between the data and the expected,
+<BR>
+ <s>='s': the score is the sum of the differences between calculated and expected.
+<BR>
+ <s>='s2': the score is the sum of the squared differences between calculated and
+expected,
+<BR>
+ <s>='p': the score is the sum of the values calculated from the penalty matrix.
+!etab
+!tab jfi_options -pm
+-pm <pf>
+!etc
+Read the penalty matrix from the file <pf> (see
+!ref err_measures
+). Can only be used if '-sm p'.
+!etab
+!tab jfi_options -sc
+-sc <m>
+!etc
+Score calculation method.
+<BR>
+ <m>='e':exact method,
+<BR>
+ <m>='f':fast method (default): the reported statistical values (avg-score, etc)
+are inexact.
+!etab
+!tab jfi_options -uv
+-uv <m>
+!etc
+defines how undefined values ('?' in data-file) are treated.
+<BR>
+ <m>='d' (default): unknown values are replaced by the variables default value,
+<BR>
+ <m>='d0': unknown values are replaced by the variables default value with
+confidence=0.0,
+<BR>
+ <m>='z': domain variable is undefined, fuzzy variables bound to variables are set to 0.0,
+<BR>
+ <m>='o': like 'z', but fuzzy values are set to 1.0,
+<BR>
+ <m>='a': like 'z', but fuzzy values are set to 1.0/number-of-fuzzy-variables.
+!etab
+!tab jfi_options -s
+-s
+!etc
+Silent (less statistical output).
+!etab
+!tab jfi_options -r
+-r
+!etc
+Score-rounding. The score for each data set is rounded to a value in [0,1].
+!etab
+!tab jfi_options -w
+-w
+!etc
+Wait for the user to press the 'return' key before finishing the program.
+!etab
+!tab jfi_options -so
+-so <s>
+!etc
+Write messages to <s> instead of writing them to standard output.
+!etab
+!tab jfi_options -a
+-a
+!etc
+Append messages to output file (instead of overwriting it).
+!etab
+<P>
+<STRONG>Examples:</STRONG>
+<PRE>
+     jfi -Et 5 sin
+</PRE>
+improve the program 'sin.jfr' taking input from 'sin.dat' (containing
+input followed by output). Stops after 5 minutes (or 10000 individuals),
+ and write the changed program to 'sin.jfr'.
+<PRE>
+     jfi -D ei -d ss.dat -o x sin
+</PRE>
+improve the program 'sin.jfr' taking input from 'ss.dat'. Write the
+changed program to 'x.jfr'.
+
+!head jfi_opt_jfs jfi options "Running JFI from JFS"
+!if !UNIX
+To invoke JFI from program JFS, (a) select JFI from the tools menu, or (b)
+press the 'Runtool' button in the options window (after having selected Jfi
+from among the avaiable options).
+<P>
+
+!dtab jfi_opts_jfs "JFI options"
+!tab jfi_opts_jfs -f
+Data separators
+!etc
+Use the specified characters as extra field separators in the data file.
+!etab
+!tab jfi_opts_jfs -D
+Data order
+!etc
+Data order in the data file. One of:
+<BR><STRONG>input_expected:</STRONG> input values before expected values,
+<BR><STRONG>expected_input:</STRONG> expected values  before input values,
+<BR><STRONG>text_input_expected:</STRONG> identifier before input before expected,
+<BR><STRONG>text_expected_input:</STRONG> identifier before expected before input,
+<BR><STRONG>input_expected_text:</STRONG> input values before expected values before identifier,
+<BR><STRONG>expected_input_text:</STRONG> expected values before input values before identifier,
+<BR><STRONG>first_line:</STRONG> the order of the variables are taken from the variable-names.
+!etab
+!tab jfi_opts_jfs -d
+Data file
+!etc
+Read training data from the specified file.
+!etab
+!tab jfi_opts_jfs -o
+Destination file
+!etc
+Write the changed jfs-program to the specified file.
+!etab
+!tab jfi_opts_jfs -Et
+Stop after minutes
+!etc
+Stop running after the specified number of minutes.
+!etab
+!tab jfi_opts_jfs -Ee
+Stop if error <=
+!etc
+Stop if error <= specified value.
+!etab
+!tab jfi_opts_jfs -Ei
+Stop after individuals
+!etc
+Stop after the specified number of individuals has been created and tested.
+!etab
+!tab jfi_opts_jfs -I
+Population size
+!etc
+Specify the number of individuals in the population.
+!etab
+!tab jfi_opts_jfs -sm
+Score method
+!etc
+Score calculating-method.
+<BR><STRONG>avg:</STRONG>
+the score is the avg-difference between the data and the expected,
+<BR><STRONG>sum:</STRONG>
+the score is the sum of the differences between calculated and expected,
+<BR><STRONG>sum(pow2):</STRONG>
+the score is the sum of the squared differences between calculated and
+expected.
+<BR><STRONG>penalty:</STRONG>
+The score is the sum of the values calculated from the penalty file.
+!etab
+!tab jfi_opts_jfs -sc
+Score calc
+!etc
+score calculation method.
+<BR><STRONG>exact:</STRONG>
+exact method,
+<BR><STRONG>fast:</STRONG>
+fast method; the reported statistical values (avg-score, etc) are inexact.
+!etab
+!tab jfi_opts_jfs -uv
+Var-values unknown
+!etc
+Defines how undefined values ('?' in data-file) are treated.
+<BR><STRONG>default:</STRONG>
+ an unknown value is replaced by the variable's default value,
+<BR><STRONG>def0:</STRONG>
+ an unknown value is replaced by the variable's default-value with confidence=0.0,
+<BR><STRONG>zero:</STRONG>
+ domain variable is undefined (default), fuzzy variables bound to domain variable are set to 0.0,
+<BR><STRONG>one:</STRONG>
+ like 'zero', but fuzzy values are set to 1.0,
+<BR><STRONG>avg:</STRONG>
+ like 'zero', but fuzzy values are set to 1.0/number-of-fuzzy-variables.
+!etab
+!tab jfi_opts_jfs -s
+Silent
+!etc
+<BR><STRONG>yes:</STRONG> less statistical output.
+!etab
+!tab jfi_opts_jfs -r
+Score rounding
+!etc
+<STRONG>yes:</STRONG> the score for each data set is rounded to a value in [0,1].
+!etab
+!tab jfi_opts_jfs -w
+Wait for RETURN
+!etc
+<STRONG>yes:</STRONG>wait for the user to press the 'return' key before finishing
+the program.
+!etab
+!tab jfi_opts_jfs -so
+Redirect stdout to
+!etc
+Write messages to the specified file instead of writting them to standard
+output (i.e., the screen).
+!etab
+!tab jfi_opts_jfs -a
+Append to sout-file
+!etc
+<STRONG>yes:</STRONG>
+ append messages to the standard output file (instead of overwriting the file).
+!etab
+!tab jfi_opts_jfs -pm
+Penalty file
+!etc
+Read the penalty matrix from the specified file (see
+!ref err_measures
+). Can only be used if 'score method' is 'penalty'.
+!etab
+!tab jfi_opts_jfs so
+Source file
+!etc
+The name of the compiled jfs-program to be improved.
+!etab
+
+!endif
+!head jfi_changes  jfi changes "Changes in JFI version 2"
+!li intro_changes jfi
+!ref jfi_changes "Changes in JFI"
+!eli
+Changes in version 2.03:
+<P>
+<UL>
+<LI>
+A bug in the handling of return-statements is fixed.
+<LI>
+A bug in the assigning of fuzzy values to undefined input variables is fixed.
+<LI>
+The data file to JFI can have its variables ordered using the 'first-line method'
+described in:
+!ref prog_input
+.
+<LI>
+Score can be calculated with a penalty matrix.
+</UL>
+
+<P>
+Changes in version 2.01:
+<UL>
+<LI>
+The program is recompiled with speed-optimization.
+</UL>
+<P>
+
+Changes in version 2.00:
+<UL>
+<LI>
+JFI can now change constants in statements.
+<LI>
+New score-calculation method: sum(sqr).
+<LI>
+Option to control the handling of unknown values.
+</UL>
+

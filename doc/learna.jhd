@@ -1,0 +1,296 @@
+!head learn_ex learn sample-learning "Learning from example-data"
+
+!ind "Learning from sample-data"
+Most learning tools in the LearnA-module are 'Learning from examples' tools.
+They take as input (a) a compiled jfs-program and (b) a set of available,
+pertnient input-output values (One always hopes the set
+contains accurate values.) As output it creates (c) a new jfs-program,
+with the goal of creating one that provides more accurate output. That is
+one desires to minimise the differences between (a) output calculated from
+the user's input by the jfs-program and (b) the "correct" output supplied
+with the input.
+<P>
+Most of the tools in this categori reads the
+correct input-output-values from an ascii-file. The file-format is
+the one described in:
+!ref prog_input
+. The file has to contain both input values and expected output values.
+<P>
+A data file to a jfs-program with 2 input variables and one
+output variable could look like this:
+<PRE>
+#trainings-file. 5 data sets
+#input-1 input-2 output
+10.27      20.10   low
+12      25        7.14
+17.5 18 8
+10,25      ?      high
+10         20      8
+</PRE>
+The LearnA module comes with several sample dataset files that pertain to
+the JFS example applications. All datasets are taken from the UCI Repository of machine learning databases, Irvine, CA: University of California, Department of Information and Computer Science (
+!ref jfs uci
+).
+
+!head learn_methods learn learn-methods "Learning methods"
+<P>
+The jfs learning tools called JFRD, JFID3 and JFFAM all uses a variant of rule creation
+called the Wang-Mendel-algorithm. The jfs learning tools called JFI, JFEA and
+JFGP uses variants of the evolutionary algorithm.
+
+!head learn_meth_WM learn_methods WangMendle "The Wang-Mendel algorithm"
+
+!ind "Wang-Mendel algorithm"
+The learning tools JFRD, JFID3 and JFFAM all uses a variant of rule creation
+method called the Wang-Mendel algorithm (WMA). A detailed description of WMA
+can be found in the book:
+!ref jfs cox2
+.
+The WMA uses a set of training
+samples of correct input/output values to create a set of rules of the form:
+<PRE>
+if <var> <adj> and <var> <adj> and ... then <var> <adj>;
+</PRE>
+The basic idea of the algorithm is: For each data set, create
+the rule closest to the data. If this rule is not already in the rule base and
+it doesn't contradict any rules in the rule base, it is added to the rule base.
+If this new rule is already in the rule base it is
+ignored (but the rule-score/rule-count is updated; see below). If the rule is in
+contradiction with an existing rule either he new rule is ignored or the existing rule
+is replace the replaced by the new rule (an algorithm is used to choose which
+rule to keep).
+<P>
+The process of converting a training-sample to a rule is done using the
+fuzzification of the input variables and defuzzification of the output variable.
+For each input the program fuzzifies the variable with the given input value.
+It chhooses the adjective of the fuzzy variable with the highest
+fuzzification value, and insert it  in the if-part of the statements as
+' and <var> <adjective>', When all input values are fuzzificated, the
+if-part of a rule is created. The program selects the adjective for
+the output variable by trying the available adjectives, and then selects the one
+which gives a defuzzification value closest to the correct output value.
+<P>
+Two rules contradict each other if they have the same if-part but different
+then-parts. For example, these two rules are contradictionary:
+<PRE>
+if speed low and distance near then brake normal;
+if speed low and distance near then brake hard;
+</PRE>
+In such a case one rule is removed. To accomplish that, a score for each rule
+is calculated and the rule with the lowest score is removed.
+There are several ways of calculating the rule scores.
+In the original WMA the values of the fuzzy variables are used to calculate
+the score. It is calculated as the product of all the fuzzy values used in the
+rule. In the first rule in the example above the score is calculated as:
+<PRE>
+'speed low * distance near * brake normal,
+</PRE>
+where the calculation is done just after the rule is executed for the data set.
+<P>
+The learning-tools in jfs uses a variant of this algorithm, and an alternative
+method based on counting the number of identical rules created from the data sets.
+Conflicts are resolved by removing the rule with fewest supporting data sets.
+<P>
+The jfs learning tools combine the Wang-Mendel algorithm with
+several types of rule simplification and rule expansion. The program JFID3
+has a facility to write a history file while creating rules. This file provides
+information about (a) how the Wang-Mendel algorithm treats each data set, and
+ (b) the created rules. See
+!ref jfid3
+ for details.
+
+!head learn_meth_evol learn_methods evolv-algorithm "Evolutionary algorithm"
+
+!ind "Evolutionary algorithm"
+!ind "Genetic algorithm"
+The learning tools JFI, JFEA and JFGP use the evolutionary algorithm (EA) to
+improve jfs-programs. A detailed description of EA can be found in the
+book:
+!ref jfs mich
+, and also via the internet.
+<P>
+The evolutionary algorithm (of which the genetic algorithm
+and genetic programming are special cases) is based on Darwinian natural selection.
+<P>
+The evolutionary algorithm starts by creating a set of random
+solutions (called individuals) to the given problem. This set is called the population.
+A score for each individual is found by testing the individual. Some individuals
+with low score are replaced by new individuals created from individuals that process
+high score. This process continues until (a) a solution to the problem is found
+or (b) some other end condition (e.g., elapsed time or number of created individuals)
+is reached. The individual in the population with the highest score is the
+solution returned by the evolutionary algorithm.
+<P>
+Many methods for selecting individuals has been tried. All
+method utilize andomness. The learning tools
+in Jfs uses either (a) rank selection (the individuals are ranked after score.
+Individuals are selected randomly with highest probability to the highest ranked
+individual), or (b) tournament selection (a small group of individuals are selected
+randomly (typical 3-10 individuals) and the individual with the lowest score is
+selected to be replaced. Another group is selected and the individual with the
+highest score is selected as parent for the new individual. If 2 parents are
+needed, another parent is selected from another group).
+<P>
+There are several ways of creating a new individual from existing individuals.
+One method is replication with mutation. A single parent is selected, and the
+child is identical to the parent except some small random change. If an individual
+is represented by a bit string, mutation is often implemented as
+changing the value of a random bit from zero to one or from one to zero. Another
+often used method is crossover: two parents are selected, and the new individual
+is created by mixing there genes. For example, if an individual is
+represented by a fixed-length string of characters, a crossover point is
+chosen. The characters before the crossover point is selected from the first
+individual, and the characters after the crossover point are taken from the
+second parent.
+
+!head started_learn learn learn-tools "Using a learning-tool"
+
+!ind "JFI, example"
+!ind "Step-by-step guide to JFI"
+!ind "Learning tool, using"
+<P>
+This chapter offers a step-by-step example using the learning tool JFI
+in conjuction with a sample jfs-programs. The use of the other programs
+packaged in the LearnA-module are quite similar to the use of JFI.
+<P>
+In this tutorial, 'sin.jfw' is the starting point. It's a traditional fuzzy system,
+it outputs a poor approximation of a sine function (input 'x' in radians output 'y').
+The following figure shows the output of 'sin.jfw' ('sin.plt') and a correct
+sine function ('sin.dat.):
+<P>
+<IMG SRC="%%sinb.gif" ALT="Correct and approximate sinus-function">
+<P>
+The samples shipped with the LearnA package include a data file named "sin.dat".
+It contains 64 data sets of relatively correct sine values, thus:
+<PRE>
+#
+#Sine-function
+#input: x in radians, output: sin(x)
+# Trainingsets 64
+0.0 0.000000
+0.1 0.099833
+0.2 0.198669
+0.3 0.295520
+   .
+   .
+   .
+6.2 -0.08309
+6.3 0.016814
+</PRE>
+
+JFI can use this file to improve the approximation that otherwise would be yielded
+by running the sin.fjw application.
+<P>
+!if UNIX
+Move to the directory <jfsdir>/samples. Take a look at the file 'sin.jfs'
+ (use a editor or le).
+!else
+First, open 'sin.jfw' located in the 'Samples' directory (a subdirectory
+of the directory, in which the learning tools where installed).
+<P>
+Snoop around in the loaded program.
+!endif
+ Note that all center values for adjectives (s, sm, m, etc.)
+are preceded by the character '%'. This indicates that the constant can
+be changed by learning tools. Look also at the program block, and note the
+ '%' in front of all the 'ifw' weights.
+<P>
+!if UNIX
+Compile 'sin.jfs' to 'sin.jfr':
+<PRE>
+    jfc sin
+</PRE>
+Run the program JFI with 'sin.jfr' as program, and 'sin.dat' as data-file. Write
+the changed program to 'newsin.jfr':
+<PRE>
+    jfi -o newsin -Ei 30000 -Et 2 -d sin.dat sin
+</PRE>
+!else
+Shift to option mode by clicking on the 'Options' button.
+Select 'Jfi' and establish the following parameters:
+ 'Destination file' is set to 'newsin.jfr' (in the samples-directory),
+ 'Stop after individuals' is set to 30000, and 'Stop after minutes' is
+set to 2. Make sure the 'data file' parameter point to the correct file: '<Runadir>\samples\sin.dat' (where <Runadir> is the directory in which
+the learning tools are installed).
+<P>
+Run the program by clicking on the 'Run tool' button. The program JFI will
+run in a Dos window.
+!endif
+It will search for a better approximation to a sine function,
+using the data sets in 'sin.dat' as correct values, while
+showing its progress on the screen.
+After 2 minutes it will stop. The best new jfs-program
+is written to 'newsin.jfr'.
+!if !UNIX
+Press the 'Return' key (as requested) to return to JFS.
+!endif
+!if UNIX
+To see the created program first convert it back to source-code, by:
+<PRE>
+  jfr2s newsin
+</PRE>
+and then examine 'newsin.jfs' in an editor. To run the created program:
+<PRE>
+  jfr -d sin.dat -D ie newsin
+</PRE>
+!else
+Press the 'Return'-key to return to JFS.
+<P>
+To see the new jfs-program either load 'newsin.jfr' into JFS, or view
+it by clicking 'Viewfile' button. To run the new jfs-program, use the
+'jfr(learn)' tool (remember to set 'source-file name' to newsin.jfr).
+<P>
+!endif
+JFI uses random factors when searching for an improvement. Each time
+is is run, it will produce a new solution. On one run the following approximation
+was found:
+<P>
+<IMG SRC="%%sina.gif" ALT="Correct and approximate sinus-function">
+<P>
+
+!li samp_progs control
+<B>CONTROL</B>
+ A simple fuzzy controller without a rule base. The rule-base can be
+created by JFFAM using the data file CONTROL.DAT.
+!eli
+!li samp_progs golf2
+<B>GOLF2</B>
+ Same function as GOLF.JFW, but without the program block. The program
+block can be created by JFID3 (or JFRD, or JFEA) using the data file
+GOLF2.DAT.
+!eli
+!li samp_progs iris
+<B>IRIS</B>
+The well-known 'iris plant clasification'-problem. The classification
+program is to be created by JFRD, JFID3 or JFEA using the data fille
+IRIS.DAT. After creation of a rule base, the program can be
+improved with JFI.
+!eli
+!li samp_progs lenses
+<B>LENSES</B>
+This is another simple classification problem: selecting the correct type
+of contact lenses. The rule-base is to be created by JFRD/JFID3/JFEA from
+the data file LENSES.DAT.
+!eli
+!li samp_progs r4
+<B>R4</B>
+An example of symbolic regression with JFGP. The program learns a polynomial
+function from the data file R4.DAT.
+!eli
+!li samp_progs sin
+<B>SIN, SIN2, SIN3</B>
+The sine programs are bad approximations to a sine function. The approximations
+can be improved by using JFI and the data file SIN.DAT. The 3 programs differ in
+what is improved by JFI. In SIN.JFW adjective centers, rule weights and
+defuzzification are improved. In SIN2.JFW the adjectives plf-functions, rule weights
+and center values for outpu -adjectives are improved. In SIN3.JFW constants in
+linear functions are improved.
+!eli
+!li samp_progs sunspot
+<B>SUNSPOT</B>
+A program to be used with JFGP and the data file SUNSPOT.DAT, to create a program,
+which predicts the number of sunspots for a given year using the number
+of sunspots from the previous years.
+!eli
+
+

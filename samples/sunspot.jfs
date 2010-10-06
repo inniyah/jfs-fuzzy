@@ -1,0 +1,38 @@
+
+title "Predict the number of sunspots";
+/*Used with JFGP and the data-file: 'sunspot.dat' 
+(NOTE: datafile in the format expected-input).*/
+
+domains
+    int integer;
+
+input
+    d1 "Number of sunspots year before" int;
+    d2 "Number of sunspots 2 years before" int;
+    d4 "Number of sunspots 4 years before" int;
+    d8 "Number of sunspots 8 years before" int;
+
+output
+    sspots "Predicted number of sunspots" int;
+
+local
+    t1 "t1" int;
+    t2 "t2" int;
+    i "i" float;
+
+adjectives
+    int xs 0;
+    int s 25;
+    int m 50;
+    int ml 75;
+    int l 100;
+    int xl 150;
+    int xxl 200;
+
+program
+
+    extern jfgp fzvars d1 d2 d4 d8 
+                functions and or not 
+                integer 0 1
+            then sspots;
+

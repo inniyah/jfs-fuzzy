@@ -1,0 +1,33 @@
+
+title "Sinus with pl-functions";
+/* Sample program to JFI. Improve a poor sinus-function from the data-file 
+   'sin.dat. Improve plf-input-functions, center-value output-functions.*/
+
+domains
+    x_dom 0 6.3;
+    y_dom -1 1;
+
+input
+    x "X" x_dom;
+
+output
+    y "Y" y_dom;
+
+adjectives
+    x s %0:1 %0.75:0;
+    x sm %0.75:0 %1.575:1 %3:0;
+    x m %3:0 %3.15:1 %4:0;
+    x ml %4:0 %4.725:1 %5:0;
+    x l %5:0 %6.3:1;
+
+    y s %-1;
+    y m %0;
+    y l %1;
+
+program
+    ifw %0.5 x s then y m;
+    ifw %0.5 x sm then y l;
+    ifw %0.5 x m then y m;
+    ifw %0.5 x ml then y s;
+    ifw %0.5 x l then y m;
+

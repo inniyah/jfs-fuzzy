@@ -1,0 +1,42 @@
+
+title "Stopping a bicycle";
+
+domains
+    metres "metres" 0 50;
+    speed_dom "kilomtres pr hour" 0 50;
+    percent "%" 0 100;
+
+input
+    distance "Distance to stop point" metres defuz avg;
+    speed "Speed" speed_dom defuz avg;
+
+output
+    brake "brake force" percent defuz avg;
+
+adjectives
+    distance near 5;
+    distance medium 17.5;
+    distance far 30;
+
+    speed slow 10;
+    speed normal 20;
+    speed high 30;
+
+    brake none 0;
+    brake low 25;
+    brake medium 50;
+    brake hard 100;
+
+program
+if speed is slow and distance is near then brake is low;
+if speed is slow and distance is medium then brake is none;
+if speed is slow and distance is far then brake is none;
+
+if speed is normal and distance is near then brake is medium;
+if speed is normal and distance is medium then brake is low;
+if speed is normal and distance is far then brake is none;
+
+if speed is high and distance is near then brake is hard;
+if speed is high and distance is medium then brake is hard;
+if speed is high and distance is far then brake is low;
+

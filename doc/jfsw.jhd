@@ -1,0 +1,1208 @@
+!head jfsw prog_bas jfs "jfs: the windows interface"
+!if !UNIX
+!ind "JFS, the windows interface"
+!ind "JFS, main-window"
+!ind "JFS, code-window"
+The program JFS is the windows interface to the Jfs-system. It is used
+to write, compile and debug jfs-programs. JFS can also be used to
+run jfs-tools (i.e., run-tools, learning-tools, conversion-tools etc.).
+<P>
+When the program JFS is started, it reads some of its properties from values
+in the registry. In the current version of JFS, the properties can only be changes
+by direct editing in the registry. See
+!ref ad_registry
+for details.
+<P>
+JFS works on a single jfs-program at a time (the current jfs-program).
+The current jfs-program is loaded/saved by means of ordinary menu functions.
+<p>
+JFS uses two major windows and several minor (pop-up) windows. The two
+major windows are (a) the main window, and (b) the code window. The main window
+can be displayed in two modes: (a) data mode (the default) and (b) option mode.
+<P>
+When the main window is in data mode, it is used to load and save jfs-programs
+and to edit declarations in the current jfs-program. The code window is
+used to edit the program part of the current jfs-program.
+<P>
+When the main window is in option mode, it is used to enter parameters
+to tool programs, and to run tool programs.
+<P>
+!head jfsw_data jfsw data "Main window in data mode"
+!ind "JFS, Main window"
+When the main window is in data mode, it contains (a) menus, (b) a set of
+buttons, and (c) a split screen with the object tree to the left, and the
+object editor to the right. The object editor is used to edit the parameters of the
+the current selected object in the object tree.
+<P>
+!head jfsw_menus jfsw_data menus "Menus"
+!ind "JFS, menus"
+<P>
+The main window contains three menus: File, Tools and Help.
+<H3>The file menu</H3>
+The file menu contains the commands:
+<P>
+<B>New: </B>
+Closes the current current jfs-program (if one has been loaded). If the
+current program has been changed a save dialog box
+is displayed before exit. Then starts editing a new jfs-program.
+<P>
+<B>Open: </B>
+Closes the current jfs-program and loads a jfs-program from a file. A
+familiar open dialog box is used to choose the file. By default jfw-files
+(extension '.jfw') are displayed. It is possible to load jfs-files
+and jfr-files, but they are converted to jfw-files before loading. The
+loaded jfs-programs current filename and filetype are set to the target file's
+filename, and filetype.
+<P>
+<B>Save: </B>
+Saves the current jfs-program. It is saved with its current filename
+as its current filetype. When a jfs-program is saved for the first time,
+a save-as dialog box is displayed.
+<P>
+<B>Save As: </B>
+Saves the current jfs-program with entered filename and filetype.
+The current filename and filetype are set to selected values.
+<P>
+
+!ind "Installing tool modules"
+!ind "Ini-file"
+!ind "jfi-file"
+<B>Install tools: </B>
+Facilitates the installation and update of jfs tool modules. Installs tools
+names into the tools menu and installs or updates the option page.
+An ordinary open dialog box is used to select an installation file.
+When installing the ini-file 'jfs.jfi' is updated and a copy of the old
+ini-file is saved in 'jfs.old'. After installing the tools the help
+system documents are updated.
+<P>
+<B>Install gnuplot: </B>
+!ind "Gnuplot, installing in JFS"
+!ind "JFS, Gnupult installation"
+!lab jfsw_ignuplt
+The two buttons 'Runplot' and'Gnuplot' are used to plot the function of
+a jfs-program and the objects in the jfs-program (hedges, fuzzification functions,
+operators etc). When JFS is installed the buttons are disabled. To activate the
+buttons do the following:
+<UL>
+<LI>Download the tool module 'JDoc' (version 2.01 or newer).
+<LI>Install 'JDoc' in JFS with the 'Install tool' menu-entry.
+<LI>Download and unzip the freeware program Gnuplot. It can be downloaded from
+<A HREF="http://www.gnuplot.org/">EXTERN Gnuplot home page</A>.
+The Windows 9X version is called something like 'gp371w32.zip'.
+<LI>Use the menu command 'Install gnuplot' to tell JFS the filename of
+the Gnuplot-program. This is done by a standard open-file dialog box. Move to the
+directory in which Gnuplot is installed and click on the Gnuplot .exe-file
+(something like 'wgnupl32.exe').
+</UL>
+<P>
+<H3>The tools menu</H3>
+The tools menu is used to run tool programs. The commands in the
+menu depends on the which tools are available.
+<P>
+<H3>The help menu</H3>
+JFS uses web pages (html-files) for all documentation. The commands in the
+help menu open web pages in the user's browser. The menu contains the
+commands:
+<P>
+<B>Contens: </B>
+Opens the contens page.
+<P>
+<B>Index: </B>
+Opens the index page.
+<P>
+<B>?: </B> context-sensitive help (shortcut 'F1'). A web page is opened
+in the browsers relevant to the current selected object.
+<P>
+<B>About</B>
+displays a pop-up window with version number and copyright information.
+
+!head jfsw_buttons jfsw_data buttons "Buttons"
+!ind "JFS, buttons"
+A set of buttons is found beneath the menu in the main window. Some buttons
+performs actions related to the selected data-object (all the buttons above the
+object tree and a few other). Other buttons executes actions on the the current
+jfs-program.
+<P>The actions of the buttons are:
+<P>
+<B>Ins: </B>
+insert a data object of the same type as the selected node; that is, if a
+domain (or the 'Domains' node) is selected, a new domain is inserted. If a
+variable is selected, a new variable is inserted and so forth. The new object being
+inserted appears as the last object of its type in the object tree. It gets
+a unique name like 'domain1' or 'operator4' (the name can be edited to suit the user).
+<P>
+<B>Ins.Adj: </B>
+This just applies if the currently selected node is a domain or a variable.
+In that case, pop-up menu titled 'Insert adjectives' are activated. The new
+adjectives are bound to whatever element has been selected.
+<P>
+<B>Del: </B>
+Deletes the selected object. All references to the object (for example
+references to a hedge from an operator) are cleared. If the object is a
+domain or a variable, then adjectives bound to the object are also deleted.
+Predefined objects (like the hedge 'not') cannot be deleted.
+<P>
+<B>Move Up: </B>
+Reorder the objects. The selected object is moved one place up
+(this is only useful with variables and adjectives). For example, assume that
+the defined variables are:
+<PRE>speed
+distance
+size
+force
+</PRE>and that the variable 'size' is selected. When the button 'Move up' is pressed,
+the order of the variables is changed to:
+<PRE>speed
+size
+distance
+force
+</PRE>It is not possible to reorder the predefined objects.
+<P>
+<B>Move dwn: </B>
+Reorder the objects by moving the selected object one place down.
+<P>
+<B>Dupl: </B>
+Inserts a new data-object of the same type as the selected object. The
+new object gets the same value for all attributes as the selected object
+except the name. If the selected object is a variable or domain with
+adjectives bound to it, then adjectives are created for the new variable.
+<P>
+<B>Code: </B>
+Activates the code window (see
+!ref jfsw_code
+).
+<P>
+<B>Compile: </B>
+Compiles the current jfs-program. The compiled program is written to the
+file with the current filename, but with the extension replaced by '.jfr'.
+If the jfs-program doesn't have a filename, then the compiled program is
+written to a temporary file. If errors are detected during compilation, the
+Errors window is activated.
+<P>
+<B>Gnuplot: </B>
+If Gnuplot is installed (see
+!ref jfsw_menus "menus, install Gnuplot"
+); plot the current selected object in the object tree to the screen. If for
+example the hedge 'not' is selected, then the function of this hedge is
+plotted tot the screen. If an Object type is selected in the object tree (for example
+the node 'Hedges') all objects of this type are plotted.
+<P>
+<B>Options: </B>
+Changes the main window's mode from data mode to options mode (see
+!ref jfsw_options
+).
+<P>
+<B>Help: </B>
+Context-sensitive help.
+<P>
+<B>Errors: </B>
+Makes the errors window the active window (see
+!ref jfsw_errors
+).
+<P>
+<B>Run: </B>
+Compiles the current jfs-program. If no errors are detected, the program JFR is
+executed. It runs the jfs-program using whatever options have been set.
+<P>
+<B>Runplot: </B>
+If Gnuplot is installed (see
+!ref jfsw_menus "Menus, install Gnuplot"
+) the program JFRPLT is used to plot the function of the current jfs-program.
+First the current jfs-program is compiled. If no errors are detected,
+the 'Runplot' window
+is activated (See
+!ref jfsw_runplot
+). From this window JFRPLT is called.
+<P>
+<B>Edit file: </B>
+.
+<P>
+Activates
+!ref jfsw_fedit
+.
+
+!head jfsw_otree jfsw_data object_tree "Object tree and object editor"
+!ind "JFS, Object editor"
+!ind "JFS, Object tree"
+The object tree is used to (a) select data objects for editing, and (b) to insert
+and delete data objects. The top-level of the tree shows the object types (i.e. the
+data types of JFL: synonyms, hedges, relations, domains and so on). The level
+below shows the data. The up/down cursor keys or the mouse can be used to
+navigate through the object tree. A non-terminal node can be expanded (a) by
+clicking on the '+' to the left of the node or (b) by pressing the return key.
+Pressing and re-pressing the tab key shifts the cursor between the object tree and
+the object editor.
+<P>
+The object editor is used to edit attributes of the object selected
+in the object tree. To select an attribute use the cursor keys or the mouse.
+Some attributes are edited by selecting from a pull-down list, others by
+entering text (use the return key to switch between insert mode and
+update mode).
+<P>
+Comments are entered by clicking in the space provided. That will cause an 'edit'
+button to appear; click it, and an editor window will pop up.
+<P>
+Plf's are entered by pressing the 'plf' button; that activates a pop-up
+window in which one can enter x-values and y-values.
+<P>
+The following chapters describes parameters that relate to the various types of objects:
+
+!head jfsw_synonym jfsw_otree synonyms "Synonyms"
+
+!ind "JFS, synonyms"
+<P>
+A synonym is a word  that is ignored or replaced in the code block by a
+specific alternative word. Synonyms are used (a) to make the the code look more like
+natural language, and (b) to define constants. A synonym has a name and possible a value. Every time the name is found in the code it is replaced by the value.
+For details about synonyms see
+!ref JFL_syntax_syn
+.
+
+!head jfsw_hedge jfsw_otree hedges "Hedges"
+
+!ind "JFS, hedges"
+Hedges are user-defined functions that map a fuzzy value (a number in [0,1])
+to a fuzzy value. Hedges are used to modify definitions of operators and
+relations, and in program statements.
+<P>
+For example, observe the use of the hedges 'not' and 'around' in the following statement:
+<PRE>
+   if not(speed is around low and distance is close) then brake is none;
+</PRE>
+Hedges are described in details in
+!ref JFL_decl_hedges
+. A hedge-definition takes the arguments:
+<P>
+!dtab jfsw_hedge_args "Hedge arguments"
+!tab jfsw_hedge_args name
+Name
+!etc
+The unique name of the hedge.
+!etab
+!tab jfsw_hedge_args type
+Type
+!etc
+The function executed by the hedge. It is either (a) one of eight predefined
+function (e.g., 'pow', 'round', etc) or (b) a 'plf'.
+!ref JFL_decl_hedges htypes
+.
+!etab
+!tab jfsw_hedge_args argument
+Argument
+!etc
+Most predefined hedge types uses a float-argument to define the hedge.
+If for example the hedge type is 'pow' and argument is
+2, then hedge is equal to a square-function.
+<BR>If the hedge type is 'plf', then the argument field is changed to a button.
+When that button is pressed, the edit-plf-window is opened (see
+!ref jfsw_plf
+for details).
+!etab
+!tab jfsw_hedge_args comment
+Comment
+!etc
+A comment to the hedge, can be entered.
+!etab
+
+!head jfsw_operator jfsw_otree operators "Operators"
+
+!ind "JFS, operators"
+An operator is a user-defined fuzzy variant of a boolean operator.
+For example, one could be a fuzzy variants of the 'and' operator.
+Operators are used (a) in expressions and (b) as fuzzy composite operators in
+domain variables. Operators are described in detail in:
+!ref JFL_decl_ops
+ . An operator-definition takes the arguments:
+<P>
+!dtab jfsw_op_args "Operator arguments"
+!tab jfsw_op_args name
+Name
+!etc
+The name of the operator.
+!etab
+!tab jfsw_op_args type
+Type
+!etc
+The primary operator type defines the operator's function. It is
+selected from a list of functions. See
+!ref JFL_decl_ops "operator types"
+for details.
+!etab
+!tab jfsw_op_args comptype
+Comp. type
+!etc
+If the operator type is a simple operator, then a composite operator type
+can be specified. Then the operators function become:
+ o(x) = (1 - comp_argument) * type(x) + comp_argument * comp_type(x).
+!etab
+!tab jfsw_op_args comparg
+Comp. argument
+!etc
+If the operator type is a complex function (like the 'yager_or'), then the
+floating-point function-argument is specified here. If a composite function
+is used, then the composite weight is specified here.
+!etab
+!tab jfsw_op_args precedence
+Precedence
+!etc
+The precedence is a number between 1 and 255. An operator's precedence is
+used to specify the order in which operators are executed.
+!etab
+!tab jfsw_op_args hedge_mode
+Hedge_mode
+!etc
+If a hedge is being used to modify the operator, the hedge_mode describes
+how that hedge is used.
+<UL>
+<LI>Hedge_mode='arg1': x op y = optype(hedge(x), y)
+<LI>Hedge_mode='arg2': x op y = optype(x, hedge(y))
+<LI>Hedge_mode='arg12': x op y = optype(hedge(x), hedge(y))
+<LI>Hedge_mode='post': x op y = hedge(optype(x, y))
+</UL>
+!etab
+!tab jfsw_op_args hedge
+Hedge
+!etc
+A hedge can be used to modify the operator (see 'hedge_mode' above).
+!etab
+!tab jfsw_op_args comment
+Comment
+!etc
+An explanatory comment about the operator can be written here.
+!etab
+
+!head jfsw_relation jfsw_otree relations "Relations"
+
+!ind "JFS, relations"
+In Jfs a user-defined relation is a function from
+2 floating-point numbers to a fuzzy value. The relation  'x rel y' is
+calculated as: rel(x-y), where 'rel' is defined by a plf.
+ For details about relations see:
+!ref JFL_decl_rels
+. A relation-definition takes the arguments:
+<P>
+!dtab jfsw_rel_args "Relation arguments"
+!tab jfsw_rel_args name
+Name
+!etc
+The relations name.
+!etab
+!tab jfsw_rel_args plf
+Plf
+!etc
+Pressing the button opens the plf-editor (
+!ref jfsw_plf
+). One can then edit the relation's function.
+!etab
+!tab jfsw_rel_args hedge
+Hedge
+!etc
+The relation's function can be modified by a hedge, changing
+the function to:
+<BR> hedge(rel(x - y)).
+!etab
+!tab jfsw_rel_args comment
+Comment
+!etc
+A comment about the relation can be created here.
+!etab
+
+!head jfsw_domain jfsw_otree domains "Domains"
+
+!ind "JFS, Domains"
+Domains are used to declare variable types and ranges (every variable
+is bound to a domain). For details about domains, see
+!ref JFL_decl_domains
+. The domain-arguments are:
+<P>
+!dtab jfsw_dom_args "Domain arguments"
+!tab jfsw_dom_args name
+Name
+!etc
+The domain's identifier.
+!etab
+!tab jfsw_dom_args utext
+Unit Text
+!etc
+An optional text describing the domain (displayed as part of help-screens
+about variables bound to the domain).
+!etab
+!tab jfsw_dom_args type
+Type
+!etc
+The domain-type. The values of variables bound to the domain are of this
+type. The possible types are:
+<BR><STRONG>float</STRONG>: floating-point number,
+<BR><STRONG>integer</STRONG>: integer number,
+<BR><STRONG>categorical</STRONG>: a variable of this type can only
+take values from a fixed set of values (the center values of
+adjectives bound to the variable).
+!etab
+!tab jfsw_dom_args min
+Min
+!etc
+The min-value is a floating-point number. It defines the low limit of
+values bound to the domain. Optional.
+!etab
+!tab jfsw_dom_args max
+Max
+!etc
+The max-value is a floating-point number. It defines the high limit of values
+bound to the domain. Optional.
+!etab
+!tab jfsw_dom_args comment
+Comment
+!etc
+A comment About the domain can be created here.
+!etab
+
+!head jfsw_adjectiv jfsw_otree adjectives "Adjectives"
+
+!ind "JFS, adjectives"
+Adjectives are used to declare fuzzy variables (for every adjective bound
+to a domain variable, a fuzzy variable is created). For details about
+adjectives see:
+!ref JFL_decl_fzvars
+. Most arguments are used to define the fuzzification-function (see
+!ref JFL_decl_fuzz
+) or the defuzzification-function (see
+!ref JFL_decl_defuz
+). Adjectives takes the arguments:
+<P>
+!dtab jfsw_adj_args "Adjective arguments"
+!tab jfsw_adj_args name
+Name
+!etc
+The name of the adjectiv. The fuzzy variable created by means of the
+adjectiv gets the name <var-name> <adj-name>, where <var-name> is the
+name of the domain variable to witch the adjectiv is bound. Fuzzy variable
+names must be unique.
+!etab
+!tab jfsw_adj_args center
+Center
+!etc
+A floating-point number defining the center value of the adjective. The
+center value is used (a) in defuzzification (see:
+!ref JFL_decl_defuz
+) and (b) when defining a triangular fuzzification function.
+!etab
+!tab jfsw_adj_args base
+Base
+!etc
+A floating-point number used in centroid defuzzification. The center values
+are weighted with regards to the base values.
+!etab
+!tab jfsw_adj_args trapstart
+Trapez start
+!etc
+A floating point number used when defining a trapezoid fuzzification function
+for the adjective. It specifies the starting point of the trapezoid's plateau.
+!etab
+!tab jfsw_adj_args trapend
+Trapez end
+!etc
+A floating-point number used when defining a trapezoid fuzzification function
+for the adjective. It specifies the ending point of the trapezoids's plateau.
+!etab
+!tab jfsw_adj_args plf
+Plf
+!etc
+A pl-function is used to define a free-form fuzzification function (e.g, as an
+alternative to a triangular function and trapezoid function).
+Pressing the button opens the plf editor window (see
+!ref jfsw_ins_adj
+).
+!etab
+!tab jfsw_adj_args hedge1
+Hedge 1
+!etc
+The name of a hedge can be selected. The fuzzification function is modified
+by this hedge (fuzz(x)=hedge(basic_fuz(x))).
+!etab
+!tab jfsw_adj_args hedge2
+Hedge 2
+!etc
+The name of a hedge can be selected. Can only be used if 'Hedge 1' has a
+value. Modifies the fuzzification function
+(fuzz(x)=if x < center then hedge1(basic_fuz(x)) else hedge2(basic_fuz(x)).
+!etab
+!tab jfsw_adj_args comment
+Comment
+!etc
+A comment about the adjective can be created here. The comment is displayed
+by some run-programs when the user asks for help about th object.
+!etab
+
+!head jfsw_variable jfsw_otree variables "Variables"
+<P>
+!ind "JFS, variables"
+Declaration of domain variables. See:
+!ref JFL_decl_domvars
+for details. The variable arguments are:
+<P>
+!dtab jfsw_var_args "Variable arguments"
+!tab jfsw_var_args name
+Name
+!etc
+The unique name of the variable.
+!etab
+!tab jfsw_var_args text
+Text
+!etc
+A short text (max 60 chars) used to describe the variable
+(The text is used as jfs-programs (a) asks a about values for
+input variables and (b) write the values of output variables).
+!etab
+!tab jfsw_var_args type
+Type
+!etc
+Selects the variable type:
+<BR><STRONG>Input</STRONG>: the run-program reads a value for
+the variable as input,
+<BR><STRONG>Output</STRONG>:
+the run-programs writes
+the value of the variable as output,
+<BR><STRONG>Local</STRONG>:
+the variable is used internally by the jfs-program
+!etab
+!tab jfsw_var_args domain
+Domain
+!etc
+Select the domain to which the variable is bound. The domain defines (a) the
+variable's value-type (i.e., float, integer, or categorical) and (b) the
+variable's upper and lower limits.
+!etab
+!tab jfsw_var_args fcomp
+Fuzzy composite operator
+!etc
+Select a value from the list of user-defined operators. The operator is
+used when a statement assigns a value to a fuzzy variable bound to the
+variable. For example (using the variable 'brake'): 'if speed is high then brake hard;'.
+See
+!ref JFL_prog_thenfzvar
+ for details.
+!etab
+!tab jfsw_var_args dcomp
+Domain composite operator
+!etc
+Defines the operation used to update the variable in
+if-statements of the form
+<BR>
+	'if <iexpr> then <var> = <texpr>;':
+<BR><STRONG>new</STRONG>:
+if-statements behave as in traditional programming languages (<var> is
+set to the value of <texpr> if <eixpr> != 0)
+<BR><STRONG>max</STRONG>:
+the variable is assigned the value of <texpr> if the the value of <iexrp> is
+greater than the variable's confidence-value.
+<BR><STRONG>avg</STRONG>:
+updates the variable's value with the value of <texpr> weighted with <iexpr>.
+<BR>
+See:
+!ref JFL_prog_thenvar
+ for details.
+!etab
+!tab jfsw_var_args  defuz1
+Defuz method 1
+!etc
+Defines the defuzzification function. See
+!ref JFL_decl_defuz
+ for details about the different defuzzification methods.
+!etab
+!tab jfsw_var_args defuz2
+Defuz method 2
+!etc
+If a second defuzzification method is entered, then the defuzzification-functions
+is: (1.0 - 'defuz_2_weight) * defuz_1() + 'defuz_2_weight' * defuz_2().
+!etab
+!tab jfsw_var_args defuzweight
+Defuz 2 weight
+!etc
+A floating-point number between zero and one, used as weight if 2 defuz-methods
+are used (see 'defuz method 2').
+!etab
+!tab jfsw_var_args alfacut
+Alfacut
+!etc
+An optional floating-point number between 0.0 and one that is used in
+defuzzification. Fuzzy variables with a value below the alfacut are not used in
+defuzzification.
+See:
+!ref JFL_decl_defuz
+ for detail.
+!etab
+!tab jfsw_var_args default
+Default value
+!etc
+Either (a) a floating point number, or (b) the name of an adjective
+bound to the variable. The variables is initialized to this
+value (or to the adjective's center value) before the jfs-program is executed.
+The variable is also set to this value by 'clear' statements (see
+!ref JFL_prog_thenclear
+).
+!etab
+!tab jfsw_var_args normalize
+Normalise value
+!etc
+Either (a) a floating-point number between zero and one or (b) the special
+value 'conf'.
+<BR>
+This is an optional value used in fuzzification. After fuzzification the fuzzy variables
+are normalized, making there sum equal to the normalised value (or equal to the
+variable's confidence value).
+<BR>
+See:
+!ref JFL_decl_fuzz
+ for details.
+!etab
+!tab jfsw_var_args argument
+Argument
+!etc
+An integer between 0 and 65536. Used to give tool programs extra information
+about the variable (not used by the standard jfs tools).
+!etab
+!tab jfsw_var_args comment
+Comment
+!etc
+A comment about the variable can be created here. The comment is displayed by some
+run-programs when the user asks for help about the variable.
+!etab
+
+!head jfsw_array jfsw_otree arrays "Arrays"
+
+!ind "JFS, arrays"
+Defines arrays of float. An array is defined by a name and
+a size (integer). The Elements of the array are a[0], a[1], ... a[size - 1].
+For detailed information about arrays see
+!ref JFL_decl_array
+.
+
+!head jfsw_options jfsw options "Main window in option-mode"
+
+!ind "Option-mode"
+!ind "JFS, option-mode"
+<P>
+When the button 'Options' is pressed, the main window is changed from
+data mode to option mode. In option mode the menus and some of the
+buttons are disabled, and other buttons are changed.
+<P>
+The window is still in two parts. A list of tools on the left, and the
+tool editor is on the right.
+<P>
+The tool editor is used to change properties of the currently selected
+tool in the tools list. Most field types in the tool editor are the same
+as in the object editor. However, a new sort of field is introduced
+that allows the user to select filenames.
+This is done either either (a) by entering the filename in the field or (b)
+by pressing the 'file' button beside the field. Pressing that button
+activates an open-file dialog box. A filename of the type: '*.<ext>' can be used.
+It specifies a filename identical to the filename of the current jfs-program
+except for the extension. For example, if the current jfs-program is 'c:\jfs2\truck.jfr',
+and the filename in the field 'Data file' is specified as '*.dat', then the
+file-name of the data file is 'c:\jfs2\truck.dat'.
+<P>
+Moving between the tools and editing of
+properties are done just as in data mode. 'F1' on the keyboard activates help for
+the selected tool.
+<P>The special buttons in option mode are:
+<P>
+<B>Reset: </B>
+The values of all attributes for the selected tool are set to their defaults.
+<BR>
+<B>Data: </B>
+Switches the main window back to data mode.
+<BR>
+<B>RunTool: </B>
+Executes the selected tool-program with the entered attributes as
+parameters.
+
+!head jfsw_ins_adj jfsw ins.adjectives "Insert adjectives window"
+
+!ind "JFS, insert adjectives window"
+The 'insert adjectives' window is a pop-up window. It is activated by
+pressing the 'Ins.Adj' button when a variable or a domain is selected in
+the main-window in data-mode. The 'Insert adjectives' window is used to
+quickly create a set of adjectives bound to the selected variable/domain. The
+fields are:
+<P>
+<B>Number of adjectives:</B><BR>
+Specifies the number of adjectives to create. The minimum number is two,
+and the maximum number is 127.
+<P>
+<B>Names:</B><BR>
+Select default adjective names from a list of names (these default names
+can be modified later). The list depends on the number of adjectives.
+If the number of adjectives is large (>5), then the names are fixed
+as 'adj_1, adj_2, ...'.
+<P>
+<B>Shape, left shoulder, right shoulder:</B><BR>
+Defines the shape of the fuzzification functions. The possible
+shapes are 'triangle' and 'trapez'.
+<UL>
+<LI><STRONG>Triangle</STRONG>: Use triangular fuzzification functions
+defined by center values. The center value of the first adjectiv is
+'Left shoulder', the center value of the last adjective is 'right shoulder',
+and the center values for those in between are evenly
+distributed between the values of the first and the last adjective.
+<P> For example, if  five adjectives are created for the
+domain 'percent' (min=0, max=100) with  'left shoulder'=30 and 'right shoulder'=90
+and the names xs,s,m,l and xl, then the center-values is:
+<PRE>
+percent xs 30
+percent s  45
+percent m  60
+percent l  75
+percent lx 90
+</PRE>
+<LI><STRONG>Trapez:</STRONG>
+If 'trapez' shape is chosen, the first adjective's fuzzification function
+is defined by a center value equal to 'left shoulder', and the
+fuzzification function of the last adjective is defined by a center value
+equal to 'right shoulder'. The other adjectives are defined by trapez-start
+and trapez-end values. Those values are equally distributed between left and
+right shoulder with gaps of the same size as the plateaus.
+<BR>
+For example, if
+the domain percent is created with the 5 adjectives xs,s,m,l,xl and a
+left shoulder of 10 and right shoulder of 80 then the adjectives'
+fuzzification functions is defined by:
+<PRE>
+adjective   center  trapez-start trapez-end
+---------------------------------------------
+percent xs    10
+percent s                 20           30
+percent m                 40           50
+percent l                 60           70
+percent xl    80
+</PRE>
+</UL>
+<P>
+<B>Improve: </B>
+If the 'improve' check-box is selected, a '%' is placed in front of all
+center values and trapez values.
+<P>
+<B>Hedge: </B>
+If a hedge is selected all created adjectives use this hedge as 'Hedge 1' (to
+modify the fuzzification function).
+<P>
+<B>Insert button</B>:
+After assigning values to the fields, either (a) the 'Insert' button is pressed
+to create the adjectives and exit the 'insert adjectives' window, or (b) the
+'Cancel' button is pressed to exit the window without creating adjectives.
+
+!head jfsw_plf jfsw plf "Plf window"
+
+!ind "JFS, plf window"
+!ind "Plf window"
+The Plf window is entered by pressing the 'edit' button in a plf-field in
+the object inspector of an adjective, hedge or relation. It is used to
+edit the selected pl-funtion (for details about plfs, see
+!ref JFL_decl_plf
+). In the window, a
+list of pl-function values are entered. For example, a typical trapezoid
+plf is entered as:
+<PRE>
+    Limit   Value
+-----------------
+     10.0     0.0
+     15.0    %0.8
+     20.0    %0.8
+    %50.0     0.0
+</PRE>
+<UL>
+<LI>As the example shows, a '%' character (used by some improving tools) can be
+placed in front of all constants.
+<LI>Constants entered in the 'Value'-field has to be in the range from
+<STRONG>0.0</STRONG> through <STRONG>1.0</STRONG>.
+<LI>Limit values has must be listed in ascending order.
+<LI>The character 'x' can be placed after a limit value to make that
+function-point an exclusive value:
+</UL>
+<PRE>
+    Limit    Value
+------------------
+      0.0      0.0
+     10.0x     1.0
+     10.0     %0.5
+     10.0x     1.0
+    %20.0      0.0
+</PRE>
+<P>
+The 'Ins. Row' buttons insert a row above the current selected row, and
+the 'Del. Row' button deletes the selected row .
+<P>
+When the 'Ok' button is clicked, the changed plf is saved and the window
+is closed. When the 'Cancel' button is pressed the plf-window is closed
+without saving the changes.
+
+!head jfsw_code jfsw code "Code window"
+
+!ind "JFS, code window"
+<P>
+The code window is activated by pressing the 'code'-button in the main window.
+It is used to edit the "program" section of the current jfs-program.
+<P>
+The main part of the window is an editor with few differences from standard
+Windows text editors like Notepad. Navigation is done with the arrow keys,
+the 'page up', 'page down', Home, ctrl-Home, End and ctrl-End keys. The
+current line is deleted by pressing ctrl-y.
+<P>
+The Menu bar contains three pull-down menus: 'Edit', 'Templates' and 'Goto'.
+<UL>
+<LI>
+The 'Edit' pull-down menu contains the editor-commands found in most Window programs:
+cut, copy, paste, find, replace and undo.
+<LI>
+The commands in the 'Templates' menu is used to quickly build special
+blocks of code like a FAM or a decision tree. Each command activates
+a window to specify parameters to code-building. The different commands are
+described on the following pages.
+<LI>
+The pull-down menu 'Goto' is used after a compilation to find syntax errors
+in the program. The commands are used together with the Error-window. The
+commands are 'First error', 'Next error' and 'Prev error'. The 'First error'
+ command activates the error-window and selects the first error. It then
+activates the code window, and places the cursor on the line in which the
+error occurs. The'Next error'/'Prev error' selects the error after/before the
+active error in the error-window, and jumps to the line containing this error.
+<BR>
+NOTE: the jumps use line numbers registered during compilation. If the
+Goto-commands are used after lines are inserted or deleted, jumps
+will be made to the wrong lines.
+</UL>
+<P>
+Most of the buttons on the top of the window are identical to some of
+the buttons on the data-window ('Errors' activates the error-window,
+'Compile' compiles the
+current jfs-program, 'Run' compiles and run the current jfs-program). The
+button 'Data' activates the Main-window (without closing the code window).
+
+!head jfsw_code_fam jfsw_code fam "THe FAM-template"
+
+!ind "JFS, FAM-template"
+The FAM-template is activated by selecting the 'Fam'-operation in
+the 'Templates'-menu in the code-window. It is used to insert a set of
+if-statements in the code at the cursor-position.
+The command opens a pop-up window
+to create the fam. In the window if-variables (input-variables) and
+one then-variable (output-variable) are selected.
+When the 'Ok'-button is pressed, if-statements of the form
+'if <iv1> <aiv1> and <iv2> <aiv2> and ... then <th> <atv>;' are inserted at the
+cursor-position in the code. Normally an if-statement for
+each possible combination of adjectives for the input-variables are
+inserted. The adjectiv-values for the output-variable is calculated as
+a relative average of the adjectives for the input-variables. If the check-box
+'all output values' is checked, then a rule is created for every possible
+combination of input-variables and output-variables. If the
+field 'weight value' is assigned a value then statements of the type
+ 'ifw <v> ', where <v> is the weight value, is created. It is possible to
+place a '%' in front of the weight value (example: %0.8) to create statements
+of the type 'ifw %<v>'. If the check-box 'Nummeric output' is checked, then
+rules of the type 'if ... then <th> = %<val>' are created. <val> is the center-value
+of an adjective of <th>. To exit the form without creating statements
+press 'Cancel'.
+
+!head jfsw_code_swit jfsw_code switch "The Switch-template"
+
+!ind "JFS, Switch-template"
+The switch template is activated by selecting the 'Switch' command in
+the 'Templates' menu in the code window. It is used to insert a
+switch-block or a decision tree in the code.
+<P>The command opens a pop-up window containing a list of variables and a
+list of selected variables.
+<P>
+A variable is moved to the list of selected variables by highlighting it and
+pressing the '->' button (a variable can be moved back by means of the
+ '<-'-button).
+<P>
+The button 'm.Up' moves a variable in the selected list  one place up,
+and the button  'm.Dwn' moves a variable one place down.
+<P>
+When the 'Ok'-button
+is pressed, a list of switch statements and case statements are inserted
+at the cursor position in the code window.
+<UL>
+<LI>A switch statement for the
+first variable in the selected list is inserted.
+<LI>For each adjectiv bound to this variable, a case-statement is inserted.
+<LI>After each case-statement for the first variable a switch statement for
+the second variable in the selected list is inserted and so on.
+<LI>Each switch-block is finished by and end-statement.
+</UL>
+<STRONG>Example</STRONG><P>
+Assume the selected list contains the variables (a) 'gender' with the
+adjectives 'male' and 'female', and (b) 'speed' with the adjectives 'slow',
+ 'medium' and 'fast', then the following statements are inserted:
+<PRE>
+switch gender:
+  case male:
+    switch speed:
+      case slow:
+      case medium:
+      case fast:
+    end;
+  case female:
+    switch speed:
+      case slow:
+      csse medium:
+      case fast:
+    end;
+end;
+</PRE>
+
+!head jfsw_code_jfrd jfsw_code jfrd "The Rule discover template"
+
+!ind "JFS, Rule discover template"
+<P>
+The JFRD tool is activated by selecting the 'rule discover' command in
+the 'Templates' menu in the code window. It is used to insert within the
+code an 'extern' statement of the form:
+<PRE>
+extern jfrd input {<var>} output <var>;
+</PRE>
+Statements of this type are used by some learning-tools like
+JFRD, JFID3, JFEA and JFFAM (see:
+!ref learn
+ for more info about learning tools).
+<P>
+The command opens a pop-up window with (a) an input variable list,
+(b) a list of selected input variables and (c) a field to select the output variable.
+<UL>
+<LI>
+The '->' button moves a variable from the input variables list to the selected list.
+<LI>
+The '<-' button moves a variable from the selected list back to the
+input variables list.
+<LI>
+The 'm.Up' button moves the current selected variable in
+the selected list one place up.
+<LI>
+The button 'm.Dwn' moves the variable one
+place down.
+</UL>
+When the 'Ok' button is pressed, an 'extern' statement is
+inserted at the cursor position in the code window. The statement is of the
+form:
+<PRE>
+extern jfrd input <v1> <v2> ... output <vo>;'
+</PRE>
+where <v1>, <v2> ... are the variables in the selected list and <vo> is
+the output variable.
+
+!head jfsw_code_jfgp jfsw_code jfgp "The Jfgp template"
+
+!ind "JFS, Jfgp template"
+<P>
+The Jfgp template is activated by selecting the 'Jfgp' command in
+the 'Template' menu in the code window. It is used to insert a statement
+of the form
+<PRE>
+extern jfgp <{param>} <stat-type> {<varlist>};
+</PRE>
+in the code. Extern-statements of this form are used by the learning tool
+JFGP (
+!if "learna"
+see:
+!ref jfgp
+ for details).
+!else
+JFGP is not installed on this computer. It is a part of the LearnA-module.
+For information of how to download and install this module, see:
+!ref learn
+!endif
+<P>
+The command opens a pop-up window where it is possible to select fuzzy
+variables (fzvars), domain variables (vars),
+functions and arrays. A '->' button copies an element from a
+list to a selected list, and a '<-' button moves the element back.
+<P>
+It is possible to add a parameter of the form 'integer <min> <max>'
+by specifying values in 'Integers' min-value and max-value.
+<P>
+If a value is entered in the
+'Floats precission' field, a parameter of the type 'float <pec>' is added.
+<P>
+The 'statement type' can be either 'then', 'assign', 'case' or 'return'.
+If either 'then' or 'assign' is selected, a list of output variables has to
+be selected.
+<P>
+When the 'Ok'-button is pressed the generated extern statement is inserted
+at the cursor position in the code window.
+<P>
+
+!head jfsw_errors jfsw errors "The Errors-window"
+
+!ind "JFS, errors window"
+The errors window is activated by pressing the 'Errors' button in the
+main window or in the code window. The window is also activated after
+compiling (if errors where encountered in the jfs-program). The window displays
+a list of the syntax-errors in the last compiling of the current jfs-program.
+<P>
+Each error is described by (a) its type ('WARNING' or 'ERROR), (b) a number, (c) the
+line number in which it occurred, and (d) a description of the error.
+The line number is the line number at compile time. It is not changed when
+lines are inserted or removed in the code window.
+<UL>
+<LI>The 'Data' button activates the main window.
+<LI>The 'Code' button activates the code window.
+</UL>
+If an error is selected (by clicking on it) and the 'code' button is pressed, then
+the cursor is placed at the error's line number in the code window (this will be
+inaccurate if lines has been inserted or deleted).
+<P>The menu commands 'next error' and 'prev error' (in the code window)
+changes the current selected error to the next or previous error.
+
+!head jfsw_runplot jfsw runplot "The Runplot window"
+!ind "JFS, Runplot window"
+The 'Runplot' window is a pop-up window activated by pressing
+the 'Runplot' button in the main window. It is used to get a plot of the
+current jfs-program's function using the programs JFRPLT and Gnuplot.
+<P>
+In the window one or two input variables and one output variable are selected.
+When the button 'Run' is pressed the output variable is plotted as a function
+of the input variable(s). The plot is shown on the screen in a new window. An
+example of a plot:
+<P>
+<IMG SRC="%%brake3b.gif" ALT="Stopping a bicycle">
+<P>
+The plot is created by running the program JFRPLT with the selected input
+variables as *-input and all other input variables as fixed input with
+default values
+!if "jfrplt"
+(see
+!ref jfrplt
+ for details).
+!endif
+If two input variables are selected a 3D-plot is produced. If
+only input variable is selected (by setting the field 'Input variable 2 (y)'
+to blank) a 2D-plot is produced. For each input variable a start value and
+an end value can be specified (if no values are specified the min/max values
+from the variable's domain are used). In the field 'Steps' the number of
+samples used in the plot can be specified. The plot above was plotted with
+the parameters:
+'Input variable 1 (X)'='distance' and 'Input variable 2 (Y)'='speed'.
+'start value'=0.0, 'end value'=50.0, and 'steps'=41 for both variables.
+<P>
+The fields 'Rotation X (degrees)' and 'Rotation Z (degrees)' are used to
+specify the viewing angle for 3D-plots. The 'Rotation X' specifies the
+rotation around the X-axis. An value of 60 gives a typical 3D-plot. A value
+of 0 (zero) views the plot from above (useful for viewing the contour-lines).
+The 'Rotation Z' specifies the rotation around the Z-axis. A value between 270 and
+360 places the point (0,0) in front. In the plot above 'Rotation Z' was 60.0 and
+ 'Rotation Z' was 75.0.
+<P>
+It is possible to get more control of the plots if JFRPLT is run from the
+tools menu (or the main window in options mode) and even more if it is
+run from the command line.
+!if "jfrplt"
+See:
+!ref jfrplt
+ for details.
+!endif
+
+!head jfsw_fedit jfsw edit-file "The Edit-file window"
+
+!ind "JFS, edit-file window"
+The 'edit file' window is a pop-up window activated by pressing
+the 'Edit file' button in the main window. It is used to view and edit
+the current jfs-program and other related files.
+<P>
+The central part of the window shows a list of files. From the list a file
+is selected and an external editor is started by pressing the 'Edit' button.
+The list of files
+includes the current jfs-program and all related files (the files specified as
+option arguments).
+<P>
+ If the current jfs-program is selected, it is first saved as
+a source-code file (a jfs-file). When saving, the original jfs-file
+is overwritten. Then this file is loaded in the external editor. The this
+file is loaded into the external editor.
+<P>
+There is no automatic change of the current jfs-program in JFS. If it is
+changed by the external editor, then the jfs-file has to be reloaded to
+before the changes are applied.
+<P>
+If a file with the extension '.jfr' is chosen, it is first
+first converted to source-code-file (jfs-file) and saved with the extension
+'.jfs'. Then the source code file is loaded in the editor. There is
+no automatic conversion back to jfr-file.
+<P>
+The external editor chosen to view or edit a given file depends on the file's
+extension. A file with the extension '.jfs' or '.txt' is by
+default edited with the program 'Notepad'. An
+alternative text editor can be specified by setting a value in
+the registry (see
+!ref ad_registry
+).
+<P>
+The program 'Notepad' is also used to edit a file of the type '.jfr' (after converting
+it to a jfs-file). Other files are edited by the program specified in the file's Mime-type.
+
+!head jfsw_changes jfsw changes "Changes in version 2.01"
+
+!dlist jfsw_li_changes
+!li jfsw_li_changes bugs
+Several bugs has been fixed:
+<BR>
+- The correct title is written in the windows-header.
+<BR>
+- Duplicates, in the list of the last loaded jfs-programs, are
+now correctly removed.
+<BR>
+-JFS now gives new programs the correct default operator-type to 'whileop'
+('prod' instead of 'max', which caused infinite loops!).
+<BR>
+- When updating tool-programs to new versions, it is now possible to add options.
+<BR>
+- A bug in variable definitions is corrected. It was not possible to set the
+default value to an adjective bound to the variable's domain.
+!eli
+!li jfsw_li_changes gp
+Hedges, operators, fuzzification-functions etc can be plotted
+directly from JFS (if the JDOC-programs and Gnuplot are installed see:
+!ref jfsw_menus "installing gnulot"
+).
+!eli
+!li jfsw_li_changes bup
+JFS can make automatic backup of the current jfs-program. See:
+!ref ad_registry
+.
+!eli
+!li jfsw_li_changes memory
+It is possible to specify the amount of memory JFS reserves to
+data-objects. See:
+!ref ad_registry
+.
+!eli
+!head jfsw_bugs jfsw bugs "Known bugs"
+
+!dlist jfsw_li_bugs
+!li jfsw_li_bugs changed
+When loading a new jfs-program or exiting JFS, a message-box with the text
+ 'the program has changed. Do you wish to save it?' sometimes (often) appear,
+even if the jfs-program isn't changed.
+!eli
+!li jfsw_li_bugs name
+When the name of an object is changed in the object-editor, the name
+in the object-tree isn't changed before another tree-node is selected.
+!eli
+!li jfsw_li_bugs undo
+The effect of the 'undo'-action in the code-window is rather random (at
+least to me. It is a standard C++-builder (Windows?) component).
+!eli
+!li jfsw_li_bugs scrollbar
+The object-editor doesn't have a scroll bar. The only way to reach hidden
+properties, is with the arrow keys.
+!eli
+!li jfsw_li_bugs edit
+When a text-field in the object-editor is entered, it is in replace-mode.
+Text entered replaces the original contens. By pressing the enter-key or
+clicking with the mouse, the field's mode is changed to edit-mode, where
+its contens can be changed, but unlike standard text-fields the left/right
+arrow keys don't change the mode.
+!eli
+!li jfsw_li_bugs errlines
+If lines are inserted or deleted from the code after compilation, then a
+'jump to an error' jumps to the wrong line.
+!eli
+!endif

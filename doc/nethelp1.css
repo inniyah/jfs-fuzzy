@@ -1,0 +1,94 @@
+/* Cascading Style Sheet, Level 1, for NetHelp */
+/* Add the following command in the <HEAD> section of your HTML file */
+/* <LINK REL=STYLESHEET TYPE="text/css" HREF="../shared/nethelp1.css"> */
+
+BODY {
+    margin: 0;
+    font-family: arial, helvetica, sans-serif;
+    color: black;
+  }
+
+H1, H2, H3, H4, H5, H6, P, UL, OL, DIR, MENU, DIV,
+DT, DD, ADDRESS, BLOCKQUOTE, PRE, BR, HR { display: block }
+
+B, STRONG, I, EM, CITE, VAR, TT, CODE, KBD, SAMP,
+IMG, SPAN { display: inline }
+
+LI { font-family: arial, helvetica, sans-serif; font-size: 10pt }
+
+H1, H2, H3, H4 { margin-top: 0; margin-bottom: 0 }
+
+H5, H6 { margin-top: 0 }
+
+H1 { text-align: left }
+
+H3, H5 { font-style: normal }
+
+H1 { font-family: arial, helvetica, sans-serif; font-size: 18pt }
+H2 { font-family: arial, helvetica, sans-serif; font-size: 16pt }
+H3 { font-family: arial, helvetica, sans-serif; font-size: 14pt }
+H4 { font-family: arial, helvetica, sans-serif; font-size: 12pt }
+H5 { font-family: arial, helvetica, sans-serif; font-size: 12pt }
+H6 { font-family: arial, helvetica, sans-serif; font-size: 10pt }
+
+P { font-family: arial, helvetica, sans-serif; font-size: 10pt; }
+
+B, STRONG { font-weight: bold }  /* relative to the parent */
+
+I, CITE, EM, VAR, ADDRESS, BLOCKQUOTE { font-style: italic }
+
+PRE, TT, CODE, KBD, SAMP { font-family: monospace }
+
+PRE { white-space: pre }
+
+PRE { font-size: 10pt }
+
+ADDRESS { margin-left: 0 }
+
+ADDRESS { font-size: 10pt }
+
+BLOCKQUOTE { margin-left: 0; margin-right: 0 }
+
+UL, DIR { list-style: disc }
+
+UL { margin-left: -1em }
+
+UL { font-family: arial, helvetica, sans-serif; font-size: 10pt }
+
+OL { list-style: decimal }
+OL { margin-left: -1em }
+OL { font-family: arial, helvetica, sans-serif; font-size: 10pt }
+
+MENU { margin: 0 }              /* tight formatting */
+
+LI { margin-left: 0 }
+LI { font-size: 10pt }
+
+DT { margin-bottom: 0 }
+DT { font-family: arial, helvetica, sans-serif; font-size: 10pt }
+
+DD { margin-top: 0 }
+DD { margin-left: 1em }
+DD { font-family: arial, helvetica, sans-serif; font-size: 10pt }
+
+TD { font-family: arial, helvetica, sans-serif;}
+TD { font-size: 10pt }
+
+TH { font-family: arial, helvetica, sans-serif;}
+TH { font-size: 10pt }
+
+TR { font-family: arial, helvetica, sans-serif;}
+TR { font-size: 10pt }
+
+HR { border-top: solid }        /* 'border-bottom' could also have been used */
+
+/* A:link { color: blue }          /* unvisited link */
+/* A:visited { color: red }        /* visited links */
+/* A:active { color: lime }        /* active links */
+
+/* setting the anchor border around IMG elements
+   requires contextual selectors */
+
+/* A:link IMG { border: 2px solid blue } */
+/* A:visited IMG { border: 2px solid red } */
+/* A:active IMG { border: 2px solid lime } */

@@ -1,0 +1,69 @@
+BODY
+{
+  color:#000000;
+  background-color:#ffFFdd;
+
+  font-size:12pt;
+  font-family:'times new roman',sans-serif;
+  margin-right:8%;
+  margin-left:8%;
+}
+
+H1
+{
+  margin-top:1em;
+  margin-bottom:0.5em;
+  color:#888800;
+  font-size:25pt;
+  font-family:arial,sans-serif;
+  font-style:italic;
+}
+
+PRE, TT 
+{
+  font-size:10pt;
+}
+
+CODE
+{
+  font-size:10p;
+}
+
+STRONG
+{
+}
+
+TABLE
+{
+}
+
+CAPTION
+{
+  font-size:14pt;
+  font-style:bold;
+}
+
+.navigation
+{
+  background-color:#F0F0D0;
+  padding-left:1em;
+  padding-top:1em;
+  margin-bottom:1em;
+}
+
+.navigation HR
+{
+  color:#F0F0D0;
+}
+
+.bnavigation
+{
+  background-color:#F0F0D0;
+  padding-left:1em;
+  padding-bottom:1em;
+}
+
+.bnavigation HR
+{
+  color:#F0F0D0;
+}

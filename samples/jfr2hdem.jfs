@@ -1,0 +1,130 @@
+
+title "JFR2HTM demo";
+/*This program dosn't do anything useful. Its purpose is to 
+demonstrate the different input/output-formats in JFR2HTM.
+It was generated from this <A HREF="jfr2hdem.txt">source code</A> 
+ (source code is also in the samples directory with the 
+name 'jfr2hdem.jfs').*/
+
+operators
+    and min precedence 30;
+    or max precedence 20;
+
+domains
+    percent "%" 0 100;
+    color_dom categorical;
+    yesno categorical;
+
+input
+
+#-----------------------------------------------------------------------
+#First input Fieldset
+
+    fl_0 "Fieldset 0" float defuz avg 
+         argument 69; # = 1+4+64 = var_type_fieldset + label-left + com_label
+/*The first block shows the different field types.
+Note this block-comment is created by using the
+label_comment flag of a hidden variable.*/
+
+    ip_num "Numeric input (%)" percent defuz avg default 50 
+           argument 4; # = type_numeric
+    ip_pulldown "Pulldown list color" color_dom defuz avg 
+           argument 12; # = type_pulldown
+    ip_radio "Radio box color" color_dom defuz avg 
+           argument 16; # = type_radio
+    ip_radio_m "Radio buttons vertical" color_dom defuz avg 
+           argument 20; # = type_radio_multiline
+    ip_checkbox "Checkbox (checked=yes)" yesno defuz avg 
+           argument 24; # = type_cehckbox
+
+#----------------------------------------------------------------------
+#Second input field set:
+
+    fl_1 "Field set 1" float defuz avg
+         argument 321; # = 1+64+256 = vt_fieldset+comment_label+no_fieldset.
+/*Block 1 (no HTML fieldset). This block shows the use of argument-flags
+to modify the input/output-fields.*/
+
+    ip_com "not used" percent defuz avg default 20 
+         argument 68; # = 4+64 = type_numeric + comment_label.
+/*The label to this field is taken
+from the variables comment and not from
+its text. Percent:*/
+
+    ip_help "Percent" percent defuz avg default 50 
+        argument 388; # = 4+128+256 = type_numeric + help_button + confidence.
+/*This is the comment to variable. The range and
+the text to the confidence field depends on 
+JFR2HTM options. If this is run from the help-system
+the cofidence is entered as a percent.*/
+
+    ip_from "From" float defuz avg default 10 
+        argument 516; # = 4+512 = type_numeric + no_newline.
+    ip_to "To" float defuz avg default 20 
+        argument 132;  # = 4+128 = type_numeric + help_button.
+/*To input fields on the same line.
+If the program is calculated with
+a 'From'-value greater than the
+ 'To'-value an error-message is shown
+in an alert.*/
+
+#--------------------------------------------------------------------------
+# Third input field set:
+
+    fl_2 "Field set 2" float defuz avg 
+          argument 85; # 1+20+64 = fieldset+label_mode_multitab + com_label
+/*This blocks shows how labels are placed in table-header if
+all variables uses radio buttons and comes from the same
+domain.*/
+    ip_color_1 "Color 1" color_dom defuz avg default 1 argument 16;
+    ip_color_2 "Color 2" color_dom defuz avg default 2 argument 16;
+    ip_color_3 "Color 3" color_dom defuz avg default 3 argument 16;
+
+#--------------------------------------------------------------------------
+# Output fieldset:
+
+output
+    fl_3 "Field set 3" float defuz avg argument 65;
+/*The output block shows the different output formats.*/
+    op_num "Numeric output" percent defuz avg argument 4;
+    op_adj "Adjective output" color_dom defuz avg 
+       argument 392; # = 8+128+256 = type_adjective + help_button + confidence.
+/*Adjective and confidence output.
+Note the confidence output is the
+domain variable's confidence. Not
+always the same as the value of the 
+fuzzy variable.*/
+    op_pulldown "Pull down output" color_dom defuz avg argument 12;
+
+#---------------------------------------------------------------------------
+# Text area fieldset:
+
+  fl_4 "Field set 4" float argument 65;
+/*The last output fieldset shows the use of text areas. */
+
+adjectives
+    color_dom Red 1;
+    color_dom Green 2;
+    color_dom Blue 3;
+
+    yesno No 0;
+    yesno Yes 1;
+
+program
+    extern textarea "first textarea" 70 5;        # unnamed textare.
+    extern textarea area2 "Second textarea" 40 3; # named textarea.
+
+    switch;
+    case ip_from > ip_to;
+      extern alert "Interval ERROR.\n%f > %f", ip_from, ip_to;
+    default;
+      op_num = ip_num;
+      ifw 0.6 true then op_adj = ip_pulldown;
+      op_pulldown = ip_pulldown;
+      extern printf "This textarea is the unnamed textarea.\n";
+      extern printf "The text is written with the printf command.\n";
+      extern printf "from value: %f, to value: %f.\n", ip_from, ip_to;
+      extern printf "Adjective output: %a. Confidence %c.\n", op_adj, op_adj;
+      extern fprintf area2, "This is written to the second textarea";
+      extern fprintf area2, " with the fprintf command.";
+    end;

@@ -1,0 +1,232 @@
+!head intro_help intro navigation "Navigation in the manual"
+
+!ind "Manual, navigation"
+This documentation is written in standard HTML.
+!if !UNIX
+Accessing help from within the program JFS starts a web browser aimed on a page
+relevant to the context.
+!endif
+<P>
+All pages in the manual has the same format:
+<UL><LI>the title
+<LI>two navigation lines
+<LI>the text
+<LI>notes
+<LI>the two navigation lines again.
+</UL>
+<P>
+The two navigation lines are named
+<STRONG>Jump</STRONG> and <STRONG>Path</STRONG> respectively. The jump line
+provides convenient links to
+<STRONG>Contents, Index, Prev</STRONG> (previous page in documentation.
+Shortcut (in some browsers): Alt+p, enter), and
+<STRONG>Next</STRONG> (next page. shortcut Alt+n, enter).
+<P>
+The path-line displays the current page's actual place in the manual. For example,
+it might appear as:
+<PRE>
+Path: jfs \ programs \ basicprograms \ jfc
+</PRE>
+In this case the line indicates that the current page describes JFC (the compiler). The page is placed in the 'Basic programs' section, which in turn is a subsection of the
+'programs' section.
+<P>
+!ind "Manual, note"
+Some web-pages contain links to notes. Clicking on such a link
+opens the note page in a new browser-window. Users can add there own notes
+to the documentation. (See:
+!ref jhlp
+ for details, and if you like, click on the note further down this page to test
+this feature by viewing a sample.)
+<P>
+!if !UNIX
+The documentation is generated when the program JFS is run for the first time,
+and it is refreshed every time new tools are installed or existing tools are
+updated. When it is refreshed, relevant information is inserted whenever appropriate.
+<P>
+!endif
+It is possible to regenerate the manual with the program JHLP. This is
+typical done if another typography is desired. It is also possible to
+generate part of the manual in format better suited to printing. See:
+!ref jhlp
+ for details.
+
+!head intro_notation intro notation "Notation used in the manual"
+
+!ind "Manual, notation"
+!ind "Backus-Nauer notation"
+The syntax of JFL and some of the tools are described (loosely)
+in a variant of extended Backus-Naur notation.
+<UL><LI>A syntax-definition starts with a name followed by '::=', followed by the
+definition. In English, "::=" can be read "is of the form".
+<LI>In the definition a name (text) placed
+between '<' and '>' is replaced by an instance
+of the syntax-definition of the given name. Text outside is used as written.
+<LI>The character '|' means 'or'.
+<LI>Text between a '[' and a ']' is optional.
+<LI>Text between '{' and '}' can be repeated zero or more times.
+</UL>
+<P>For Example:
+<PRE>
+ifwstatement ::= ifw [%]<float> then <var> = <expr>;
+expr         ::= <float> {<op> <expr>}
+op           ::= + | - | * | /
+float        ::= {digit}[.{digit}]
+digit        ::= 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9
+</PRE>
+Here are two correct ifw statements using this syntax:
+<PRE>
+     ifw 0.2 then x = 2 + 3 * 4;
+     ifw %0.8 then y = 3.27;
+</PRE>
+<P>
+!ind "Manual, links"
+The manual contains not only links to other HTML pages in the manual,
+but also to web pages on remote computes. A link to a remote computer is started with
+the word
+<EM>EXTERN</EM>.
+If part of the manual is written in printer-format, then links
+are either written as a chapter-number reference (if the link is included in the written
+pages), or as a reference started with the word
+<EM>ONLINE</EM> (if the link is not in the written pages).
+<P>
+The word
+<EM>program</EM> has two meanings in the manual. Either (a) a <EM>program</EM> is an
+executable file, or (b) a
+<EM>program</EM> is program written in the
+jfs-programming language JFL. To avoid confusion a program written in JFL is
+called a jfs-program, and the word
+<EM>program</EM> without 'jfs-' means an executable file.
+<P>
+The acronym
+<EM>jfs</EM> has several meanings:
+<UL><LI>A "jfs-program" is a program written in the language JFL.
+!if !UNIX
+<LI>
+The program JFS is the Windows program JFS.EXE used to develop and edit jfs-programs.
+!endif
+<LI>A "jfs-file" is a jfs-program in source-code form.
+</UL>
+!head intro_overview intro overview "What is JFS ?"
+
+!ind "Jfs, what is"
+<STRONG>Rationale and use of JFS, and a brief introduction to JFL</STRONG>
+<P>
+Jfs is a programming environment for development and execution of programs
+written in the specialized language JFL. JFL is used to write
+functions that utilize fuzzy logic and machine-learning techniques.
+<P>
+!ind "Jfs-program"
+Programs written in JFL are called jfs-programs.
+!if UNIX
+They are written with a standard text-editor.
+!else
+They are written either using the JFS environment, or with an ordinary
+text-editor.
+!endif
+Once written, Jfs-programs can be (a) compiled to p-code, which is run by one
+of the general run programs, (b) converted to javascript and run via a web browser,
+ (c) run from other programs using a dll-interface, (d) run from a C program
+using the run library, or (e) converted to C source code and included in C programs.
+The Jfs development environment includes tools to
+!if !UNIX
+design, edit,
+!endif
+compile, run, debug, improve, and convert jfs-programs.
+<P>
+JFL combines elements from traditional
+procedural languages like Pascal, C or Basic with fuzzy logic. The source
+code (jfs-file) of a jfs-program looks much like a program written in Pascal.
+<P>
+JFL is used to write functions with numeric and categorical input and output.
+When a jfs-program is
+executed it gets a list of input  values from the run-program, then the jfs-program
+is executed, and the resulting output-values are returned
+to the run  program. JFL has no inbuilt facilities to handle strings, files,
+windows etc. It is not a replacement for general purpose languages like C++, Basic,
+or Java, but Jfs-programs can be called from programs written in those
+other  languages.
+<P>
+
+!if UNIX
+Jfs-programs are written by a text editor (vi, emacs etc), the compiler,
+runner, and tools are executed from the command-line.
+!else
+A user will typically develop a jfs-programs via the Windows interface (the program
+JFS.EXE). All available tools can be accessed and executed from that environment. The alternative method is to edit jfs-programs with a text editor and execute the tools
+from a DOS-prompt (or from a batch file) using the command line interface.
+!endif
+<P>
+<STRONG>File formats, compiling, and inverse compiling</STRONG>
+<P>
+!ind "File formats"
+!ind "Jfs-file"
+!ind "Jfw-file"
+!ind "Jfr-file"
+A jfs-program can be saved in 3 file-formats: jfs-file, jfw-file and
+jfr-file.
+<UL><LI>A jfs-file is a standard ascii source code file. It can be
+edited and printed using an ordinary text editor (
+!if UNIX
+Vi,
+!else
+Windows NOTEPAD,
+!endif
+ for example).
+<LI>A jfr-file is a binary p-code file. It can be interpreted
+(executed) by Jfs's run programs, (e.g., by JFR).
+<LI>A jfw-file is an intermediate between the jfs and the jfr formats.
+In a jfw-file, definitions are in binary form but the program block is in
+text format. jfw-files are used to edit jfs-programs with a graphical interface
+(at the moment this is only supported under Windows, where jfw-programs can be
+edited by the program JFS).
+</UL>
+<P>
+!ind "Compile"
+!ind "Inverse compile"
+The process of compiling a jfs-program consists of converting a jfs-file
+to a jfr-file. It is a two step process: First the jfs-file is converted
+to a jfw-file, and then the jfw-file-file is converted to a jfr-file.
+<P>
+JFL differs from most other programing
+language in that (a) a compiled program can be changed (improved),
+and (b) a compiled program can be converted back to source code. This later
+conversion is called
+<STRONG>inverse compiling</STRONG>. Like compiling, it is a two-step process:
+first the jfr-file is converted to a jfw-file, and then the jfw-file is
+converted to a jfs-file.
+<P>
+The figure below shows how some of the programs use the various
+file formats. An arrow from a file to a program means the program reads the
+file. An arrow from a program to a file means the program writes to the file:
+<P>
+<IMG SRC="%%overview.gif" ALT="Overview of programs and file-formats">
+<P>
+
+!head intro_why intro why_jfs "Why use JFS?"
+!head intro_changes intro changes "Changes in version 2"
+<P>
+!ind "Version 2 of jfs"
+!ind "changes, version 2"
+Changes in version 2:
+!dlist intro_mchanges
+!if !UNIX
+!li intro_mchanges 1
+The Jfs tools only runs under 32-bit windows (windows 95/98/NT).
+!eli
+!li intro_mchanges 2
+A central windows based program is included to edit, compile and run Jfs programs.
+!eli
+!endif
+!li intro_mchanges 3
+The Jfs language (JFL) is changed. Several new features are introduced. Some
+of the more exotic features in version 1 are removed. There are some major
+changes in the syntax, but most jfs-programs written with version 1 compile
+and run under version 2 without modification.
+!eli
+!li intro_mchanges 4
+Jfs version 2 is not runtime compatible with version 1. A jfr-file compiled
+under version 1 won't run under version 2 without recompilation.
+!eli
+For details about the changes see:
+!dlist intro_changes
+

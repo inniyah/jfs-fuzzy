@@ -1,0 +1,673 @@
+!head jfea learn jfea "JFEA: rule creation with an evolutionary algorithm"
+
+!ind JFEA
+!ind "Evolutionary algorithm"
+JFEA is a rule generator. It uses an evolutionary algorithm to create rules.
+It replaces either of these two types of statements:
+<PRE>
+     extern jfrd input [-{<option>}] output [-{<option>}] <var>;
+     extern jfrd input {[-{<option>}] <var>} output [-{<option>}] <var>;
+</PRE>
+with if-statements of the type:
+<PRE>
+     if <v1-expr> and <v2-expr> and ... then <ovar-expr>;
+</PRE>
+The <var>-words in the 'extern jfrd'-statement are names of domain variables. In the
+if-statements, <v1-expr> is an expression based on the first <var>, <v2-expr> is
+based on the second and so on. <ovar-expr> is an expression based on the <var> after the 'output'-word in the extern-statement.
+<P>
+For example, if a jfs-program contains the statement:
+<PRE>
+    extern jfrd input speed distance output brake;
+</PRE>
+then JFEA replaces it with statements of the type:
+<PRE>
+   if <speed-expr> and <distance-expr> then <brake-expr>;
+</PRE>
+for example:
+<PRE>
+   if speed low and distance between medium and high then brake none;
+   if speed normal and distance medium then brake normal;
+   if speed between high and xhigh then brake hard;
+</PRE>
+The types of expressions used for a given variable is defined by the
+options (-{<option>}) in front of the variable. The options are build
+from the letters: 'a', 'v', 'b', 'h', 'i', 'n', 'r', 'c', 'C', 'd', 'D' and 'o'.
+An example of a jfrd-statement with options:
+<PRE>
+  extern jfrd input -abhi speed -vb distance output -a brake;
+</PRE>
+The meaning of the individual options for input-variables are:
+<P>
+!dtab jfea_ip_options "JFRD-statement input-options"
+!tab jfea_ip_options head
+<B>Option</B>
+!etc
+<B>Meaning</B>
+!etab
+!tab jfea_ip_options a
+a
+!etc
+Include expressions of the type: '<var> <adjective>' (-a is only legal
+if at least one adjective is bound to <var>).
+!etab
+!tab jfea_ip_options v
+v
+!etc
+Include expressions of the type <var> <rel> <const>, where <rel> is one
+of the logical relations: '>', '>=', '==', '<', '<=', '!=' and <const>
+is numerical constant.
+<BR>
+Example: 'speed > 127.2'.
+<BR>
+ the v-option is only legal if both a minimum and a maximum value
+is defined for the domain to which <var> is bound.
+!etab
+!tab jfea_ip_options b
+b
+!etc
+If the 'a'-options is included, then use expressions of the type '<var>
+between <adjective> and <adjective>'.
+<BR>
+If the 'v'-option is specified then use expressions of the type '<var> <= <const>
+and <var> >= <const>'.
+!etab
+!tab jfea_ip_options i
+i
+!etc
+Use expressions of the type '<var> in <adjective>, <adjective>,...<adjective>'
+<BR>
+Only legal if the 'a'-options is specified and at least 2 and at most 24
+adjectives are bound to <var>.
+!etab
+!tab jfea_ip_options h
+h
+!etc
+Use expressions of the type '<hedge>(<var> <adjective>)'.
+<BR>
+Only legal if the a-options is specified for <var>'.
+!etab
+!tab jfea_ip_options r
+r
+!etc
+Use expressions of the type '<var> <urel> <const>', where <urel> is the
+name of a user-defined relation.
+<BR>
+Only legal if the program includes at least one user-defined relation,
+and both a minimum and a maximum
+value is defined for the domain, to which <var> is bound.
+!etab
+!tab jfea_ip_options c
+c
+!etc
+Use expressions of the type '<var> <rel> <var2>', where
+<BR>
+ <rel> is one of the predefined relations ('>', '==', etc),
+<BR>
+ <var2> is the name of a variable in the 'input'-list.
+!etab
+!tab jfea_ip_options C
+C
+!etc
+Use expressions of the type '<var> <urel> <var2>', where
+<BR>
+ <urel> is the name of a user-defined relation,
+<BR>
+ <var2> is a variable in the 'input'-list.
+!etab
+!tab jfea_ip_options d
+d
+!etc
+Use expressions of the type '<var> <rel> <var2>', where
+<BR>
+  <rel> is one of the predefined relations ('>', '==', etc),
+<BR>
+  <var2> is the name of a variable in the 'input'-list with the same domain as <var>.
+!etab
+!tab jfea_ip_options D
+D
+!etc
+Use expressions of the type '<var> <urel> <var2>', where
+<BR>
+ <urel> is the name of a user-defined relation,
+<BR>
+ <var2> is a variable in the 'input'-list with the same domain as <var>.
+!etab
+!tab jfea_ip_options o
+o
+!etc
+Use expressions of the type '<var> <op> <var2> <rel> <const>', where
+<BR>
+ <op> is one of '+', '-' and '*',
+<BR>
+ <var2> is the name of a variable in the input-list,
+<BR>
+ <rel> is a predefined relation.
+!etab
+<P>
+The meaning of the options before the 'output'-word are:
+<P>
+!dtab jfea_op_options "JFRD-statement output-options"
+!tab jfea_op_options head
+<B>Option</B>
+!etc
+<B>Meaning</B>
+!etab
+!tab jfea_op_options a
+a
+!etc
+Use then-expressions of the type '<var> <adjective>'.
+!etab
+!tab jfea_op_options v
+v
+!etc
+Use then-expressions of the type '<var> = <const>', where <const> is a
+numeric constant. Only possible if both a minimum and a
+maximum-value is defined for <var>'s domain.
+!etab
+!tab jfea_op_options i
+i
+!etc
+Use then-expressions of the type ' <incdec> <var> with <const>', where
+<BR>
+  <incdec> is 'increase' or 'decrease',
+<BR>
+  <const> is a number between 0.0 and 1.0.
+!etab
+<P>
+<STRONG>Example</STRONG><P>
+If JFEA is run on a jfs-program with the statement:
+<PRE>
+    jfrd input -abh speed -vo distance -a brake;
+</PRE>
+then the statement could be replaced with the rules:
+<PRE>
+    if speed low and distance > 10 then brake none;
+    if not(speed between low and medium) and distance <= 20 then brake normal;
+    if speed high and speed * distance * 117 then brake hard;
+</PRE>
+If no options are specified to an input variable, then default-options are used for
+that variable. The default-options are '-ab' if adjectives are bound to
+the variable, and '-vb' if not.
+<P>
+If no variables are specified in the input-part of the 'extern jfrd'-statement,
+then all domain-variables of the type 'input' are used as if-variables. The
+specified options are used for all variables.
+<P>
+JFEA uses a data
+file containing sample input and output values. The goal is to minimize the
+difference between the output values from the data file, and the output
+values calculated by the jfs-program.
+<P>
+The evolutionary algorithm used by JFEA uses a variant of steady state EA
+with rank-selection and the genetic operators:
+<UL>
+<LI><STRONG>crossover:</STRONG>
+ standard 2-point crossover,
+<LI><STRONG>sumcros:</STRONG>
+ the value of a gene in the child is the avg between the parents value for the gene,
+<LI><STRONG>mutation:</STRONG>
+ the new individual is equal to parent individuals
+except for a random number < 5 of genes, which are given random types and values,
+<LI><STRONG>creation:</STRONG>
+ all genes of the new individual are chosen randomly
+<LI><STRONG>pointcros:</STRONG>
+the genes for the new individual are taken randomly from the 2 parents with
+the probabilities 3/4 and 1/4 for parent-1 and parent-2,
+<LI><STRONG>rulecros:</STRONG>
+ each rules in the are taken randomly from one of the 2 parents,
+<LI><STRONG>stepmutation:</STRONG>
+ the new individual is equal to parent-1, except for a single gene, on which
+a small change is made,
+<LI><STRONG>repeatmutation:</STRONG>
+ the last executed stepmutation is repeated,
+<LI><STRONG>maxcros:</STRONG>
+ each gene in the child is selected as the "largest" gene from the 2 parents,
+<LI><STRONG>mincros:</STRONG>
+ each gene in the child is selected as the "smallest" gene from the 2 parents.
+</UL>
+<P>
+The score of a jfs-program is calculated by running the program with all the
+data sets in the data file (except if the 'early-stop option' is specified).
+If a data set has the input values i1,..,im and
+the output values e1,..,en, and the jfs-program returns o1,...,on when run
+with input i1,..,in, then the score for this data set is by default calculated as
+|e1 - o1| + ,..., + |en - on|. Using options an alternative score-calculation method
+can be used. The alternatives are (a) squared-sum and (b) penalty matrix (see
+!ref err_measures
+for details).
+<P>
+The total score for the jfs-program is
+the sum of the data-scores divided by the number of data sets (division
+can be suppressed by an option).
+<P>
+The data file must be a field-separated ascii file. See
+!ref prog_input
+for details.
+<P>
+JFEA comes with several sample jfs-programs. See:
+!ref ap_examples
+.
+
+!head jfea_options jfea options "Running JFEA from the command line"
+
+To invoke JFEA type 'jfea' at the prompt and
+follow it with a set of command line arguments. The command line format is:
+<PRE>
+      jfea {<option>} <filename>
+</PRE>
+where <filename> is the a compiled jfs-program that contains an 'extern jfrd'
+statement as described in the
+!ref jfea "previous chapter"
+.
+<P>
+If called without options
+options JFEA reads data from the file <filename>.dat. The changed jfs-program
+is written to <filename>.jfr (overwriting the original program).
+JFEA recognizes the following option:
+<P>
+!dtab jfea_options "JFEA options"
+!tab jfea_options -f
+-f <fs>
+!etc
+Use the characters in <fs> as field separators in the data file.
+!etab
+!tab jfea_options -D
+-D <dam>
+!etc
+Data file order. <dam> is one of:
+<BR>'ie' : input values before expected values,
+<BR>'ei' : expected values  before input values,
+<BR>'tie': identifier before input before expected,
+<BR>'tei': identifier before expected before input,
+<BR>'iet': input values before expected values before identifier,
+<BR>'eit': expected values before input values before identifier,
+<BR>'f'  : the order of the variables are taken from the variable-names
+in the first line.
+<BR>See
+!ref prog_input
+for details.
+!etab
+!tab jfea_options -d
+-d <datafile>
+!etc
+Read data from the file <datafile>.
+!etab
+!tab jfea_options -o
+-o <outfile>
+!etc
+Write the changed jfs-program to the file <outfile>.
+!etab
+!tab jfea_options -Et
+-Et <elapsed>
+!etc
+End after <elapsed> minutes (default is 60 minutes).
+!etab
+!tab jfea_options -Ee
+-Ee <ee>
+!etc
+End if error <= <ee> (default <ee> = 0).
+!etab
+!tab jfea_options -Ei
+-Ei <i>
+!etc
+End after <i> individuals has been created and tested (default
+  <i> = 10000).
+!etab
+!tab jfea_options -Es
+-Es <pct>
+!etc
+Use a variant of 'early stopping' for judging the best individual:
+Use <pct> percent of the training sets as validation data and
+the rest as training data. Use the training data in the evolutionary
+process, but return the individual with the best score on the
+validation data as JFEA's result.
+!etab
+!tab jfea_options -I
+-I  <ic>
+!etc
+ <ic> is the population size (default 40).
+!etab
+!tab jfea_options -R
+-R <c>
+!etc
+ <c> is the number of generated rules. By default one rules is generated
+for each adjective bound to the output variable.
+!etab
+!tab jfea_options -fr
+-fr
+!etc
+Fixed then-part of rules.
+<BR>
+The first rule is of the type 'if <expr> then <v> <a1>;', the
+next rule is of the type 'if <expr> then <v> <a2>;' and so on, where <a1> is
+the first adjective bound to the output variable <v>, <a2> is the second, and so
+on. (If the number of rules is greater than the number of adjectives bound to
+ <v>, the adjectives continues with <a1>).
+!etab
+!tab jfea_options -nd
+-nd
+!etc
+Don't create rules of the type 'if <e> then <v> <a>;', where <a> is the
+default adjective-value for <v> (the declaration of <v> must include
+ 'default <adj>').
+!etab
+!tab jfea_options -sm
+-sm  <s>
+!etc
+score calculating-method.
+<BR>
+ <s> ='a': the score is the avg-difference between the data and the expected,
+<BR>
+ <s>='s': the score is the sum of the differences between calculated and expected,
+<BR>
+ <s>='s2': the score is the sum of the squared differences between calculated and
+expected.
+<BR>
+ <s>='p': the score is the sum of the values calculated from the penalty matrix.
+!etab
+!tab jfea_options -pm
+-pm <pf>
+!etc
+Read the penalty matrix from the file <pf> (see
+!ref err_measures
+). Can only be used if '-sm p'.
+!etab
+!tab jfea_options -sc
+-sc <m>
+!etc
+score calculation method.
+<BR>
+ <m>='e':exact method,
+<BR>
+ <m>='f':fast method.
+<BR>
+Default is 'f'; the reported statistical values (avg-score, etc) are inexact.
+!etab
+!tab jfea_options -uv
+-uv <m>
+!etc
+defines how undefined values (values of '?' in data file) are treated.
+<BR>
+ <m>='d' (default): unknown values are replaced by the variables default-value,
+<BR>
+ <m>='d0': unknown values are replaced by the variables default-value with
+confidence=0.0,
+<BR>
+ <m>='z': domain variable is undefined, fuzzy variables bound to variables
+are set to 0.0,
+<BR>
+ <m>='o': like 'z', but fuzzy values are set to 1.0,
+<BR>
+ <m>='a': like 'z', but fuzzy values are set to
+1.0/number-of-fuzzy-variables.
+!etab
+!tab jfea_options -s
+-s
+!etc
+silent--(less statistical output).
+!etab
+!tab jfea_options -r
+-r
+!etc
+Score rounding.
+<BR>
+The score for each data set is rounded to a value in [0,1].
+!etab
+!tab jfea_options -w
+-w
+!etc
+Wait for the user to press the return key before finishing the program.
+!etab
+!tab jfea_options -so
+-so <s>
+!etc
+write messages to <s> instead of writing them to standard output (i.e., the screen).
+!etab
+!tab jfea_options -a
+-a
+!etc
+Append messages to output file (i.e., <s> mentioned just above)
+instead of overwriting it.
+!etab
+<P>
+<STRONG>Examples:</STRONG>
+<PRE>
+     jfea -Et 5 iris
+</PRE>
+creates rules in the program 'iris.jfr' taking input from 'iris.dat' (containing
+input followed by output). Stops after 5 minutes (or 10000 individuals)
+writing the changed program to 'iris.jfr'.
+<PRE>
+     jfea -d ss.dat -o newiris -R 6 iris
+</PRE>
+creates 6 rules in the program 'iris.jfr' taking input from 'ss.dat' and
+writes the changed program to 'newiris.jfr'.
+
+
+!head jfea_opt_jfs jfea options "Running JFEA from JFS"
+!if !UNIX
+To invoke JFEA from the program JFS, select 'Jfea' from the tools menu or
+press the 'Runtool' button in the options window.
+<P>
+
+!dtab jfea_opts_jfs "JFEA options"
+!tab jfea_opts_jfs -f
+Data separators
+!etc
+use the specified characters as extra field separators in the data file.
+!etab
+!tab jfea_opts_jfs -D
+Data order
+!etc
+Data order in the data file. One of:
+<BR><STRONG>input_expected:</STRONG> input values before expected values,
+<BR><STRONG>expected_input:</STRONG> expected values  before input values,
+<BR><STRONG>text_input_expected:</STRONG> identifier before input before expected,
+<BR><STRONG>text_expected_input:</STRONG> identifier before expected before input,
+<BR><STRONG>input_expected_text:</STRONG> input values before expected values before identifier,
+<BR><STRONG>expected_input_text:</STRONG> expected values before input values before identifier,
+<BR><STRONG>first_line:</STRONG> the order of the variables are taken from the variable-names.
+!etab
+!tab jfea_opts_jfs -d
+Data file
+!etc
+read training data from the specified file.
+!etab
+!tab jfea_opts_jfs -o
+Destination file
+!etc
+write the changed jfs-program to the file specified here.
+!etab
+!tab jfea_opts_jfs -Et
+Stop after minutes
+!etc
+stop improving after the specified number of minutes.
+!etab
+!tab jfea_opts_jfs -Ee
+Stop if error <=
+!etc
+stop if error <= specified value.
+!etab
+!tab jfea_opts_jfs -Ei
+Stop after individuals
+!etc
+Stop after the specified number of individuals has been created and tested.
+!etab
+!tab jfea_opts_jfs -Es
+Early stopping percent
+!etc
+Use a variant of 'early stopping' for judging the best individual:
+<BR>
+the specified percentage of the training sets is used as validation data and
+the rest is used as training data. The training data is used in the evolutionary
+process, but the individual with the best score on the
+validation data is returned as JFEA's result.
+!etab
+!tab jfea_opts_jfs -I
+Population size
+!etc
+specify the number of individuals in the population.
+!etab
+!tab jfea_opts_jfs -R
+Number of rules
+!etc
+specify the number of generated rules. If empty then one rules is generated
+for each adjective bound to the output variable.
+!etab
+!tab jfea_opts_jfs -fr
+Fixed rules
+!etc
+<STRONG>yes:</STRONG>
+ fixed then-part of rules. First rule is of the type
+'if <expr> then <v> <a1>;',
+next rule is of the type 'if <expr> then <v> <a2>;' and so on, where <a1> is
+the first adjective bound to the output variable <v>, <a2> is the second and so
+on (if the number of rules is greater than the number of adjectives bound to
+ <v> then the adjectives continues with <a1>).
+!etab
+!tab jfea_opts_jfs -nd
+no default
+!etc
+<STRONG>yes:</STRONG>,
+don't create rules of the type 'if <e> then <v> <a>;',
+where <a> is the
+default adjective-value for <v> (the declaration of <v> must include
+ 'default <adj>').
+!etab
+!tab jfea_opts_jfs -sm
+Score method
+!etc
+score calculating method.
+<BR><STRONG>avg:</STRONG>
+The score is the avg-difference between the data and the expected,
+<BR><STRONG>sum:</STRONG>
+The score is the sum of the differences between calculated and expected,
+<BR><STRONG>sum(pow2):</STRONG>
+The score is the sum of the squared differences between calculated and
+expected.
+<BR><STRONG>penalty:</STRONG>
+The score is the sum of the values calculated from the penalty file.
+!etab
+!tab jfea_opts_jfs -sc
+Score calc
+!etc
+score calculation method.
+<BR><STRONG>exact:</STRONG>
+exact method,
+<BR><STRONG>fast:</STRONG>
+fast method (default),
+the reported statistical values (avg-score, etc) are inexact.
+!etab
+!tab jfea_opts_jfs -uv
+Var-values unknown
+!etc
+defines how undefined values ('?' in data file) are treated.
+<BR><STRONG>default:</STRONG>
+unknown values are replaced by the variable's default value,
+<BR><STRONG>def0:</STRONG>
+unknown values are replaced by the variable's default value with
+confidence=0.0,
+<BR><STRONG>zero:</STRONG>
+domain variable is undefined, fuzzy variables bound to variables are set to 0.0,
+<BR><STRONG>one:</STRONG>
+like 'zero', but fuzzy values are set to 1.0, 'avg': like 'zero', but fuzzy
+values are set to 1.0/number-of-fuzzy-variables.
+!etab
+!tab jfea_opts_jfs -s
+Silent
+!etc
+<STRONG>yes:</STRONG> less statistical output.
+!etab
+!tab jfea_opts_jfs -r
+Score rounding
+!etc
+<STRONG>yes:</STRONG> the score for each data set is rounded to a value in [0,1].
+!etab
+!tab jfea_opts_jfs -w
+Wait for RETURN
+!etc
+wait for the user to press the 'return' key before finishing the program.
+!etab
+!tab jfea_opts_jfs -so
+Redirect stdout to
+!etc
+write messages to the specified file instead of writting them to standard
+output (i.e., the screen).
+!etab
+!tab jfea_opts_jfs -a
+Append to sout-file
+!etc
+<STRONG>yes:</STRONG>
+append messages to the standard output file (instead of overwriting
+the file).
+!etab
+!tab jfea_opts_jfs -pm
+Penalty file
+!etc
+Read the penalty matrix from the specified file (see
+!ref err_measures
+). Can only be used if 'score method' is 'penalty'.
+!etab
+!tab jfea_opts_jfs so
+Source file
+!etc
+Specify the jfs-program to be improved.
+!etab
+
+!endif
+!head jfea_bugs jfea bugs "Known bugs in JFEA"
+!head jfea_v2 jfea changes "Changes in JFEA version 2"
+
+!li intro_changes jfea
+!ref jfea_v2 "Changes in JFEA"
+!eli
+<P>
+Changes in JFEA version 2.03:
+<UL>
+<LI>
+A bug in the assigning of fuzzy values to undefined input variables is fixed.
+<LI>
+The data file to JFEA can have its variables ordered using the 'first-line method'
+described in:
+!ref prog_input
+.
+<LI>
+Score can be calculated with a penalty matrix.
+<LI>New input variable options 'd' and 'D': compare only variables from the
+same domain.
+</UL>
+<P>
+Changes in JFEA version 2.01:
+!dlist jfea_v2.01
+!li jfea_v2.01 1
+A memory allocation bug is fixed (sometimes JFEA would stop with an
+ 'illegal instruction' Windows error).
+!eli
+!li jfea_v2.01 1.1
+A Bug is corrected which caused JFEA to enter an infinite loop if the
+'extern jfrd'-statement wasn't the first statement.
+!eli
+!li jfea_v2.01 1.2
+Better error messages if error in 'extern jfrd' statement.
+!eli
+!li jfea_v2.01 2
+The program has been recompiled with speed optimization.
+!eli
+!li jfea_v2.01 3
+Improved method to generate initial generation.
+!eli
+!li jfea_v2.01 4
+New genetic operators: pointcros, rulecros, step-mutation, creation, mincros, maxcros,
+and repeat-stepmutaion.
+!eli
+!li jfea_v2.01 5
+JFEA can now create expression with hedges, in-functions, relations (both build-in
+and user-defined), constants and operators.
+!eli
+!li jfea_v2.01 6
+Syntax of 'extern jfrd' statement expanded with option-possibilities.
+!eli
+!li jfea_v2.01 7
+JFEA can now use a variant of 'early-stopping' to select best individual.
+!eli

@@ -1,0 +1,504 @@
+!head jfgp learn jfgp "JFGP: rule creation with genetic programing"
+
+!ind JFGP
+!ind "Genetic programming"
+JFGP is a learning tool based on genetic programming. It replaces
+ 'extern' statements in a compiled jfs-program with
+if/case/return/assign-statements. JFGP
+uses a data file, with sample input and output values, to generate the
+statements. The goal is to make the output from the jfs-program match the
+output values from the data file, when run with the input values from the
+data file.
+<P>
+JFGP uses a steady state variant of Genetic Programming (GP) with
+tournament-selection. New individuals are
+created by several non-standard variants of mutation and crossover.
+<P>
+The score of a jfs-program is calculated by running the program with all the
+data sets in the data file and calculate the sum of difference between the
+expected and calculated output values (see
+!ref err_measures
+ for details).
+If 2 individuals has the same
+score and JFGP has generated more than half the individuals to be generated,
+then the smallest individual is deemed best (this can be changed by the an option).
+<P>
+The data file must be a field-separated ascii-file. See
+!ref prog_input
+for details.
+<P>
+JFGP replaces 'extern' statements of the form:
+<PRE>
+     extern jfgp <variables and operators> <statement-type>;
+</PRE>
+with statements. An example:
+<PRE>
+     extern jfgp fzvars age spect_presc astigmatic tear_rate
+	       functions and or not
+	  then lenses;
+</PRE>
+In this example the input variables are
+'age', 'spect_presc', 'astigmatic' and 'tear_rate', and the output variable is
+'lenses'. The keyword 'then' tells JFGP to create statements of the type:
+if <expr> then lenses is <adjective>;. If the adjectives bound to
+ 'lenses' are: 'hard', 'soft' and 'none', then the created statements
+might be:
+<PRE>
+     if not (tear_rate reduced or not(astigmatic yes)) and not(
+       age between pre_presbyoric and presbyoric) then lenses hard;
+     if tear_rate normal and astigmatic no then lenses soft;
+     if spect_presc hypermetrope or tear_rate reduced then lenses none;
+</PRE>
+The full syntax of the JFGP extern-statement is:
+<PRE>
+     extern jfgp [fzvars {<fzv>}] [vars {<v>}] [functions {<f>}]
+                 [integer <min> <max>] [float <dec>] arrays (<a>} <darg>;
+</PRE>
+where
+<PRE>
+     <darg>::= then {<v>} | assign {<v>} | case | return
+</PRE>
+The meaning of the keywords:
+!dtab jfgp_kwords Keywords
+!tab jfgp_kwords fzvars
+fzvars {<fzv>}
+!etc
+ defines the fuzzy variables used in the generated statements. {<fzv>} is
+a list of domain variable names. The fuzzy variables bound to the domain variables
+are used in the if-expressions.
+!etab
+!tab jfgp_kwords vars
+vars {<v>}
+!etc
+defines the domain variables used in the generated statements. {<v>} is a
+list of domain variable names.
+!etab
+!tab jfgp_kwords functions
+functions {<f>}
+!etc
+defines the operators, hedges, relations and functions
+used in the generated statements. Both predefined and user-defined
+operators/relations/functions can be specified in the list of names {<f>}.
+<BR>
+Example: 'functions cos + - not > and or min max'.
+!etab
+!tab jfgp_kwords integer
+integer <min> <max>
+!etc
+defines the integer constants used in the generated statements. Integers are
+selected from the interval [<min>,<max>].
+!etab
+!tab jfgp_kwords float
+float  <dec>
+!etc
+defines the floating point constants used in the generated statements. The float
+constants are in the interval [0.0, 1.0]. <dec> specifies the
+number of decimals in the constants. If <dec> is 1, then the constants
+are selected from 0.0, 0.1,...,0.9, 1.0. If <dec> is 3, then the constants
+are selected from 0.0, 0.001, 0.002,...,0.999, 1.0.
+!etab
+!tab jfgp_kwords arrays
+arrays {<a>}
+!etc
+defines the arrays used ind the generated statements. {<a>} is a list of
+array names.
+!etab
+<P>
+The <darg>-part of extern-statements defines which type of statement(s) to
+generate. The possible values are:
+
+!dtab jfgp_darg "darg-values"
+!tab jfgp_darg then
+then {<v>}
+!etc
+Generate statements of the type 'if <expr> then <fzvar>'.
+<BR>
+For each adjective 'a', bound to a variable 'var' in the list of
+variable names {<v>}, create a statement of the
+form 'if <expr> then <var> is <adj>;'.
+!etab
+!tab jfgp_darg assign
+assign {<v>}
+!etc
+Create statements of the type '<v> = <expr>;'.
+<BR>
+For each domain variable 'var' in the list of domain variable
+names {<v>}, create a statement of the form '<var> = <expr>;'.
+!etab
+!tab jfgp_darg case
+case
+!etc
+Create a statement of the type 'case <expr>;'
+<BR>
+ (The 'extern' statement has to be placed inside a 'switch' block).
+!etab
+!tab jfgp_darg return
+return
+!etc
+Create a statement of the type 'return <expr>;'
+<BR>
+ (The 'extern' statement has to be placed in a user-defined function).
+!etab
+<P>
+An example of an 'extern' statement with several operators:
+<PRE>
+     extern jfgp fzvars age spect_presc astigmatic tear_rate
+                 vars age spect_presc astigmatic tear_rate
+                 function and or = > < pow max + - not cos
+                 integer 0 3
+                 float 2
+            assign lenses;
+</PRE>
+JFGP comes with several sample jfs-programs. See:
+!ref ap_examples
+.
+
+
+!head jfgp_options jfgp options "Running JFGP from the command line"
+
+To invoke JFGP from a command line type 'jfgp' at the prompt and
+follow it with a set of command line arguments. The command line format is:
+<PRE>
+      jfgp {<option>} jfrf
+</PRE>
+
+where 'jfrf' is the filename of a compiled jfs-program containing at least
+one statement of the form
+<PRE>
+      extern jfgp {<arguments>};
+</PRE>
+If jfgp is run without options, it reads trainings data from the file <jfrf>.dat
+and writes the changed jfs-program to <jfrf> (overwriting its original
+contents). JFGP takes the following options:
+<P>
+!dtab jfgp_options "Options"
+!tab jfgp_options -f
+-f <fs>
+!etc
+Use the characters in <fs> as field-separators in the data file.
+!etab
+!tab jfgp_options -D
+-D <dam>
+!etc
+Data file order. <dam> is one of:
+<BR>'ie' : input values before expected values,
+<BR>'ei' : expected values  before input values,
+<BR>'tie': identifier before input before expected,
+<BR>'tei': identifier before expected before input,
+<BR>'iet': input values before expected values before identifier,
+<BR>'eit': expected values before input values before identifier,
+<BR>'f'  : the order of the variables are taken from the variable-names
+in the first line.
+<BR>See
+!ref prog_input
+for details.
+!etab
+!tab jfgp_options -d
+-d <df>
+!etc
+Read data from the file <df> (if <df> has no extension then '.dat' is added).
+!etab
+!tab jfgp_options -o
+-o <of>
+!etc
+Write the changed jfs-program to the file <of>.
+!etab
+!tab jfgp_options -Et
+-Et <et>
+!etc
+End training after <et> minutes (default is 60 minutes).
+!etab
+!tab jfgp_options -Ei
+-Ei <i>
+!etc
+End training after <i> individuals has created and tested (default
+	     <i> = 10000).
+!etab
+!tab jfgp_options -I
+-I  <ic>
+!etc
+Population-size. <ic> is the number of individuals in the
+population (default 100).
+!etab
+!tab jfgp_options -A
+-A  <a>
+!etc
+Defines the number of atoms. An individual is build from atoms. An atom can be
+part of several individuals. Default number of atoms: 1000.
+!etab
+!tab jfgp_options -sm
+-sm  <s>
+!etc
+Score calculating-method.
+<BR>
+ <s> ='a': the score is the avg-difference between the data and the expected,
+<BR>
+ <s>='s': the score is the sum of the differences
+between calculated and expected,
+<BR>
+ <s>='s2': the score is the squared sum of differences between calculated
+and expected. Default is 'a'.
+<BR>
+ <s>='p': The score is the sum of the values calculated from the penalty
+matrix.
+!etab
+!tab jfgp_options -pm
+-pm <pf>
+!etc
+Read the penalty matrix from the file <pf> (see
+!ref err_measures
+). Can only be used if '-sm p'.
+!etab
+!tab jfgp_options -sc
+-sc <m>
+!etc
+Score calculation method.
+<BR>
+ <m>='f':fast but inexact (statistical info about
+avg-score etc are inexact),
+<BR>
+ <m>='e':exact but slower. Default is 'f'.
+!etab
+!tab jfgp_options -s
+-s
+!etc
+Silent. Don't write statistical output to standard output.
+!etab
+!tab jfgp_options -r
+-r
+!etc
+Score rounding. The score for each data set is rounded to a
+	     value in [0,1].
+!etab
+!tab jfgp_options -mm
+-m <m>
+!etc
+Describes how individual-size is used in the comparing the scores of
+individuals.
+<BR>
+ <m>='n': don't use individual's size in score-comparing,
+<BR>
+ <m>='y': if 2 individuals has the same score then the smallest individual is
+deemed best.
+<BR>
+ <m>='h' (default): don't use size in the first half of the run, but use size in the
+last half of the run.
+!etab
+!tab jfgp_options -gs
+-gs <s>
+!etc
+ <s> is the group size in tournament selection (default = 5).
+!etab
+!tab jfgp_options -so
+-so <s>
+!etc
+Write messages to the file <s> instead on standard output (screen).
+!etab
+!tab jfgp_options -a
+-a
+!etc
+Append messages to stdout-file instead of overwriting the file.
+!etab
+!tab jfgp_options -w
+-w
+!etc
+Wait for the user to press the return-key before exiting the program.
+!etab
+<P>
+<STRONG>example:</STRONG>
+<PRE>
+       jfgp -Et 10 -Ei 100000 -o x truck
+</PRE>
+means: Change the program 'truck.jfs', reading data from the file 'truck.dat',
+using max 10 minutes or 100000 individuals. Write the changed program
+to 'x.jfr'.
+
+!head jfgp_jfs_opts jfgp options "Running JFGP from JFS"
+!if !UNIX
+To invoke JFGP from the program JFS chose 'jfgp' from the tools menu, or
+press the 'runtool' button after choosing 'jfgp' in the options screen.
+The program must include at least one statement of the form:
+<PRE>
+   extern jfgp {<arguments>};
+</PRE>
+Statements of this type can be created with the JFGP template (choose
+ 'JFGP' from the templates menu in the code window).
+<P>
+JFGP takes the following
+options:
+<P>
+!dtab jfgp_jfs_opts "Options"
+!tab jfgp_jfs_opts -f
+Data separators
+!etc
+Use the specified characters as as extra field-separators in the data file.
+!etab
+!tab jfgp_jfs_opts -D
+Data order
+!etc
+Data order in the data file. One of:
+<BR><STRONG>input_expected:</STRONG> input values before expected values,
+<BR><STRONG>expected_input:</STRONG> expected values  before input values,
+<BR><STRONG>text_input_expected:</STRONG> identifier before input before expected,
+<BR><STRONG>text_expected_input:</STRONG> identifier before expected before input,
+<BR><STRONG>input_expected_text:</STRONG> input values before expected values before identifier,
+<BR><STRONG>expected_input_text:</STRONG> expected values before input values before identifier,
+<BR><STRONG>first_line:</STRONG> the order of the variables are taken from the variable-names
+!etab
+!tab jfgp_jfs_opts -d
+Data file
+!etc
+Read training sets from the data file specified here.
+!etab
+!tab jfgp_jfs_opts -o
+Destination file
+!etc
+Write the changed jfs-program to the file specified here.
+!etab
+!tab jfgp_jfs_opts -Et
+Stop after minutes
+!etc
+Stop training after the specified number of minutes.
+!etab
+!tab jfgp_jfs_opts -Ei
+Stop after individuals
+!etc
+Stop training after the specified number of individuals are created and tested.
+!etab
+!tab jfgp_jfs_opts -I
+Population size
+!etc
+Create a population with the specified number of individuals.
+!etab
+!tab jfgp_jfs_opts -A
+Number of atoms
+!etc
+Specifies the number of atoms. An individual is build from atoms.
+An atom can be part of several individuals.
+!etab
+!tab jfgp_jfs_opts -sm
+score method
+!etc
+<BE><STRONG>avg:</STRONG>
+ The score is the avg-difference between the data and the
+expected
+<BR><STRONG>sum:</STRONG>
+ The score is the sum of the differences between calculated
+and expected,
+<BR><STRONG>sum(pow2):</STRONG>
+ The score is the squared sum of differences between calculated and expected.
+<BR><STRONG>penalty:</STRONG>
+The score is the sum of the values calculated from the penalty file.
+!etab
+!tab jfgp_jfs_opts -sc
+Score calculate
+!etc
+score calculation method:
+<BR><STRONG>fast:</STRONG>
+ fast but inexact (statistical info about avg-score etc are inexact),
+<BR><STRONG>exact:</STRONG>
+exact but slower.
+!etab
+!tab jfgp_jfs_opts -s
+Silent
+!etc
+<BR><STRONG>yes:</STRONG>
+ Don't write statistical output to standard output.
+!etab
+!tab jfgp_jfs_opts -r
+Score rounding
+!etc
+<BR><STRONG>yes:</STRONG>
+ The score for each data set is rounded to a value in [0,1].
+!etab
+!tab jfgp_jfs_opts -mm
+Min individual size
+!etc
+Describes how individual-size is used in the comparing the scores of
+individuals.
+<BR><STRONG>no:</STRONG>
+Don't use individual's size in score-comparing,
+<BR><STRONG>yes:</STRONG>
+If two individuals have the same score then the smallest individual is the best,
+<BR><STRONG>half:</STRONG>
+Don't use size in the first half of the run, but use size in the
+last half of the run.
+!etab
+!tab jfgp_jfs_opts -gs
+Tournament group size
+!etc
+Specify the group size in tournament selection.
+!etab
+!tab jfgp_jfs_opts -pm
+Penalty file
+!etc
+Read the penalty matrix from the specified file (see
+!ref err_measures
+). Can only be used if 'score method' is 'penalty'.
+!etab
+!tab jfgp_jfs_opts -so
+Redirect stdout to
+!etc
+Write messages to the specified file instead of standard output (i.e.,
+the screen).
+!etab
+!tab jfgp_jfs_opts -a
+Append to sout-file
+!etc
+<STRONG>yes:</STRONG>
+ Append messages to stdout-file instead of overwriting the file.
+!etab
+!tab jfgp_jfs_opts -w
+Wait for RETURN
+!etc
+<STRONG>yes:</STRONG>
+Wait for the user to press the 'return' key before exiting the program.
+<ATRONG>no:</STRONG>
+Don't wait.
+!etab
+!tab jfgp_jfs_opts so
+Source file
+!etc
+specify the compiled jfs-program to be changed.
+!etab
+
+!endif
+!head jfgp_v2 jfgp changes "Changes in JFGP version 2"
+!li intro_changes jfgp
+!ref jfgp_v2 "Changes in JFGP"
+!eli
+<P>
+Changes in JFGP version 2.03:
+<UL>
+<LI>
+A bug in the assigning of fuzzy values to undefined input variables is fixed.
+<LI>
+The data file to JFGP can have its variables ordered using the 'first-line method'
+described in:
+!ref prog_input
+.
+<LI>
+Score can be calculated with a penalty matrix.
+</UL>
+
+<P>
+Changes in JFGP version 2.01:
+!dlist jfgp_v2.01
+!li jfgp_v2.01 1
+A general memory-allocation-bug is fixed (sometimes jfgp would stop with an
+ 'illegal instruction' Windows error).
+!eli
+!li jfgp_v2.01 2
+The program has been recompiled with speed-optimization.
+!eli
+<p>
+Changes in JFGP version 2.00:
+!dlist jfgp_v2.00
+!li jfgp_v2.00 1
+the syntax of the 'extern jfgp' is changed. The keywords 'hedges' and
+'operators' are removed (replaced by 'functions'). New statement-types (<darg>)
+are included.
+!eli
+!li jfgp_v2.00 2
+JFGP no longer support exception-levels.
+!eli

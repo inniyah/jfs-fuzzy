@@ -1,0 +1,279 @@
+!head jfplot misc_programs jfplot "JFPLOT: plot adjectives, operators etc"
+
+!ind JFPLOT
+!ind "plot of adjectives, operators etc"
+!ind "GNUPLOT with JFPLOT"
+<P>
+the program JFPLOT is used together with the freeware program GNUPLOT to
+get plots of a jfs-program's hedges, operators, relations, fuzzification functions
+and defuzzification centers.
+<P>
+The program GNUPLOT can be downloaded from:
+<A HREF="http://www.gnuplot.org/">EXTERN Gnuplot homepage</A>.
+<P>
+JFPLOT takes a compiles jfs-program as input, and writes a plt-file as output. When
+the plt-file is loaded into GNUPLOT (with the command: load '<plf>.plt'), simple plots
+of the jfs-program's components are shown on the screen (or written to files).
+For example:
+<P>
+<IMG SRC="%%brake.gif" ALT="Fuzzification-function BRAKE">
+<P>
+<IMG SRC="%%and.gif" ALT="The operator AND (min)">
+<P>
+By default JFPLOT writes plot information about all hedges, fuzzy operators,
+user-defined relations and fuzzification functions and defuzzification centers
+for some domains and variables. Fuzzification functions are written for a domain,
+if adjectives are bound to the domain. Fuzzification functions are written
+for a domain variable if adjectives are bound directly to the variable or
+a normalization-value is specified for the variable. Defuzzification centers
+are written for all domain variables with defuzzification centers different
+from other variables (
+<STRONG>note </STRONG>
+ some of the plotted defuzzification functions are not strictly correct. See:
+!ref jfplot_errors
+for details). Using options, it is possible to limit the plot-info to
+certain types and selected objects.
+<p>
+When a default plt-file is loaded into GNUPLOT, the plots are shown on the
+screen one after another (with a 'press return for next object' button).
+With the 'terminal' option this is changed. The plots are written to files in
+a specified format (for example 'gif' or 'eps'). The filenames are the names
+of the objects (for example 'speed.gif', 'and.gif', 'not.gif', 'dfspeed.gif'
+(defuzzification function 'speed')).
+<P>
+The rather simple plots produced by default-JFPLOT can be made more visual
+attractive by the setting of the parameters in GNUPLOT. By default the following
+parameters are set in the start of the plt-file:
+<PRE>
+set view 60,300,1,1
+set grid
+set isosamples 21
+set contour surface
+set samples <sr>
+</PRE>
+where <sr> is the sample rate specified in an option to JFRPLOT (default 300).
+Using an option, it is possible to replace the default parameters with a
+list of statements read from a file.
+
+!head jfplot_options jfplot options "Running JFPLOT from the command line"
+
+To invoke JFPLOT from the command line type 'jfplot' at the prompt and
+follow it with a set of command line arguments. The command line
+format is:
+<PRE>
+      jfplot {<option>} <rf>
+</PRE>
+where <rf> is the filename of a compiled jfs-program. If JFPLOT is run without
+options, then the plt-file is written to <rf>.plt. JFPLOT recognizes the
+following options:
+<P>
+!dtab jfplotoptions "JFPLOT options"
+!tab jfplotoptions -o
+-o <of>
+!etc
+write the Gnuplot commands to the file <of> (if no extension is specified,
+ '.plt' is added to the filename).
+!etab
+!tab jfplotoptions -d
+-d {<name>}
+!etc
+plot only information about the objects {<name>}, where each <name> is the
+name of a hedge, relation, operator, domain or domain variable.
+!etab
+!tab jfplotoptions -m
+-m <samples>
+!etc
+Defines the number of samples used by Gnuplot (i.e., the value to the
+Gnuplot command 'set samples <samples>'). Default is 300. Smaller 
+numbers gives faster but less exact plots. Larger numbers gives slower
+and more precise plots.
+!etab
+
+!tab jfplotoptions -p
+-p <mode>
+!etc
+plot only information about the types specified in <mode>, where <mode> is
+build from the letters: 'h', 'r', 'o', 'f', 'd'. Meaning: h:hedges, r:relations,
+ o:operators, f:fuzzification, d:defuzzification.
+!etab
+
+!tab jfplotoptions -i
+-i <if>
+!etc
+Read initialization commands to GNUPLOT from the file <if>.
+!etab
+!tab jfplotoptions -t
+-t <t> <e> [<d>]
+!etc
+GNUPLOT writes output to files in the directory <d> (default: current
+directory) with the extension '.<ext>'. Write the files in
+the format <t>, where <t> is an argument to the Gnuplot command 'set term <t>'
+for example <t>='gif' (see the documentation to Gnuplot for details).
+!etab
+
+!tab jfplotoptions -g
+-g <digits>
+!etc
+ <digits> is the maximal number of digits after the decimal
+point in constants (<digits> has to be in [1,9]). Default 4.
+!etab
+
+!tab jfplotoptions -S
+-S <s>
+!etc
+redirect standard output to the file <s>.
+!etab
+!tab jfplotoptions -a
+-a
+!etc
+append to the standard output file (instead of overwriting it).
+!etab
+!tab jfplotoptions -w
+-w
+!etc
+Wait for the user to press the return-key before exiting the program.
+!etab
+<P>
+Examples of jfplot-calls:
+<PRE>
+      jfplot truck
+</PRE>
+writes plot-information about all hedges, relations, operators,
+fuzzification and defuzzification in the jfs-program 'truck.jfr'
+to the file 'trunc.plt' in the
+current directory. To see the plots start Gnuplot, change to
+current directory and write the command: load 'truck.plt' (or
+start gnuplot from the command line with 'truck.plt' as argument).
+<P>
+<PRE>
+     jfplot -o x.plt -p ho -i gnuini.plt truck
+</PRE>
+writes plot-info about all hedges and operators in 'truck.jfr' to the
+file 'x.plt'. The initialization part of the plt-file is read from the
+file 'gnuini.plt'.
+<PRE>
+     jfplot -p of -d and or speed truck
+</PRE>
+writes plot-info to 'truck.plt' about the operators 'and' and 'or' and
+fuzzification of 'speed'.
+<PRE>
+     jfplot -p o -t gif gif c:\Temp truck
+</PRE>
+writes plot-info about operators to the file 'truck.plt'. When this file
+is loaded into Gnuplot, it writes plots to the files 'c:\tmp\and.gif',
+ 'c:\tmp<or.gif' etc.
+<P>
+
+
+!head jfplotjfs_run jfplot options "Running JFPLOT from JFS"
+!if !UNIX
+JFPLOT is run by (a) pressing the 'Gnuplot' button, (b) from the 'Tools'-menu, or
+ (c) by the 'RunTool' button in the main-window in option-mode.
+The following options can be set (NOTE: not all the options to JFPLOT can be set
+from JFS (limits in the standard option-handling system in JFS). To get the full
+set of options, JFPLOT has to be run from the command line):
+<P>
+!dtab jfplotjfs_opts "JFPLOT options"
+!tab jfplotjfs_opts -o
+Output file
+!etc
+write the Gnuplot commands to the specified file.
+!etab
+!tab jfplotjfs_opts -i
+Initialization file
+!etc
+Read initialization commands to GNUPLOT from the specified file.
+!etab
+!tab jfplotjfs_opts -ph
+Plot hedges
+!etc
+plot information about all hedges.
+!etab
+!tab jfplotjfs_opts -po
+Plot operators
+!etc
+plot information about all user-defined (and predefined) fuzzy operators.
+!etab
+!tab jfplotjfs_opts -pr
+Plot relations
+!etc
+plot information about user-defined relations.
+!etab
+!tab jfplotjfs_opts -pf
+Plot fuzzification
+!etc
+plot fuzzification functions for domains and domain variables.
+!etab
+!tab jfplotjfs_opts -pd
+Plot defuzzification
+!etc
+plot defuzzification centers for domain variables.
+!etab
+!tab jfplotjfs_opts -g
+Precision
+!etc
+Use the specified number as the maximal number of digits after the decimal
+point in constants (has to be in [1,9]).
+!etab
+!tab jfplotjfs_opts -m
+Number of samples
+!etc
+Specifies the number of samples used by Gnuplot (i.e., the value to the
+Gnuplot command 'set samples <samples>'). Smaller 
+numbers gives faster but less exact plots. Larger numbers gives slower
+and more precise plots.
+!etab
+
+!tab jfplotjfs_opts -S
+Redirect stdout to
+!etc
+redirect standard output to the specified file.
+!etab
+!tab jfplotjfs_opts -a
+Append to stdoutfile
+!etc
+append to the standard output file (instead of overwriting it).
+!etab
+!tab jfplotjfs_opts -w
+Wait for return
+!etc
+Wait for the user to press the return-key before exiting the program.
+!etab
+!tab jfplotjfs_opts -so
+Source file
+!etc
+Write plot-info about the specified jfs-program.
+!etab
+
+!endif
+
+!head jfplot_errors jfplot bugs "Known bugs in JFPLOT"
+<P>
+The plots of defuzzification-functions are not strictly correct. The
+plots should depend on the defuzzification method. The plots are
+correct for 'centroid' defuzzification, but for the other types
+('firstmax', 'cmax', 'avg' and so on) the plots should show the
+center values as single vertical lines instead of triangles
+because JFS uses singleton representation of fuzzy sets. 
+
+
+!head jfplot_changes jfplot changes "Changes in JFPLOT version 2"
+
+<H4>Changes in JFPLOT version 2.02</H4>
+<P>
+<UL>
+<LI>
+JFPLOT now sets a sample-size value (default 300). Can be changed
+by an option.
+<LI>
+Recompiled with jfr_lib version 2.03 (fixes a problem in the handling
+of return-statements, no influence on JFPLOT).
+</UL>
+
+<H4>Changes in JFPLOT version 2.01</H4>
+<P>
+Only cosmetic changes:
+<UL>
+<LI>Some spelling errors in the about-text is corrected.
+<LI>JFPLOT now handles the call 'jfplot -w' correctly.
+</UL>

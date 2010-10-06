@@ -1,0 +1,281 @@
+!head source jfs source "Source code"
+
+!ind "Source-code"
+!ind "C-source"
+<P>
+The source code files contain 3 libraries:
+<UL>
+<LI>jfr_lib
+<LI>jfg_lib
+<LI>jfp_lip
+</UL>
+They are used to run, get information about, and change a compiled jfs-program.
+<P>
+The source code files also includes complete (but undocumented) source code to JFC, JFR2S,
+JFR, JFI, JFRD, JFID3, JFEA, JFGP, JFR2HTM, JFR2C and JHLP. All source code are written
+in Ansi C, but has only checked with Borland's C++builder 3 compiler, and Linux GCC-compiler.
+<P>
+Except for jhlp_lib.cpp, the programs only uses the standard C libraries.
+<P>
+The folowing source code files are included:
+<P>
+!dtab source_files "source code files" sorted
+!tab source_files a
+<STRONG>Files</STRONG>
+!etc
+<STRONG>Comment</STRONG>
+!etab
+!tab source_files jf_error
+jf_error.h
+!etc
+General error-texts.
+!etab
+!tab source_files jfea
+jfea.cpp
+<BR>jfea_lib.cpp<BR>jfea_lib.h
+!etc
+To Build
+<STRONG>jfea</STRONG>,
+compile and link jfea.cpp, jfea_lib.cpp, jfg_lib.cpp,
+jfp_lib.cpp, jfr_lib.cpp, jft_lib.cpp.
+!etab
+!tab source_files jffam
+jffam.cpp
+<BR>jffamlib.cpp<BR>jffamlib.h
+!etc
+To build
+<STRONG>jffam</STRONG>,
+ compile and link jffam.cpp, jffamlib.cpp, jfg_lib.cpp,
+jfp_lib.cpp, jfr_lib.cpp, jft_lib.cpp, jfs_text.cpp.
+!etab
+!tab source_files jfg_lig
+jfg_lib.cpp
+<BR>jfg_lib.h
+!etc
+Functions to get information about a compiled jfs-programs. See:
+!ref source_jfg
+ for details.
+!etab
+!tab source_files jfgp
+jfgp.cpp
+<BR>jfgp_lib.cpp<BR>jfgp_lib.h
+!etc
+To Build
+<STRONG>jfgp</STRONG>, compile and link: jfgp.cpp, jfgp_lib.cpp, jfg_lib.cpp,
+jfp_lib.cpp, jfr_lib.cpp, jft_lib.cpp.
+!etab
+!tab source_files jfi
+jfi.cpp
+<BR>jfi_lib.cpp<BR>jfi_lib.h
+!etc
+To Build
+<STRONG>jfi</STRONG>,
+ compile and link: jfi.cpp, jfi_lib.cpp, jfg_lib.cpp,
+jfp_lib.cpp, jfr_lib.cpp, jft_lib.cpp.
+!etab
+!tab source_files jfid3
+jfid3.cpp
+<BR>jfid3lib.cpp<BR>jfid3lib.h
+!etc
+To Build
+<STRONG>jfid3</STRONG>, compile and link: jfid3.cpp, jfid3lib.cpp, jfg_lib.cpp,
+jfp_lib.cpp, jfr_lib.cpp, jft_lib.cpp, jfs_text.cpp.
+!etab
+!tab source_files jfm_lib
+jfm_lib.cpp
+<BR>jfm_lib.h
+!etc
+memory management library used by some conversion-tools.
+!etab
+!tab source_files jopt_lib
+jopt_lib.cpp
+<BR>jopt_lib.h
+!etc
+option-decode library used by some of the console-tools.
+!etab
+!tab source_files jfp_lib
+jfp_lib.cpp
+<BR>jfp_lib.h
+!etc
+Functions to change a compiled jfs-program. See:
+!ref source_jfp
+ for details.
+!etab
+!tab source_files jfplot
+jfplot.cpp
+<BR>jfpltlib.cpp<BR>jfpltlib.h
+!etc
+To build
+<STRONG>jfplot</STRONG>,
+ compile and link jfplot.cpp, jfpltlib.cpp,
+jfr_lib.cpp, jfg_lib.cpp, jopt_lib.cpp, jfs_text.cpp.
+!etab
+!tab source_files jfrplt
+jfrplt.cpp
+!etc
+To build
+<STRONG>jfrplt</STRONG>,
+ compile and link jfrplt.cpp, jfs_text.cpp, jft_lib.cpp,
+jfr_lib.cpp, jfg_lib.cpp, jopt_lib.cpp.
+!etab
+!tab source_files jfr
+jfr.cpp
+!etc
+To build
+<STRONG>jfr</STRONG>,
+ compile and link jfr.cpp, jfs_text.cpp, jft_lib.cpp,
+jfr_lib.cpp, jfg_lib.cpp.
+!etab
+!tab source_files jfr2htm
+jfr2htm.cpp
+<BR>jfr2hlib.cpp<BR>jfr2hlib.h
+!etc
+To build
+<STRONG>jfr2htm</STRONG>,
+ compile and link jfr2htm.cpp, jfr2hlib.cpp,
+jfg_lib.cpp, jfr_lib.cpp, jfs_text.cpp.
+!etab
+!tab source_files jfr2c
+jfr2c.cpp
+<BR>jfr2clib.cpp<BR>jfr2clib.h
+!etc
+To build
+<STRONG>jfr2c</STRONG>,
+ compile and link jfr2c.cpp, jfr2clib.cpp,
+jfg_lib.cpp, jfr_lib.cpp, jfs_text.cpp.
+!etab
+!tab source_files jfr2s
+jfr2s.cpp
+!etc
+To build
+<STRONG>jfr2s</STRONG>,
+ compile and link jfr2s.cpp, jfr2wlib.cpp,
+jfw2slib.cpp, jfr_lib.cpp, jfg_lib.cpp, jfs_text.cpp.
+!etab
+!tab source_files jfr2wlib
+jfr2wlib.cpp
+<BR>jfr2wlib.h
+!etc
+Function to convert a jfr-file to a jfw-file.
+!etab
+!tab source_files jfr_gen
+jfr_gen.h
+!etc
+General internal structures used in the jfs-system.
+!etab
+!tab source_files jfr_lib
+jfr_lib.cpp
+<BR>jfr_lib.h
+!etc
+Functions to load and run a compiled jfs-program. See:
+!ref source_jfr
+ for details.
+!etab
+!tab source_files jfrd
+jfrd.cpp
+<BR>jfrd_lib.cpp<BR>jfrd_lib.h
+!etc
+To build
+<STRONG>jfrd</STRONG>
+ compile and link jfrd.cpp, jfrd_lib.cpp,
+jfg_lib.cpp, jfr_lib.cpp, jfp_lib.cpp, jft_lib.cpp, jfs_text.cpp.
+!etab
+!tab source_files jfs2wlib
+jfs2wlib.cpp
+<BR>jfs2wlib.h
+!etc
+Function to convert a jfs-file to a jfw-file (part of compiling).
+!etab
+!tab source_files jfs_cons
+jfs_cons.h
+!etc
+Constants used in the programs.
+!etab
+!tab source_files jfs_text
+jfs_text.cpp
+<BR>jfs_text.h
+!etc
+Text-strings used in the programs.
+!etab
+!tab source_files jft_lib
+jft_lib.cpp
+<BR>jft_lib.h
+!etc
+Functions to read data-sets from an ascii-file.
+!etab
+!tab source_files jfw2rlib
+jfw2rlib.cpp
+<BR>jfw2rlib.h
+!etc
+Function to convert a jfw-file to a jfr-file (part of compiling).
+!etab
+!tab source_files jfw2slib
+jfw2slib.cpp
+<BR>jfw2slib.h
+!etc
+Function to convert a jfw-file to a jfs-file (part of inverse
+compiling).
+!etab
+!tab source_files jhlp
+jhlp.cpp
+<BR>jhlp_lib.cpp<BR>jhlp_lib.h
+!etc
+To build
+<STRONG>jhlp</STRONG>,
+ compile and link jhlp.cpp, jhlp_lib.cpp, jfm_lib.cpp. NOTE: default
+compilation of jhlp only works on Windows.
+To compile on unix, define the preprocessor identifier OS_UNIX (compile
+with -DOS_UNIX).
+!etab
+!tab source_files jfc
+jfc.cpp
+!etc
+To build
+<STRONG>jfc</STRONG>,
+ compile and link: jfc.cpp, jfs2w.cpp, jfw2r.cpp,
+jfs_text.cpp.
+!etab
+<P>
+The source-code library comes with some sample C-programs. The sample programs
+are in the directory
+!if UNIX
+  <jfsdir>/samples/source.
+!else
+'SOURCEDIR\samples', where SOURCEDIR is the directory in
+which, the source code library is installed (typical: 'c:\programs\jfs2\source').
+!endif
+
+!head source_v2 source changes "Changes in Source1 version 2"
+
+<P>
+<H4>Changes in Source1 version 2.04</H4>
+<P>
+Source1 now includes:
+<UL>
+<LI>
+Source code to the libraries and command line tools in JFS version 2.01 patch 2.
+<LI>
+Source code to the command line tools in RunA version 2.03.
+<LI>
+Source code to the programs in LearnA version 2.02.
+<LI>
+Source code to the programs in JDoc version 2.02.
+</UL>
+
+<H4>Changes in Source1 version 2.02</H4>
+<P>
+!dlist source_v2.02
+!li source_v2.02 1
+The source-code to JFPLOT (version 2.00) are in Source1.
+!eli
+!li source_v2.02 2
+Source code to version 2.02 of RunA-modules are included.
+!eli
+!li source_v2.02 3
+Minor non-functional changes made to all source code libraries (
+to make the source code compile and run under Unix). The changes includes:
+<BR> - all filenames are in lowercase.
+<BR> - The types of some internal varaibles are changed from 'int' to
+'short', from 'signed' ot 'unsigend' etc.
+<BR> - The random number generator used in jfea, jfgp and jfi, is changed.
+!eli

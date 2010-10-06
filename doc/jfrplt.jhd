@@ -1,0 +1,342 @@
+!head jfrplt misc_programs jfrplt "JFRPLT: plot from jfs-program"
+
+!ind JFRPLT
+!ind "plots from jfs-programs"
+!ind "GNUPLOT with JFRPLT"
+<P>
+The program JFRPLT is used together with the freeware program GNUPLOT to
+plot a jfs-program's function. The calculated output is plotted as a
+function of one or two of its input variables.
+<P>
+The program GNUPLOT can be downloaded from:
+<A HREF="http://www.gnuplot.org/">EXTERN Gnuplot home page</A>.
+<P>
+JFRPLT  takes a compiled jfs-program as input. First it asks the user for values to
+input variables. The answers can be either a fixed value or an interval.
+Then JFRPLT runs the jfs-program with the entered values. The input values and calculated output values are written to a GNUPLOT plot-file (extension '.plt') and to one or
+several data files (extension '.dat'). When the plt-file is loaded into GNUPLOT (with
+the command: load '<plf>.plt'), simple plots of the calculated output as function
+of the input are shown on the screen (or written to files). Examples (slightly
+modified):
+<P>
+<IMG SRC="%%brake3b.gif" ALT="Stopping a bicycle">
+<P>
+<IMG SRC="%%brake15b.gif" ALT="Stopping a bicycle (speed = 15)">
+<P>
+When JFRPLT is executed, it asks the user for values to the input variable in
+the jfs-program being run. The possible answers are the same as in JFR:
+<UL>
+<LI>A number
+<LI>The name of an adjective
+<LI>The special multiplot value '*m'
+<LI>The character '*' followed by one or three numbers.
+</UL>
+An answer with a number or an adjective gives the variable a fixed value. The
+variables which gets a '*' answer (a '*' folowed by one or three numbers), is the
+variables shown on the plots. At least one and maximum two variables has to
+be given '*' answers. The full
+syntax of the '*' answer is:
+<PRE>
+     *[<steps>[:<start>:<end>]]
+</PRE>
+If all three numbers are given in the *-answer, for example '*5:10:50', the
+jfs-program is calculated <steps> times. In the first calculation the value
+to the input variable is set to <start>. In the last calculation it is set to
+ <end>. In the calculations between, the values are spaced equally in the interval
+from <start> to <end>. In the example, the input values are 10,20,30,40,50.
+<BR>
+If the *-answer only includes <steps>, for example '*21', the jfs-program
+is executed <step> times starting with the minimum value of the input variable's
+domain, and ending with the maximum value of the domain.
+<BR>
+If the *-answer is given without arguments, the jfs-program is calculated
+ <ac> times, where <ac> is the number of adjectives bound to the input variable.
+The values are the center-values of the adjectives.
+<P>
+If a variable gets the multiplot-answer ('*m') a graph is written for
+each adjective's center-value for the given variable. For example if
+the ideal weight program was executed from JFRPLT and the variable 'sex'
+is given the value '*m' and the variable 'height' is given the value
+ '*21', then two graphs are shown in the same plot-window. One shows
+the ideal weight as a function of height for sex=male, and the
+other shows the ideal weight as a function of height for sex=female.
+Maximum one variable can get a multiplot value.
+<P>
+By default JFRPLT writes plots of all output variables. It creates a single
+GNUPLOT plot-file with the name <jfrf>.plt and a data file for each
+output variable with the names <jfrf><vname1>.dat, <jfrf><vname2>.dat and
+so on, where <jfrf> is the name of the jfs-program and <vname1> is the
+name of the first variable, <vname2> the name of the second variable and
+so on. Assume for example, that JFRPLT is run with the jfs-program 'bicycle.jfr'
+and default options. Then the plot file is written to 'bicycle.plt' and
+the data file for the single output variable 'brake'
+is written to 'bicyclebrake.dat'.
+Options can be used to specify other filenames, and to limit data to a single
+output variable.
+<p>
+When a default plot file is loaded into GNUPLOT, the plots are shown on the
+screen one after another (with a 'press return for next object'-button).
+With the terminal-option this is changed. The plots are written to files in
+a specified format (for example 'gif' or 'eps'). The filenames are the names
+of the variables with the specified extension (for example 'brake.gif').
+<P>
+The rather simple plots produced by default JFRPLT can be made more visual
+attractive by the setting of the parameters in GNUPLOT. By default the following
+parameters are set in the start of the plot file:
+<PRE>
+set title "Stopping a bicycle"
+set grid
+set contour surface
+set data style lines
+set view 60.00,75.00,1,1
+set surface
+</PRE>
+ (the parameters to
+<code>set view</code>
+can be changed by options). Using an option, it is possible to replace the
+default parameters with a list of statements read from a file.
+
+!head jfrplt_options jfrplt options "Running JFRPLT from the command line"
+
+To invoke JFRPLT from the command line type 'jfrplt' at the prompt and
+follow it with a set of command line arguments. The command line
+format is:
+<PRE>
+      jfrplt {<option>} <rf>
+</PRE>
+where <rf> is the filename of a compiled jfs-program. If JFRPLT is run without
+options, the plot file is written to <rf>.plt and the data files to <rf><vname>.data.
+JFRPLT recognizes the following options:
+
+<P>
+!dtab jfrpltoptions "JFRPLT options"
+!tab jfrpltoptions -o
+-o <of>
+!etc
+Write output to the the Gnuplot file <of>.plt and the data files
+ <of><vname>.dat (where <vname> is the names of the output variables).
+!etab
+
+
+!tab jfrpltoptions -p
+-p <dec>
+!etc
+Precision. Numbers are written to the data files using <dec> digits after
+the decimal-point (default is 3).
+!etab
+
+!tab jfrpltoptions -i
+-i <if>
+!etc
+Read initialization commands to GNUPLOT from the file <if>. If no extension is
+specified '.plt' is added.
+!etab
+
+!tab jfrpltoptions -t
+-t <t> <e> [<d>]
+!etc
+GNUPLOT writes output to files in the directory <d> (default: current
+directory) with the extension '.<ext>'. Write the files in
+the format <t>, where <t> is an argument to the Gnuplot command 'set term <t>',
+for example <t>='gif' (see the documentation to Gnuplot for details).
+!etab
+
+!tab jfrpltoptions -v
+-v <vname>
+!etc
+Plot only the output variable <vname>.
+!etab
+
+!tab jfrpltoptions -Ax
+-Ax <angle>
+!etc
+Rotation angle for the x-axis (in degrees). Used in Gnuplot's 'set view'
+command (see documentation to Gnuplot for details). Default is 60.
+!etab
+
+!tab jfrpltoptions -Az
+-Az <angle>
+!etc
+Rotation angle for the z-axis (in degrees). Used in Gnuplot's 'set view'
+command (see documentation to Gnuplot for details). Default is 300.
+!etab
+
+!tab jfrpltoptions -As
+-As
+!etc
+Use Gnuplot's autoscale on the output axis (instead of the domain for the output
+variable).
+!etab
+
+!tab jfrpltoptions -d
+-d {<name>}
+!etc
+Read input from the file <name>. If no extension is specified '.dat' is
+added.
+!etab
+
+!tab jfrpltoptions -f
+-f {<fs>}
+!etc
+Extra field separators: <fs> is a string of characters. The characters in <fs> are used as extra field-separators in the input file.
+!etab
+
+!tab jfrpltoptions -a
+-a
+!etc
+Append to the output file (instead of overwriting it).
+!etab
+
+!tab jfrpltoptions -rs
+-rs <ss>
+!etc
+Stacksize. <ss> is stacksize (in bytes) of the run-stack (default is 1024).
+!etab
+
+
+!tab jfrpltoptions -w
+-w [<m>]
+!etc
+ <m> is one of
+<UL>
+<LI>y: Wait for the user to press the return-key before exiting the program
+<LI>n: Don't wait,
+<LI>e: Wait if errors.
+</UL>
+Default is 'n'. '-w' without an argument is the same as '-w y'.
+!etab
+<P>
+
+Examples of jfrplt-calls:
+<PRE>
+      jfrplt truck
+</PRE>
+writes plot information about all output variables in the jfs-program
+ 'truck.jfr' (it has only one output variable: 'theta'). Writes
+the plot file to 'truck.plt' and 'trucktheta.dat' in the
+current directory. To see the plots start Gnuplot, change to
+current directory and write the command: load 'truck.plt' (or
+start gnuplot from the command line with 'truck.plt' as argument).
+<P>
+<PRE>
+     jfrplt -o x.plt -Az 150 truck
+</PRE>
+writes plot-info from 'truck.jfr' to the Gnuplot command file 'x.plt' and
+the data file 'xtheta.dat'. Set the z-axis rotation to 150.
+<PRE>
+     jfrplt -t gif gif c:\Temp truck
+</PRE>
+writes plot-info to 'truck.plt' and trucktheta.dat. When this file
+is loaded into Gnuplot, it writes plots to the files 'c:\tmp\theta.gif'.
+<P>
+
+!head jfrpltjfs_run jfrplt options "Running JFRPLT from JFS"
+!if !UNIX
+JFRPLT can be run  (a) by pressing the 'RunPlot' button, (b) from the 'Tools' menu,
+ or (c) by selecting 'jfrplt' and pressing the 'RunTool' button in the
+in the main window in option mode. If JFRPLT is run by the 'RunPlot' button parameters are
+entered in a special window. See
+!ref jfsw_runplot
+ for details. When run from the 'Tools' menu
+or from the options window the following options can be set (NOTE:
+not all the options to JFRPLT can be set from JFS. To get the full
+set of options JFRPLT has to be run from the command line):
+<P>
+
+!dtab jfrpltjfs_opts "JFRPLT options"
+!tab jfrpltjfs_opts -o
+Output file
+!etc
+Write the Gnuplot commands to the specified file and to the data files <sf><vname>.dat,
+where <sf> is the name of the specified file without extension and <vname> is the
+name of the output variables.
+!etab
+
+!tab jfrpltjfs_opts -d
+Input from file
+!etc
+Read input from the specified file (instead of reading input from the keyboard).
+!etab
+
+!tab jfrpltjfs_opts -f
+Separators
+!etc
+Use the specified characters as extra space separators in the input file.
+!etab
+
+!tab jfrpltjfs_opts -v
+Output variable
+!etc
+If the name of an output variable is specified, write only a plots
+for this variable.
+!etab
+
+!tab jfrpltjfs_opts -Ax
+Rotation X
+!etc
+Specify the rotation around the x-axis (in degrees) on 3D-plots.
+!etab
+
+!tab jfrpltjfs_opts -Az
+Rotation Z
+!etc
+Specify the rotation around the z-axis (in degrees) on 3D-plots.
+!etab
+
+
+!tab jfrpltjfs_opts -i
+Initialization file
+!etc
+Read initialization commands to GNUPLOT from the specified file.
+!etab
+
+!tab jfrpltjfs_opts -p
+Precision
+!etc
+Use the specified number of digits in numbers written to the data files.
+!etab
+
+!tab jfrpltjfs_opts -rs
+Stack size
+!etc
+Specifies the size of the run-stack used to run the jfs-program.
+!etab
+
+!tab jfrpltjfs_opts -a
+Append to stdoutfile
+!etc
+append to the standard output file (instead of overwriting it).
+!etab
+
+!tab jfrpltjfs_opts -w
+Wait for return
+!etc
+Wait for the user to press the return-key before exiting the program.
+!etab
+
+!tab jfrpltjfs_opts -as
+Autoscale output axis
+!etc
+If 'yes' let Gnuplot do the scaling of the output axis. If 'no' the output
+axis is scaled by the minimum and maximum of the output variables domains.
+!etab
+
+!tab jfrpltjfs_opts -so
+Source file
+!etc
+Write plot files about the specified jfs-program.
+!etab
+
+!endif
+
+!head jfrplt_changes jfrplt changes "Changes in JFRPLT"
+<P>
+<H4>Changes in JFRPLT version 2.01</H4>
+<P>
+<UL>
+<LI>
+A general bug in the handling of 'return' statements (in jfr_lib) is fixed.
+<LI>
+It is now possible to get a plot for each adjective value of a variable
+(with the '*m' answer).
+</UL>

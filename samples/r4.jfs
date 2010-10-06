@@ -1,0 +1,24 @@
+
+title "4-polynomium";
+/* Learning a polynomium-functions with JFGP. To be used with 'r4.dat'. 
+  The function to be learned is: x**4 + x**3 + x**2 + x.*/
+
+hedges
+    very pow 2;
+    around pow 0.5;
+
+domains
+    x_dom -1 1;
+    y_dom -10 10;
+
+input
+    x "X" x_dom;
+
+output
+    y "y" y_dom;
+
+program
+    /* y = pow(x,4)+pow(x,3)+pow(x,2)+x; */
+
+     extern jfgp vars x functions sqr cos sin log - + * / 
+                 assign y;

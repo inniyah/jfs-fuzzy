@@ -1,0 +1,412 @@
+!head jfrd learn jfrd "JFRD: Rule creation using the Wang-Mendel method"
+
+!ind JFRD
+!ind "Rule discover"
+JFRD is a rule generator. It replaces
+an 'extern' statement within the code of a compiled jfs-program
+with a set of if-statements. Those statements are generated as the jfs-program
+looks at a date file that contains sample input and output values.
+<P>
+JFRD replaces an 'extern' statement of the form:
+<PRE>
+     extern jfrd input [-<opt>] <vname_1> [-<opt>] <vname_2> .... output [-<opt>] <vname>;
+
+with a list of if-statements of the form:
+
+     if [<vname_1>-expr] [and <vname_2>-expr] ... then <vname> is <adj>;
+</PRE>
+where the if-statements are generated from the input/output values in a
+training file. JFRD ignores the <opt>-arguments (they are only included to make all
+the learning tools compatible). If no variables are specified after 'input' in
+the 'extern jfrd' statement all domain variables of the type 'input' are used.
+<P>
+Example: let 'speed' and 'distance' be the input variables to
+a typical fuzzy controller, and let 'brake_force' be the output variable.
+From a data file with samples of correct braking force for given speed and
+distance values, jfrd might replace the statement:
+<PRE>
+	extern jfrd input speed distance output brake_force;
+</PRE>
+with the statements:
+<PRE>
+	if speed in (high, xhigh) and distance close then brake_force high;
+	if distance far then brake_force none;
+	if speed medium and distance medium then brake_force normal;
+	.
+	.
+	.
+</PRE>
+The if-statements are created by the Wang-Mendel-method (see
+!ref learn_meth_WM
+) and is optionally followed by a reduction of the generated rules.
+The rule reduction is done in 3 stages:
+<OL>
+<LI>all-reduction,
+<LI>between-reduction,
+<LI>in-reduction.
+</OL>
+ With an option it is possible to specify that only some (or none) of the
+stages are to be executed.
+<P>
+In all-reduction, the generated statements are reduced one at a time. Each variable expression in the if-part of the rule are tested. If the variable expression
+can be removed without creating contradictions with other statements, then the variable
+expression is removed. When all variable expressions, from a given statement,
+have been tested, the statement is compared with other statements to see
+if some of the statements are now special cases of the actual statement. The special
+case statements are removed from the rule-base. Then the next rule are reduced and so on.
+<P>
+The second rule reduction method (between-reduction) works just like all-reduction,
+except that instead of removing the variable expression, they are replaced by
+expressions of the type:
+<PRE>
+	'<var> between <adj_1> and <adj_2>'.
+</PRE>
+'In-reduction' is the same except that variable expressions are replaced by
+expressions of the type:
+<PRE>
+	'<var> in (<adj1>, <adj2>,...)'.
+</PRE>
+In the worst case the MW-method creates a rule for each data set in the
+data-file. If there are many such instances in the data-file, JFRD might run
+out of memory (the amount of memory devoted to rules can be changed by an
+option). If JFRD runs out of memory in the rule creating part, it will
+run an 'all-reduction' and then continue with the rule creation. In a later
+data set, it might discover that one of the reductions it has made was wrong.
+If this happens, the reduced rule is replaced with the rule generated from
+the new data set, the data file is rewinded, and the rule generating process
+is restarted from the first data set.
+<P>
+The data file to JFRD must be a field separated ascii-file. See
+!ref prog_input
+for details.
+<P>
+JFRD comes with several sample jfs-programs. See:
+!ref ap_examples
+.
+
+!head jfrd_options jfrd options "Running JFRD from the command line"
+
+To invoke JFRD from the command line type 'jfrd' at the prompt followed
+by a set of command line arguments. The syntax is:
+<PRE>
+      jfrd {<options>} <jfrf>
+</PRE>
+where <jfrf> is the filename of a compiled jfs-program containing a statement
+of the form:
+<PRE>
+      extern jfrd input <var> {<var>} output <var>;
+</PRE>
+If JFRD is called without options it reads data from the file <jfrf>.dat and
+writes the changed program to <jfrf> (overwriting the original program).
+JFRD accepts the following options:
+<P>
+!dtab jfrd_options "JFRD options"
+!tab jfrd_options -f
+-f <fs>
+!etc
+ <fs> is a string of characters. These characters are used as extra
+field separators in the data file (by default space characters are
+the field separators).
+!etab
+!tab jfrd_options -D
+-D <dam>
+!etc
+Data set order. <dam> is one of:
+<BR>'ie' : input values before expected values,
+<BR>'ei' : expected values  before input values,
+<BR>'tie': identifier before input before expected,
+<BR>'tei': identifier before expected before input,
+<BR>'iet': input values before expected values before identifier,
+<BR>'eit': expected values before input values before identifier,
+<BR>'f'  : the order of the variables are taken from the variable-names
+in the first line.
+<BR>See
+!ref prog_input
+for details.
+!etab
+!tab jfrd_options -d
+-d <df>
+!etc
+Read input from the file <df>. If no extension is specified,
+ '.dat' is added to filename.
+!etab
+!tab jfrd_options -o
+-o <of>
+!etc
+Write the changed jfs-program to the file <of>. If no extension
+is specified, '.jfr' is added to the file name.
+!etab
+!tab jfrd_options -Mp
+-Mp <pb>
+!etc
+Allocate <pb> K extra memory to the jfs-program (the space is
+used to the new rules). Default is 30. (Maximum is
+64 - program size).
+!etab
+!tab jfrd_options -Md
+-Md <db>
+!etc
+Allocate <db> K to rules. Default is 30.
+!etab
+!tab jfrd_options -Mt
+-Mt <mt>
+!etc
+Maximum number of minutes used in rewind-reduction. Rewinding
+can make rule-generation extremely slow. To avoid this there is
+no rewinding after <mt> minutes. Then new data sets
+contradicting with reduced rules are not inserted. By default
+<mt>=60.
+!etab
+!tab jfrd_options -r
+-r <rm>
+!etc
+Reduction-mode. <rm> is one of 'n', 'a', 'b', 'i' and 'ib'.
+<BR>
+'n' means no reduction,
+<BR>
+'a' means all-reduction,
+<BR>
+'b' means all-reduction and between-reduction,
+<BR>
+ 'i' means all, between and in-reduction.
+<BR>
+'ib' is the same as 'i' except that if an in-expression can be written
+as a between-expression, then this is done.
+<P>
+By default variables of the type 'float' are reduced
+with 'b', variables of the type 'categorical' are reduced with
+'i' and variables of the type 'integer' are reduced by 'ib'.
+!etab
+!tab jfrd_options -iw
+-iw <wgt>
+!etc
+Generate if-rules of the type 'ifw %<wgt> ... '.
+!etab
+!tab jfrd_options -b
+-b
+!etc
+Case-reduction. When the rules are written to the program, then
+rules with common expression are placed in switch-case-blocks.
+!etab
+!tab jfrd_options -c
+-c <cr>
+!etc
+conflict-resolve:
+<BR>
+ <cr>=s:score (default),
+<BR>
+ <cr>=c:count.
+!etab
+!tab jfrd_options -S
+-S
+!etc
+Reduction in entered order. By default jfrd uses a heuristic to
+decide in witch order the variables are reduced within a
+rule. The -S option forces the input variables to be reduced in
+the entered order.
+!etab
+!tab jfrd_options -e
+-e
+!etc
+Remove rules with default output value. If -e is specified, then
+jfrd counts the number of rules resulting in each output
+adjective. The output variable's default value is changed to the
+center value of the adjective with most rules. These rules are
+not inserted in the jfs-program.
+!etab
+!tab jfrd_options -so
+-so <s>
+!etc
+Write messages to the file <s> instead of standard output.
+!etab
+!tab jfrd_options -a
+-a
+!etc
+Append messages to the file specified with '-os' instead of overwriting it.
+!etab
+!tab jfrd_options -w
+-w
+!etc
+Wait for the user to press the 'return' key before exiting the program.
+!etab
+
+!head jfrd_jfs_opts jfrd options "Running JFRD from JFS"
+!if !UNIX
+To invoke JFRD from the program JFS choose 'jfrd' from the Tools menu
+or press the 'Runtool' button after selecting 'jfrd' in the option screen.
+The code block must include a statement of the type:
+<PRE>
+      extern jfrd input {<var>} output <var>;
+</PRE>
+The 'extern' statement can be build by the Jfrd-template in the templates menu
+in the code window. The following options are available:
+<P>
+!dtab jfrd_jfs_opts "JFRD options"
+!tab jfrd_jfs_opts -f
+Data separators
+!etc
+Use the specified characters as extra field-separators in the data-file.
+!etab
+!tab jfrd_jfs_opts -D
+Data order
+!etc
+Data order of data sets in the data file. One of:
+<BR><STRONG>input_expected:</STRONG> input values before expected values,
+<BR><STRONG>expected_input:</STRONG> expected values  before input values,
+<BR><STRONG>text_input_expected:</STRONG> identifier before input before expected,
+<BR><STRONG>text_expected_input:</STRONG> identifier before expected before input,
+<BR><STRONG>input_expected_text:</STRONG> input values before expected values before identifier,
+<BR><STRONG>expected_input_text:</STRONG> expected values before input values before identifier,
+<BR><STRONG>first_line:</STRONG> the order of the variables are taken from the variable-names.
+either 'input-expected':data instances consists of input-values followed by
+output-values,  or 'expected-input': expected-values followed by input-values.
+!etab
+!tab jfrd_jfs_opts -d
+Data file
+!etc
+read trainings-data from the specified file.
+!etab
+!tab jfrd_jfs_opts -o
+Destination file
+!etc
+Write the changed jfs-program to the specified file.
+!etab
+!tab jfrd_jfs_opts -Mp
+Alloc K to program
+!etc
+Allocate the specified amount of extra Kilobytes to the jfs-program (the
+extra memory is used to the new rules).
+!etab
+!tab jfrd_jfs_opts -Md
+Alloc K to data
+!etc
+Allocate the specified amount of memory (in kilobytes) to rules.
+!etab
+!tab jfrd_jfs_opts -Mt
+Maxtime rewind
+!etc
+Maximum number of minutes used in rewind-reduction. Rewinding
+can make rule generation extremely slow. To avoid this there is
+no rewinding after specified number of minutes. Then new data sets
+contradicting with reduced rules are not inserted.
+!etab
+!tab jfrd_jfs_opts -r
+Reduction mode
+!etc
+<STRONG>none:</STRONG>
+no reduction,
+<BR><STRONG>all:</STRONG>
+all-reduction,
+<BR><STRONG>between:</STRONG>
+all-reduction and between-reduction,
+<BR><STRONG>in:</STRONG>
+all, between and in-reduction.
+<BR><STRONG>inbetween:</STRONG>
+the same as 'in' except that if an
+in-expression can be written as a between-expression, then this is
+done,
+<BR><STRONG>default:</STRONG>
+variables of the type 'float' are reduced with 'between', variables of the type 'categorical' are reduced with 'in' and variables of the type 'integer' are
+reduced by 'in-between'.
+!etab
+!tab jfrd_jfs_opts -iw
+ifw %<w> statements
+!etc
+Generate if-rules of the type 'ifw %<wgt> ... ', where <wgt> is the specified
+local weight.
+!etab
+!tab jfrd_jfs_opts -b
+Case reduction
+!etc
+ <STRONG>yes:</STRONG>
+when the rules are written to the program, then
+rules with common expression are placed in switch-case-blocks.
+!etab
+!tab jfrd_jfs_opts -c
+Conflict resolve
+!etc
+<STRONG>score:</STRONG>rule closest to adjective-centers is winner,
+<BR><STRONG>count:</STRONG>rule with highest number of supporting data sets
+ is winner.
+!etab
+!tab jfrd_jfs_opts -S
+Reduct. in entered order
+!etc
+<STRONG>no:</STRONG>
+jfrd uses a heuristic to decide in witch order the variables are reduced
+within a rule.
+<BR><STRONG>yes:</STRONG>the input variables are reduced in the entered order.
+!etab
+!tab jfrd_jfs_opts -e
+Remove default-rules
+!etc
+<STRONG>yes:</STRONG>
+ jfrd counts the number of rules resulting in each output adjective. The output
+variable's default value is changed to the center value of the
+adjective with most rules. These rules are not inserted in the jfs-program.
+!etab
+!tab jfrd_jfs_opts -so
+Redirect stdout to
+!etc
+Write messages to the specified file instead of standard output (screen).
+!etab
+!tab jfrd_jfs_opts -a
+Append to stdout-file
+!etc
+<STRONG>yes:</STRONG>
+append messages to the file specified with 'Redirect stdout to'
+instead of overwriting it.
+!etab
+!tab jfrd_jfs_opts -w
+Wait for Return
+!etc
+<STRONG>yes</STRONG>:
+wait for the user to press the RETURN_key before exiting the program.
+!etab
+!tab jfrd_jfs_opts so
+Source file
+!etc
+Specify the jfs-program to be improved.
+!etab
+
+!endif
+!head jfrd_limit jfrd limitations "Limitations"
+
+Limitations/known bugs in JFRD:
+!dlist jfrd_lim
+!li jfrd_lim 1
+The maximum number of variables in the 'extern jfrd' statement is 50.
+!eli
+!li jfrd_lim 2
+Only one 'extern jfrd' statement in the jfs-program.
+!eli
+!li jfrd_lim 3
+JFRD cannot handle an 'extern jfrd' statement placed inside a while-loop.
+!eli
+!li jfrd_lim 4
+Primitive handling of unknown values ('?' in the data file).
+!eli
+
+!head jfrd_v2 jfrd changes "Changes in JFRD version 2"
+
+!li intro_changes jfrd
+!ref jfrd_v2 "Changes in JFRD"
+!eli
+Changes in JFRD version 2.03:
+<UL>
+<LI>
+JFRD can now read the order of the values in the data file
+from the first line in the data file.
+</UL>
+<P>
+Changes in JFRD version 2.01:
+!dlist jfrd_v2.01
+!li jfrd_v2.01 1
+A memory-allocation-bug is fixed.
+!eli
+!li jfrd_v2.01 2
+The program is recompiled with speed-optimization.
+!eli
+!li jfrd_v2.01 3
+JFRD now accepts (but ignores) the extended syntax of the 'extern jfrd'-statement.
+!eli

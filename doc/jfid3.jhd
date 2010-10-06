@@ -1,0 +1,348 @@
+!head jfid3 learn jfid3 "JFID3: decision tree builder"
+
+!ind JFID3
+!ind ID3
+!ind "Decision tree"
+JFID3 is a JFS learning tool. It
+replaces an extern-statement in a compiled jfs-program with a fuzzy decision
+tree (build from switch- and case-statements). The decision tree is created
+from a data file with sample input and output values.
+<P>
+JFID3 replaces an extern-statement of the form:
+<PRE>
+     extern jfrd input [-<opt>] <vname_1> [-<opt>] <vname_2> .... output [-<opt>] <vname>;
+</PRE>
+with a decision tree based on the domain variables <vname_1>, <vname_2>,... (the -<opt>
+arguments are ignored by JFID3).
+<P>
+For example, JFID3 could replace the statement:
+<PRE>
+	extern jfrd input speed distance output brake_force;
+</PRE>
+with the statements:
+<PRE>
+        switch speed:
+           case high:
+             brake_force high;
+           case medium:
+             switch distance:
+               case far:
+                 brake_force none;
+               case close:
+                 brake_force normal;
+             end;
+           case slow:
+            .
+            .
+            .
+        end;
+</PRE>
+If no variables are specified after 'input' in the 'extern jfrd' statement,
+then all domain variables of the type 'input' are used.
+<P>
+JFID3 uses a 2-step method to create the decision tree. First a set of fuzzy
+rules are created by the Wang-Mendel-method (see
+!ref learn_meth_WM
+). Second, the rules are converted to a decision tree using the simplest
+version of Quinlan's ID3 algorithm (an online description of the
+algorithm can be found at:
+<A HREF="http://joda.cis.temple.edu/~ingargio/cis587/readings/id3-c45.html">
+EXTERN Id3-C45
+</A>).
+<P>
+It is possible to get some information about how the Wang-Mendel
+creates the rule base by having JFID3 write a history-file (controlled
+by 2 history options). This file can contain information about how each
+data set is handled by algorithm, and information about the created rules.
+<P>
+The data file to JFID3 must be a field-separated ascii-file (see
+!ref prog_input
+for details).
+<P>
+JFID3 comes with several sample jfs-programs. See:
+!ref ap_examples
+.
+
+!head jfid3_options jfid3 options "Calling JFID3 from the command line"
+
+To invoke JFID3 from the command line type 'jfid3' at the prompt followed
+by a set op command line arguments. The syntax is:
+<PRE>
+       jfid3 {<option>} <jfrf>
+</PRE>
+where <jfrf> is the filename of a compiled jfs-program containing a line of
+the form:
+<PRE>
+      extern jfrd input {<vname>} output <vname>;
+</PRE>
+If JFID3 is called without options, data is read from the file <jfrf>.dat and
+the changed program is written to <jfrf> (overwriting the original contens).
+<P>
+JFID3 takes the options:
+<P>
+!dtab jfid3_options Options
+!tab jfid3_options -f
+-f <fs>
+!etc
+ <fs> is a string of characters. Use these characters as extra
+field separators in the data file (by default space characters are
+the field separators).
+!etab
+!tab jfid3_options -D
+-D <dam>
+!etc
+Data file order. <dam> is one of:
+<BR>'ie' : input values before expected values,
+<BR>'ei' : expected values  before input values,
+<BR>'tie': identifier before input before expected,
+<BR>'tei': identifier before expected before input,
+<BR>'iet': input values before expected values before identifier,
+<BR>'eit': expected values before input values before identifier,
+<BR>'f'  : the order of the variables are taken from the variable-names
+in the first line.
+<BR>See
+!ref prog_input
+for details.
+!etab
+!tab jfid3_options -d
+-d <df>
+!etc
+Read data sets from the file <df>. If no extension is specified,
+'.dat' is added to the filename.
+!etab
+!tab jfid3_options -o
+-o <of>
+!etc
+Write the changed jfs-program to the file <of>. If no extension
+is specified, '.jfr' is added to the filename.
+!etab
+!tab jfid3_options -Mp
+-Mp <pb>
+!etc
+Allocate <pb> K extra memory to the jfs-program (the space is
+used to the new rules). Default is 20. (Maximum is
+65 - programsize).
+!etab
+!tab jfid3_options -Md
+-Md <db>
+!etc
+Allocate <db> K to rules. Default is 50.
+!etab
+!tab jfid3_options -c
+-c <cr>
+!etc
+Conflict-resolve:
+<BR>
+ <cr>=s:score (default),
+<BR>
+ <cr>=c:count.
+!etab
+!tab jfid3_options -ms
+-ms <s>
+!etc
+Remove rules created by Wang-Mendel with score below <s>.
+!etab
+!tab jfid3_options -h
+-h <hf>
+!etc
+Write history information to the file <hf>. If a history mode option ('-hm')
+is specified, but no history file is specified, then the history file is set to
+ <datafile>.txt.
+!etab
+!tab jfid3_options -hm
+-hm <m>
+!etc
+History mode. <m> specifies what is written to the history-file. <m> is build
+from the characters
+<BR><STRONG>d:</STRONG>
+ write score and insert-replace-ignore information for each data set.
+<BR><STRONG>r:</STRONG>
+ write rules in data file format,
+<BR><STRONG>R:</STRONG>
+ write rules in data file format with dataset number and score added.
+<P>
+Default history-mode (if history-file is specified) is 'dr'.
+!etab
+!tab jfid3_options -so
+-so <f>
+!etc
+Write messages to the file <f> instead of writing them to
+standard output.
+!etab
+!tab jfid3_options -a
+-a
+!etc
+Append messages to the file specified with -so instead of overwriting it.
+!etab
+!tab jfid3_options -w
+-w
+!etc
+Wait for the user to press the 'return' key before exiting the program.
+!etab
+
+!head jfid3_jfr_opts jfid3 options "Calling JFID3 from JFS"
+!if !UNIX
+To invoke JFID3 from the program JFS choose 'jfid3' from the tools menu, or
+press the 'runtool' button after selecting 'jfid3' in the options screen.
+The current jfs-program has to contain a line of the form:
+<PRE>
+      extern jfrd input {<vname>} output <vname>;
+</PRE>
+The Jfrd template (select 'Jfrd' in the templates menu in the code window)
+can be used to create the extern statement.
+<P>
+JFID3 takes the options:
+<P>
+!dtab jfid3_jfr_opts Options
+!tab jfid3_jfr_opts -f
+Data separator
+!etc
+Use the specified characters as extra field separators in the data file.
+!etab
+!tab jfid3_jfr_opts -D
+data order
+!etc
+Data order in the data file. One of:
+<BR><STRONG>input_expected:</STRONG> input values before expected values,
+<BR><STRONG>expected_input:</STRONG> expected values  before input values,
+<BR><STRONG>text_input_expected:</STRONG> identifier before input before expected,
+<BR><STRONG>text_expected_input:</STRONG> identifier before expected before input,
+<BR><STRONG>input_expected_text:</STRONG> input values before expected values before identifier,
+<BR><STRONG>expected_input_text:</STRONG> expected values before input values before identifier,
+<BR><STRONG>first_line:</STRONG> the order of the variables are taken from the variable-names.
+!etab
+!tab jfid3_jfr_opts -d
+Data file
+!etc
+Read data sets from the specified file.
+!etab
+!tab jfid3_jfr_opts -o
+Destination file
+!etc
+Write the changed jfs-program to the specified file.
+!etab
+!tab jfid3_jfr_opts -Mp
+Alloc K to program
+!etc
+Allocate the specified amount of extra memory to the jfs-program (the
+memory is used to the new rules).
+!etab
+!tab jfid3_jfr_opts -Md
+Alloc K to data
+!etc
+Allocate the specified amount of kilobytes to rules.
+!etab
+!tab jfid3_jfr_opts -c
+Conflict resolve
+!etc
+<STRONG>score:</STRONG>
+ If conflict, the data set closest to the adjective-centers is chosen,
+<BR><STRONG>count:</STRONG>
+ The adjective matching most data sets is chosen.
+!etab
+!tab jfid3_jfr_opts -ms
+Rm rules if score <
+!etc
+Remove rules created by Wang-Mendel with score below the specified number.
+!etab
+!tab jfid3_jfr_opts -h
+history-file
+!etc
+Write history information to the file <hf>.
+!etab
+!tab jfid3_jfr_opts -hmd
+Write data-sets to history
+!etc
+<STRONG>yes:</STRONG>
+Write score and insert-replace-ignore info for each data set, to
+the history file.
+!etab
+!tab jfid3_jfr_opts -hmr
+Write rules to history
+!etc
+<STRONG>yes:</STRONG>
+ Write the rules generated by the Wang-Mendel algorithm
+to the history file in data file format.
+!etab
+!tab jfid3_jfr_opts -hmlr
+Write rule-stat to history
+!etc
+<STRONG>yes:</STRONG>
+Write the rules generated by the Wang-Mendel algorithm
+to the history file, in data file format as well as the data set
+number and score of each rule.
+!etab
+!tab jfid3_jfr_opts -so
+Redirect stdout to
+!etc
+Write messages to the specified file instead of writing them to
+standard output (i.e., the screen).
+!etab
+!tab jfid3_jfr_opts -a
+Append to stdout-redirect
+!etc
+Append messages to the file specified in 'Redirect stdout to' instead
+of overwriting it.
+!etab
+!tab jfid3_jfr_opts -w
+Wait for return
+!etc
+<STRONG>yes:</STRONG>
+Wait for the user to press the 'return' key before exiting the program.
+!etab
+!tab jfid3_jfr_opts so
+Source file
+!etc
+Change the specified jfs-program.
+!etab
+
+!endif
+!head jfid3_lim jfid3 limitations "Limitations/known bugs"
+
+!dlist jfid3_lil
+!li jfid3_lil 1
+The maximum number of variables in the jfid3 call-statement is 50.
+!eli
+!li jfid3_lil 2
+Only one 'extern jfrd' statement in the jfs-program.
+!eli
+!li jfid3_lil 3
+JFID3 cannot handle 'extern jfrd' statement placed inside a while-loop.
+!eli
+!li jfid3_lil 4
+Primitive handling of unknown values ('?' in the data file).
+!eli
+
+!head jfid3_v2 jfid3 changes "Changes in JFID3 version 2"
+!li intro_changes jfid3
+!ref jfid3_v2 "Changes in JFID3"
+!eli
+<P>
+Changes in JFID3 version 2.03:
+<UL>
+<LI>JFID3 now accepts a data file with values ordered after first line.
+</UL>
+<P>
+Changes in JFID3 version 2.01:
+!dlist jfid3_v2.01
+!li jfid3_v2.01 1
+A memory-allocation-bug is fixed.
+!eli
+!li jfid3_v2.01 2
+The program is recompiled with speed-optimization.
+!eli
+!li jfid3_v2.01 3
+JFID3 now accepts (but ignores) the extended syntax of the 'extern jfrd' statement.
+!eli
+<P>
+Changes in JFID3 version 2.00:
+!dlist jfid3_v2.00
+!li jfid3_v2.00 1
+New filter option: remove rules with score below a certain value.
+!eli
+!li jfid3_v2.00 2
+New history options: write dataset score/action, rules to history-file.
+!eli
+!li jfid3_v2.00 3
+Changed score-calculation (bugs fixed).
+!eli

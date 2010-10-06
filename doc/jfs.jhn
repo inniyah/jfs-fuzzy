@@ -1,0 +1,7 @@
+# note file. Each line contains:
+# <headname> <text> <filename>
+#
+# jfs_started "Note about notes" "c:\program files\jfs2\notenote.htm"
+
+intro_help "Sample note" sample_note.htm
+

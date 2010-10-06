@@ -1,0 +1,182 @@
+!head jfrl200 prog_run jfrl200 "JFRL200: DLL to run jfs-programs"
+!if !UNIX
+!ind JFRL200
+!ind "Visual Basic, running from"
+!ind "DLL, running from"
+JFRL200 is a Dynamic Link Library (dll-file) to load and run
+jfs-programs from Visual Basic or other programming languages with
+facilities to execute (32-bit) dll-functions. JFRL200 has only been
+tested with a demo version of Visual Basic 6. The file JFRL200.DLL
+is installed in the windows-system-directory (c:\windows\system
+or something like that).
+<P>
+JFRL200 can load several compiled jfs-programs and switch between them.
+One of the programs is the 'active program' (most applications doesn't use
+this facility. Only one program is loaded and this is automatically set to
+the active program). Both loading and activating is done by the function:
+jfrl_activate(filename). If the jfs-program <filename> is already loaded, it
+is activated. If it isn't loaded, then it is loaded and activated.
+<P>
+Before an activated program is run, the input-variables are given values.
+This is done by the function jfrl_pvar_set(<ivar_no>, <value>, <conf>).
+It gives input variable number <ivar_no> (starts with zero) the value
+ <value> with confidence equal to <conf>.
+<P>
+The function jfrl_run() executes the active jfs-program with the
+input values.
+<P>
+The function jfrl_ovar_get(<ovar_no>) returns the calculated value of
+output variable number <ovar_no>.
+<P>
+Pseudo-code for a program which executes the jfs-program 'truck.jfr' for
+a list of data could look like this (assume 'truck' takes 2 input values
+and return a single value):
+<PRE>
+  ip1,ip2,op:float;
+  res:integer;
+
+  res = jfrl_activate("c:\tmp\truck.jfr");
+  if (res <> 0)
+    exit("error in loading"),
+  while read(ip1, ip2)<> End-of-file do
+  begin
+    jfrl_ivar_set(0, ip1, 1.0);
+    jfrl_ivar_set(1, ip2, 1.0);
+    jfrl_run();
+    opv = jfrl_ovar_get(0);
+    write(opv);
+  end;
+  jfrl_free();
+</PRE>
+
+!head jfrl_functions jfrl200 functions "The functions in JFRL200"
+<P>
+The functions in JFRL200 (in pseudo-code) are:
+<P>
+<CODE>jfrl_init(prog_count: short integer, stack_size: short integer) return short integer:
+</CODE><BR>
+The function jfrl_init() reserves memory to description of <prog_count>
+jfs-programs and creates a run-stack with the size <stack_size> bytes. If
+ <stack-size>=0, then a stack of default-size (1024) is created. jfrl_init()
+returns zero for success or other number for errors. The possible values are:
+<BR>0: success,
+<BR>6: allocation failed, not enough memory,
+<BR>7: illegal parameter.
+<P>
+<CODE>jfrl_activate(file_name: pointer to string) return short integer:
+</CODE><BR>
+The function jfrl_activate() makes the jfs-program with the name
+ <file-name> the active program (if the jfrl-library isn't
+initialised then jfrl_init(5,0) is called before the jfs-program is
+activated). If the program <file-name> isn't already loaded, then it
+is loaded before it is activated. If all program blocks are in use
+another program is freed before the loading. jfrl_activate() returns
+zero for success and other numbers for failure. The return codes are:
+<BR>0:success,
+<BR>1:cannot open a file with the name: file-name,
+<BR>2:error reading from file,
+<BR>4:the file does not contain a compiled jfs-program,
+<BR>5:a newer version of jfrl200 is needed to run the program,
+<BR>6:cannot allocate memory to program.
+<P>
+
+<CODE>jfrl_ivar_set(ivar_no:short integer, value:single float, conf:single float)
+return short integer:
+</CODE><BR>
+The function jfrl_ivar_set() gives input variable number <ivar_no> the
+value <value> with confidence <conf>. The first input variable
+has the number 0 (zero). The function always return the value zero.
+<P>
+<CODE>jfrl_ovar_get(ovar_no:short integer) return single float:
+</CODE><BR>
+The function jfrl_ovar_get() returns the value of output-variable
+number <ovar_no>, where the first output variable is number 0 (zero).
+<P>
+<CODE>jfrl_run() return short integer:
+</CODE><BR>
+Executes the active jfs-program. Returns zero if no errors or warnings.
+Returns other values if errors or warnings. Possible return-codes:
+<BR>0: success,
+<BR>7: no active program,
+<BR>201: warning: cannot normalise variable because all fuzzy variables=0,
+<BR>202: warning: variable out of domain range,
+<BR>203: warning: illegal operation,
+<BR>204: warning: cannot defuzzificate because all fuzzy variables = 0,
+<BR>205: warning: function argument out of range,
+<BR>206: error: stack overflow.
+<P>
+<CODE>jfrl_free() return short integer:
+</CODE><BR>
+Frees the memory reserved to jfs-programs, program-descriptions and
+stack. Returns zero.
+
+!head jfrl_vb jfrl200 VisualBasic "Using JFRL200 from Visual Basic"
+
+!ind "Visual Basic, calling JFRL200 from"
+The following code shows how to use JFRL200 from visual basic. When
+the button 'Command1' is pressed, the VB-program opens the
+jfs-program 'truck', and calculates theta from the input x=40.0, delta=2.0:
+<P>
+<PRE>
+Private Declare Function jfrl_init Lib "jfrl200" _
+(ByVal prog_count As Integer, _
+ ByVal stack_size As Integer) As Integer
+
+Private Declare Function jfrl_activate Lib "jfrl200" _
+(ByVal fname As String) As Integer
+
+Private Declare Function jfrl_ivar_set Lib "jfrl200" _
+(ByVal ivno As Integer, ByVal val As Single, _
+ ByVal conf As Single) As Integer
+
+Private Declare Function jfrl_ovar_get Lib "jfrl200" _
+(ByVal ovno As Integer) As Single
+
+Private Declare Function jfrl_run Lib "jfrl200" _
+() As Integer
+
+Private Declare Function jfrl_free Lib "jfrl200" _
+() As Integer
+
+Private Sub Command1_Click()
+  Dim res As Integer
+  Dim theta As Single
+
+  res = jfrl_init(1, 0)
+  If res <> 0 Then
+    MsgBox "Error Initialising jfs-system. Errorcode: " & res
+  Else
+    If res = 0 Then
+      res = jfrl_activate("C:\jfs2\examples\truck.jfr")
+      If res <> 0 Then
+        MsgBox "Error loading jfs-program. Errorcode: " & res
+      End If
+    End If
+    If res = 0 Then
+      res = jfrl_ivar_set(0, 40#, 1#)      ' set 'X'
+      res = jfrl_ivar_set(1, 2#, 1#)       ' set 'Delta'
+      res = jfrl_run
+      If res <> 0 Then
+        MsgBox "Error running program. Error-code: " & res
+      Else
+        theta = jfrl_ovar_get(0)
+        MsgBox "Result: Theta= " & theta
+      End If
+    End If
+    res = jfrl_free()
+  End If
+End Sub
+</PRE>
+
+!head jfrl200_changes jfrl200 changes "Changes in JFRL200 version 2"
+
+<H4>Changes in JFRL200 version 2.0.0.1</H4>
+<P>
+<UL>
+<LI>
+A bug, which in some cases prevented jfrl200 to run if some Borland
+runtime libraries was installed, is fixed.
+<LI>
+A bug in the execution of return-statements is fixed.
+</UL>
+!endif

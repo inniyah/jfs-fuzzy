@@ -1,0 +1,1115 @@
+!head JFL_program JFL program "The program block"
+
+The statement part of a JFL-program is defined in the program block.
+The program contains userdefined functions and procedures followed by the
+main program. When the jfs-program is executed, the statements in the
+main program are executed sequentially.
+<P>
+The statements in the functions and procedures are executed when the given
+function/procedure is called (a) from the main-program, or (b) from another
+function/procedure.
+<P>
+A special hidden variable named the global weight (glw) is used in
+the execution of the program.
+<P>
+Before the first statement is executed, the variables
+are initialized and the input variables are assigned values.
+
+!head JFL_prog_init JFL_program initialization "Initialization"
+
+!ind "Initialization, jfs-program"
+In initialization:
+<UL>
+<LI>The value of domain variables are set to the variables' default values,
+ there confidences are set to 0.0, there conf_sum are set
+to 0.0, and there statuses are set to 'undefined'.
+<LI>Arrays are initialized to 0.0.
+<LI>All fuzzy variables are set to 0.0.
+<LI>The global weight is set to 1.0.
+</UL>
+
+!head JFL_prog_expr JFL_program expressions "Expressions"
+
+!ind "Expressions"
+!ind "Functions, predefined"
+!ind "Predefined functions"
+!ind "Operators, predefined"
+!ind "Precedence"
+!ind "Variable-functions"
+!ind "In-operator"
+!ind "Between-operator"
+In JFL there is only one type of expression: the float expression. Expressions
+are build using constants, variables, hedges, functions, operators and
+relations. Expressions are part of if-statements, while-statements and
+case-statements. The execution of an expression results in a floating-point
+number.
+<P>
+Here are examples of expressions:
+<PRE>
+speed is low or not(speed is medium)
+25 * (x_speed + 17.23) / log(100)
+min(x_speed, y_speed) eq (x_speed + y_speed) / 2 or risk is low
+</PRE>
+<P>
+<STRONG>Constants and variables</STRONG>
+<P>
+Constants are either a number, or one of the words 'true' (equal to 1.0)
+or 'false' (equal to 0.0).
+<BR>
+Domain variables calculates to there values (always a float), and so do
+fuzzy variables.
+<P>
+Array variables are of the form:
+<PRE>
+     <a>[<expr>]
+</PRE>
+For example:
+<PRE>
+      sale[year - 1990]
+</PRE>
+First <expr> is calculated. Then the calculated value is rounded to
+closest integer in the interval [0, <a>.size - 1], and the value
+of this array-cell is the value of the array-expression.
+<P>
+<STRONG>Functions</STRONG><P>
+Functions in expressions are either (a) hedges, (b) predefined functions,
+or (c) user-defined functions. The predefined functions are:
+<P>
+!dtab JFL_pdfuncs "Predefined functions"
+!tab JFL_pdfuncs head
+<STRONG>
+name
+</STRONG>
+!etc
+<STRONG>
+function
+</STRONG>
+!etab
+!tab JFL_pdfuncs cos
+cos(a)
+!etc
+cosine(a) where a is an angle in radians.
+!etab
+!tab JFL_pdfuncs sin
+sin(a)
+!etc
+          sine(a), a in radians.
+!etab
+!tab JFL_pdfuncs tan
+tan(a)
+!etc
+          tangent(a), a in radians (if a==0 then result is 0).
+!etab
+!tab JFL_pdfuncs acos
+acos(a)
+!etc
+         if a in [-1,1] then inverse-cosine(a) in range [0, phi] else
+0.
+!etab
+!tab JFL_pdfuncs asin
+asin(a)
+!etc
+        if a in [-1,1] then inverse-sine(a) in range [-phi/2, phi/2] else
+0.
+!etab
+!tab JFL_pdfuncs atan
+atan(a)
+!etc
+       inverse-tangent(a) in range [-phi/2, phi/2].
+!etab
+!tab JFL_pdfuncs log
+log(a)
+!etc
+          if a > 0 then natural-logarithm(a) else 0.
+!etab
+!tab JFL_pdfuncs fabs
+fabs(a)
+!etc
+        if a >= 0 then a else -a.
+!etab
+!tab JFL_pdfuncs floor
+floor(x)
+!etc
+       largest integer not greater than x (as float).
+!etab
+!tab JFL_pdfuncs ceil
+ceil(x)
+!etc
+       smallest integer not less than x (as float).
+!etab
+!tab JFL_pdfuncs random
+random(a)
+!etc
+     a random float-number in [0, a[.
+!etab
+!tab JFL_pdfuncs pow
+pow(a, b)
+!etc
+    if (a=0, b<=0) or (a<0 and b is not an integer) then 0 else power(a,
+b).
+!etab
+!tab JFL_pdfuncs min
+min(a,b)
+!etc
+        minimum(a, b).
+!etab
+!tab JFL_pdfuncs max
+max(a,b)
+!etc
+       maximum(a, b).
+!etab
+!tab JFL_pdfuncs cut
+cut(a,b)
+!etc
+        if a > b then a; else 0.0.
+!etab
+!tab JFL_pdfuncs iif
+iif(a,b,c)
+!etc
+      a * b + (1.0 - a) * c.
+!etab
+!tab JFL_pdfuncs wget
+wget(a)
+!etc
+        if weight > a then weight else 0.0.
+!etab
+<P>
+<STRONG>Operators</STRONG><P>
+Operators in expressions are either (a) the operators defined in the
+operators-block or (b) these predefined operators:
+<P>
+!dtab JFL_expr_ops "Predefined operators"
+!tab JFL_expr_ops head
+<STRONG>
+name
+</STRONG>
+!etc
+<STRONG>
+     precedence
+</STRONG>
+!etc
+<STRONG>
+ function (x <op> y)
+</STRONG>
+!etab
+!tab JFL_expr_ops plus
++
+!etc
+     50
+!etc
+<CODE>
+ x + y
+</CODE>
+!etab
+!tab JFL_expr_ops minus
+-
+!etc
+ 50
+!etc
+<CODE>
+ x - y
+</CODE>
+!etab
+!tab JFL_expr_ops mult
+*
+!etc
+60
+!etc
+<CODE>
+ x * y
+</CODE>
+!etab
+!tab JFL_expr_ops div
+/
+!etc
+        60
+!etc
+<CODE>
+ x / y (floating point division. If y=0 then 0)
+</CODE>
+!etab
+<P>
+Operators in an expression are calculated in order of precedence:
+highest precedence first, lowest precedence last. Operators with same
+precedence are calculated as they are encountered (i.e., from left to right).
+The order of operators can be changed by the use of parentheses. The expression:
+<PRE>
+     3 * 4 - 5 / 6 - 8
+
+is equal to
+
+     ((3 * 4) - (5 / 6)) - 8
+</PRE>
+<STRONG>Relations</STRONG><P>
+Relations in expressions are either (a) user-defined relations or (b) these
+ predefined relations:
+<P>
+!dtab JFL_expr_rels "Predefined relations"
+!tab JFL_expr_rels head
+<STRONG>
+name
+</STRONG>
+!etc
+<STRONG>
+function (x <rel> y)
+</STRONG>
+!etab
+!tab JFL_expr_rels eq
+=
+!etc
+<CODE>
+if x = y then 1 else 0
+</CODE>
+!etab
+!tab JFL_expr_rels gt
+>
+!etc
+<CODE>
+if x > y then 1 else 0
+</CODE>
+!etab
+!tab JFL_expr_rels lt
+<
+!etc
+<CODE>
+ if x < y then 1 else 0
+</CODE>
+!etab
+!tab JFL_expr_rels geq
+>=
+!etc
+<CODE>
+ if x >= y then 1 else 0
+</CODE>
+!etab
+!tab JFL_expr_rels leq
+<=
+!etc
+<CODE>
+ if x <= y then 1 else 0
+</CODE>
+!etab
+!tab JFL_expr_rels neq
+ !=
+!etc
+<CODE>
+ if x != y then 1 else 0
+</CODE>
+!etab
+<P>
+Al relations has the precedence 40. If the precedence of 'and' is the
+standard (30) the expression:
+<PRE>
+     x = 3 and 2 + y > 4
+</PRE>
+is equal to:
+<PRE>
+     (x = 3) and ((2 + y) > 4)
+</PRE>
+
+<STRONG>Variable-functions</STRONG><P>
+Variable-functions can be used in  expressions. A variable-function is a
+function that takes a single domain variable as argument.
+The variable-functions are:
+
+!dtab JFL_expr_vfunc "variable-functions"
+!tab JFL_expr_vfunc head
+<STRONG>
+name
+</STRONG>
+!etc
+<STRONG>
+function ( f(v))
+</STRONG>
+!etab
+!tab JFL_expr_vfunc dnormal
+dnormal
+!etc
+<CODE>
+    if v.domain.min or v.domain.max are undefined then return 0.0
+<BR>
+            else return (v.value - v.domain.min)
+                        / (v.domain.max - v.domain.min)
+</CODE>
+!etab
+!tab JFL_expr_vfunc m_fzvar
+m_fzvar
+!etc
+<CODE>
+ return max{fzvar.value, where fzvar is bound to v}.
+</CODE>
+!etab
+!tab JFL_expr_vfunc s_fzvar
+s_fzvar
+!etc
+<CODE>
+ return sum{fzvar.value, where fzvar is bound to v}.
+</CODE>
+!etab
+!tab JFL_expr_vfunc default
+default
+!etc
+<CODE>
+    return v.default.
+</CODE>
+!etab
+<P>
+<STRONG>the in-function and the between-operator</STRONG>
+<P>
+The in-function:
+<PRE>
+     <var> in (<adjective_1>, <adjective_2>, ...)
+</PRE>
+is a short way of writing:
+<PRE>
+    <var> <adjective_1> or <var> <adjective_2> or ....
+</PRE><P>
+The between-operator:
+<PRE>
+    <var> between <adjective_1> and <adjective_2>
+</PRE>
+is calculated as:
+<PRE>
+    if (<var>.value < <adjective_1>.center)
+    then
+      return afuzz(<adjective_1>, <var>.value
+    else
+    if (<var>.value  > <adjective_2>.value)
+    then
+      return afuzz(<adjective_2>, <var>.value)
+    else
+      return 1;
+</PRE>
+where afuzz() is defined in:
+!ref JFL_decl_fuzz
+.
+<P>
+<STRONG>Examples</STRONG><P>
+Assume that the variable 'x' of type percent (dom_min=0,
+dom_max=100) has the value 80.0, and that 'x low' has center 0.0 and
+value 0.0, 'x medium' has center 50 and value 0.3, 'x high' has center 100
+and value 0.7, and all operators and hedges are default. Then:
+<PRE>
+      x + 20.0 * 10.0               = 280.0
+
+      cos(x * (3.1415 / 180))       = -0.174
+
+      x is medium or x < 27         = 0.3 (=max(0.3, 0.0)
+
+      dnormal(x) + m_fzvar(x)       = 1.5  (= 0.8 + 0.7)
+
+      x in (medium, high)           = 0.7 (=max(0.3, 0.7)
+
+      x between medium and high     = 1.0 (because 80 is between 50
+                                           and 100).
+</PRE>
+
+
+!head JFL_prog_if JFL_program if_statement "If-statement (and assign-statement)"
+
+!ind "If-statements"
+There are three types of if/assign statements:
+<PRE>
+     <thenexpr>;
+     if <expr> then <thenexpr>;
+     ifw <lw> <expr> then <thenexpr>;
+</PRE>
+<STRONG>Type 1--
+ <thenexpr>
+</STRONG><P>
+This sort of expression is evaluated like the expression:
+<PRE>
+     if true then <thenexpr>;
+</PRE>
+<STRONG>´Type 2--
+if <expr> then <thenexpr>
+</STRONG><P>
+This sort of statements is calculated by the algorithm:
+<PRE>
+     eval('if <expr> then <thenexpr>;') =
+     begin
+       rm_glw = global_weight;
+       t = eval(<expr>);
+       t = fzvround(t);  /* fzvround is defined below */
+       global_weight = global_weight * t;
+       eval(<thenexpr>);
+       global_weight = rm_glw;
+     end;
+</PRE>
+<STRONG>Type 3--
+ifw <lw> <expr> then <thenexpr>
+</STRONG><P>
+This sort of statement is calculated by the algorithm:
+<PRE>
+     eval('ifw <lw> <expr> then <thenexpr>;') =
+     begin
+       rm_glw = global_weight;
+       global_weight = weightop(global_weight, <lw>);
+       t = eval(<expr>);
+       t = fzvround(t);  /* fzvround is defined below */
+       global_weight = global_weight * t;
+       eval_then_expr(<thenexpr>);
+       global_weight = rm_glw;
+     end;
+</PRE>
+where 'weightop' is the user-defined operator with the name 'weightop' and
+fzvround is:
+<PRE>
+  fzvround(v: float) return float =
+  begin
+    if v < 0.0
+    then
+      res = 0.0
+    else if > 1.0
+    then
+      res = 1.0
+    else
+      res = v;
+    return res;
+  end;
+</PRE>
+The evaluation of a <then-expr> depends on its type:
+
+!head JFL_prog_thenfzvar JFL_prog_if fzv_assign "Fuzzy variable assignment"
+
+!ind "Fuzzy composite operator"
+!ind "Fuzzy-variable assignment"
+A fuzzy variable assignment is a <then-expr> of the type:
+<PRE>
+     <var> <adj>
+</PRE>
+where '<var> <adj>' is the name of a fuzzy variable. An example of a
+statement with a fuzzy variable assignment is:
+<PRE>
+     if speed hard and distance near then brake hard;
+</PRE>
+It is calculated by the algorithm:
+<PRE>
+     eval_then_expr('<var> <adj>') =
+     begin
+       let <fzv> be the fuzzy variable defined by '<var> <adj>';
+       <fzv>.value = <var>.fzcomp(<fzv>.value, global_weight);
+     end;
+</PRE>
+
+For example,
+assume 'x is low' = 0.6, 'y is high' = 0.3, x.fzcomp is the default fuzzy
+composite operator ('or'), and the operator-type of or is 'max' (the default),
+and the global weight = 1.0. Then
+<PRE>
+      ifw 0.8  x is low  then y is high;
+</PRE>
+will change the value of 'y high' to 0.48
+<CODE>
+(=or(0.3, 0.8 * 0.6)=max(0.3,0.48)).
+</CODE>
+
+!head JFL_prog_thenvar JFL_prog_if var_assign "Domain variable assignment"
+
+!ind "Domain-variable assignment"
+!ind "Domain composite operator"
+A domain variable assignment is a <then-expression> of the type:
+<PRE>
+      <var> = <expr>
+</PRE>
+where <var> is the name of a domain variable. It is calculated by the
+following algorithm:
+<PRE>
+eval_then_expr('<var> = <expr>') =
+begin
+  v = eval(<expr>);
+  if global_weight != 0.0 then
+  begin
+    if <var>.d_comp == 'new' then
+    begin
+      <var>.value = v;
+      <var>.confidence = t;
+    end
+    else
+    if <var>.d_comp == 'avg' then
+    begin
+      f = <var>.value * <var>.conf_sum + v * global_weight;
+      <var>.conf_sum = <var>.conf_sum + global_weight;
+      <var>.value = f / <var>.conf_sum;
+      if global_weight > var.confidence then
+        var.confidence = global_weight;
+    end
+    else
+    if <var>.d_comp == 'max' then
+    begin
+      if (global_weight > <var>.confidence)
+      begin
+        <var>.value = v;
+        <var>.confidence = global_weight;
+      end;
+    end;
+    varround(<var>);  /* varround is defined below */
+  end;
+end;
+
+where
+!lab varround
+varround(v: domain-var) =
+begin
+  if v.domain_type == 'integer' then
+  begin
+    let v.value be <m>.<d>;
+    if <d> >= 0.5 then
+       v.value = <m> + 1.0;
+    else
+      v.value = <m>;
+   end
+   else
+   if v.domaintype == 'categorical' then
+   begin
+     let a[1], a[2], ..., a[acount] be the adjectives bound to v;
+     if acount == 0 then
+       v.value = v.default_value
+     else
+     begin
+       dmin = min({abs(v.value - a[n].center) | n in 1..acount});
+       di = min({n | abs(v.value - a[n].center) = dmin, n in 1..acount});
+       v.value = a[di].center;
+       /* v.value := center of first adjective
+                     with minimal distance to v.value */
+    end;
+  end;
+  if v.domain_min is defined and v.value < v.domain_min
+  then
+    v.value = v.domain_min;
+  if v.domain_max is defined and v.value > v.domain_max
+  then
+    v.value = v.domain_max;
+end;
+</PRE>
+For example assume global_weight=1.0, the domain-variable 'a' is of the type 'float',
+has the value 60 with confidence 0.2 and conf_sum 0.2, 'x low' = 0.6.
+The if-part of the statement:
+<PRE>
+      ifw 0.7  x is low   then x = 80;
+</PRE>
+calculates to 0.42.
+<P>
+If x's d_comp-operator is 'new', then the statement
+changes the value of x to 80, and the confidence of x to 0.42.
+<P>
+If x's d_comp-operator is 'max', then the value of x is changed to
+80 (because 0.42 > 0.2), and the confidence is changed to 0.42.
+<P>
+If the d_comp-operator is 'avg' then
+the value of x is changed to 73.55, confidence is changed to 0.42,
+and conf_sum is changed to 0.62
+<CODE>
+(the value is calculated from (0.2 * 60 + 0.42 * 80) / (0.2 + 0.42)).
+</CODE>
+
+!head JFL_prog_theninc JFL_prog_if increase "Increase/decrease-assignment"
+
+!ind "Increase statement"
+!ind "Decrease statement"
+Increase/decrease assignment is a <then-expression> of one the types:
+<PRE>
+     increase <var> with <expr>
+     decrease <var> with <expr>
+</PRE>
+where <var> is the name of a domain variable.
+<P><STRONG>Increase</STRONG><P>
+An increase statement is calculated by the algorithm:
+<PRE>
+eval_then_expr('increase <var> with <expr>') =
+begin
+  v = eval(<expr>);
+  if global_weight != 0.0 then
+  begin
+    <var>.value = <var>.value + global_weight * v;
+    if (global_weight > <var>.confidence)
+      <var>.confidence = global_weight;
+    varround(<var>);
+  end;
+end;
+</PRE>
+the function varround() is defined in
+!ref JFL_prog_thenvar varround
+.
+<P><STRONG>Decrease</STRONG><P>
+A decrease statement is calculated by:
+<PRE>
+eval_then_expr('increase <var> with <expr>') =
+begin
+  v = eval(<expr>);
+  if global_weight != 0.0 then
+  begin
+    <var>.value = <var>.value - global_weight * v;
+    if (global_weight > <var>.confidence)
+      <var>.confidence = global_weight;
+    varround(<var>);
+  end;
+end;
+</PRE>
+<STRONG>Example</STRONG><P>
+For example assume the global-weight=1.0, the variable 'a' is of the type 'float',
+and has the value 60 with confidence 0.2.
+<P>
+The statement:
+<PRE>
+      if 0.7 then increase a with 20;
+</PRE>
+changes the value of 'a' to 74.0 and the confidence of 'a' to 0.7. The value
+is calculated thus:
+<CODE>
+60 + 0.7 * 20 = 74.
+</CODE>
+
+!head JFL_prog_thenarr JFL_prog_if arr_assign "Array assignment"
+
+!ind "Array assignment"
+An array-assignment is a <then-expression> of the type:
+<PRE>
+      <arr>(<expr1>) = <expr2>
+</PRE>
+where <arr> is the name of an array. It is evaluated by:
+<PRE>
+eval_then_expr('<arr>(<expr1>)=<expr2>') =
+begin
+  if global_weight != 0.0 then
+  begin
+    i = round_to_integer(eval(<expr1>);
+    if i < 0 then
+      i = 0;
+    if i >= <arr>.size)
+      i = <arr>.size - 1;
+    <arr>[i] = eval(<expr2>);
+  end;
+end;
+</PRE>
+<STRONG>Example</STRONG><P>
+For example assume the value of 'x' is 5.4 and the array 'a' has the size 10.
+The statement:
+<PRE>
+       if x > 3.5 then a(x + 2) = x - 3.5;
+</PRE>
+changes the value of a[7] to 1.9.
+
+!head JFL_prog_thenclear JFL_prog_if clear "Clear variable"
+
+!ind "Clear-statement"
+A clear-expression is a <then-expression> of the type:
+<PRE>
+     clear <var>
+</PRE>
+where <var> is the name of a domain variable. The expression initializes
+the named domain variable and all fuzzy variables bound to it.
+The expression is evaluated by:
+<PRE>
+eval_then_expr('clear <var>') =
+begin
+  if global_weight != 0.0 then
+  begin
+    <var>.value = <var>.default_value;
+    <var>.confidence = 0.0;
+    <var>.conf_sum = 0.0;
+    <var>.status = 'undefined';
+    for fzv in {fuzzy_vars bound to <var>}
+      fzv.value = 0.0;
+  end
+end
+</PRE>
+
+!head JFL_prog_thenextern JFL_prog_if extern "Extern call"
+
+!ind "Extern-expression"
+!ind "Extern statement"
+An extern-expression is a <then-expression> of the type:
+<PRE>
+     extern {<arg>}
+</PRE>
+Statements with an extern-expressions without a if-part (i.e., a statement of the
+form: 'extern {<arg>};') are called extern-statements.
+<P>
+The extern expression executes a function specific to the actual
+JFL-interpreter (a user-exit). It takes a list of words as arguments.
+<P><STRONG>WARNING:</STRONG>
+The argument-list is split into words by the compiler. It uses
+the JFL-syntax-rules, which for example will split 'extern a+2' into
+3 words 'a', '+' and '2'). The function is only called if global_weight
+ != 0.0.
+<P>
+<STRONG>Example</STRONG><P>
+JFR recognizes two extern-statements: 'printf' and 'read'. They are explained in
+!ref jfr
+. An example of a 'printf'-expression:
+<PRE>
+     if x != 0 then extern printf "Value of x = %d seconds\n", x;
+</PRE>
+Many learning tools replaces an extern-statement with other statements.
+
+!head JFL_prog_thenproc JFL_prog_if procedure "Procedure call"
+
+!ind "Procedures"
+A procedure expression is a <then-expression> of the type:
+<PRE>
+      <proc>(<e1>, <e2>, ..., <en>)
+</PRE>
+where <proc> is a user-defined procedure and <e1>..<en> are expressions.
+It is evaluated by:
+<PRE>
+eval_then_expr('<proc>(<e1>, <e2>, ..., <en>)') =
+begin
+  eval_proc(<proc>, eval(<e1>), eval(<e2>), ..., eval(<en>));
+end;
+</PRE>
+where 'eval_proc' is described in
+!ref JFL_prog_proced.
+
+
+!head JFL_prog_block JFL_program block "The switch block statements"
+
+!ind "Switch statement"
+!ind "Case statement"
+!ind "End statement"
+The switch block statements are 'switch', 'case', 'default', and 'end'.
+They are used to write conditional blocks somewhat like the if-then-else
+statements in C or the cond-blocks in Lisp.
+<P>
+In JFL there are no jumps. All statements are
+executed, but the value of the global weight is changed. There are 2 types
+of switch-blocks:
+<P><STRONG>Type 1</STRONG><P>
+<PRE>
+     switch <var>;
+       case <adj1>:
+         <statements>;
+       case <adj2>:
+         <statements>;
+       .
+       .
+       .
+       case <adjn>:
+         <statements>;
+       default:
+         <statements>;
+     end;
+</PRE>
+where <var> is the name of a domain-variable. The adjectives <adj1>,...,<adjn> are
+adjectives bound to <var>. The 'default' part is optional.
+<P><STRONG>Type 2</STRONG>
+<PRE>
+     switch;
+       case <expr1>:
+         <statements>;
+       case <expr2>:
+         <statements>;
+       .
+       .
+       .
+       case <exprn>:
+         <statements>;
+       default:
+         <statements>;
+     end;
+</PRE>
+The second form can be viewed as a generalization
+of the first (with <expr1> = <var> <adj1>, etc).
+<P><STRONG>Example</STRONG><P>
+<PRE>
+  switch x:
+    case low:
+      y = 20;
+      if speed is low then z is high;
+    case medium:
+      z is medium;
+    default:
+      y = 50;
+  end;
+</PRE>
+
+A switch-block is evaluated by:
+<PRE>
+eval('switch; <case-statements> [<default-statement>] end;') =
+begin
+   rm_glw = global_weight;
+   sumweight = 0.0;
+   for each case-statement 'case <expr>: <statements>' do
+   begin
+     v = fzround(eval(<expr>);
+     sumweight = sumweight + v;
+     global_weight = caseop(rm_glw, v);
+     eval(<statements>);
+   end;
+   if default-statement: 'default: <statements>' do
+   begin
+     global_weight = caseop(rm_glw, fzround(1.0  - sumweight));
+     eval(<statements>);
+   end;
+   global_weight = rm_glw;
+end;
+</PRE>
+where 'caseop' is the user defined operator 'caseop' (by default equal to
+multiplication).
+<P>
+For example, assume 'x low' = 0.1, 'x medium' = 0.2, default case_operator
+('prod'), and global_weight = 0.8 in the block:
+<PRE>
+    switch:
+      case x is low:
+        # 1
+      case x is medium:
+        # 2
+      default:
+        # 3
+    end;
+        # 4
+</PRE>
+<UL>
+<LI>At the point '# 1' weight = 0.08 (=0.8*0.1).
+<LI>At '# 2' weight = 0.16(=0.8*0.2)
+<LI>At '# 3' weight = 0.56 (=0.8*(1-(0.1+0.2))).
+<LI>At '# 4' weight = 0.8 (the value before the switch block).
+</UL>
+
+!head JFL_prog_while JFL_program while "The while-block"
+
+!ind "While-statement"
+The 'while'  statement is a fuzzy version of the "loop" statement in traditional
+programming languages. Like the 'switch' statement, the 'while' statement works
+by changing the value of the global weight. A while-block starts with a 'while'
+statement followed by other statements, ending with an 'end' statement.
+<P>
+A while statement is evaluated by:
+<PRE>
+eval('while <expr>; <statements> end;') =
+begin
+  rm_glw = global_weight;
+  repeat
+    v = eval(<expr>);
+    global_weight = whileop(rm_glw, v);
+    eval(<statements>);
+  until global_weight == 0.0;
+  global_weight = rm_glw;
+end;
+</PRE>
+where whileop is the user-defined operator 'whileop' (default operator-type:
+'prod').
+<P><STRONG>Example:</STRONG>
+<P>
+For example, assume 'x is low' has the fuzzification-function: '0:1 2:0', x.d_comp =
+new, default operators, and global_weight = 0.9 in this program:
+<PRE>
+x = 0;
+while x low:
+  # 1
+  x = x + 1;
+end;
+  # 2
+</PRE>
+The first time the 'while' statement is executed, the global weight is
+"changed" to 0.9 (whileop(0.9, 'x low') = 0.9*1.0). Then x:=1.
+<BR>
+Because the global weight is not 0.0 at the 'end' statement, the 'while'
+statement is executed again. The global_weight is changed to 0.45. Then x:=2.
+<BR>
+Because the global weight is still not 0.0 at the 'end' statement,
+the 'while' statement is executed again. But now the global_weight is set to 0.0.
+The assignment statement is executed but x is not changed because
+the global weight is 0.0. The 'end' statement is executed. Because the
+global weight is 0.0, it is changed back to the
+value it had before the loop ((i.e. 0.9); then, whatever statement that follows the
+'end' statement is executed.
+
+!head JFL_prog_wset JFL_program wset "The wset statement"
+
+!ind "Wset statement"
+The wset statement changes the global weight. It has the form:
+<PRE>
+     wset <expr>;
+</PRE>
+It is evaluated by:
+<PRE>
+eval('wset <expr>') =
+begin
+  if global_weight != 0.0 then
+    global_weight = fzround(eval(<expr>));
+end;
+</PRE>
+
+!head JFL_prog_procedure JFL_program procedure "User-defined procedures and functions"
+
+!ind "Procedures"
+!ind "Functions, user-defined"
+!ind "Return-statement"
+A procedure is defined by a list of statements:
+<PRE>
+procedure <proc>(<v1>, <v2>, ..., <vn>):
+  <statement>
+  <statement>
+      .
+      .
+      .
+end;
+</PRE>
+ The parameter-variables <v1>,...,<vn> are local to the procedure. In the
+procedure-block they are used as domain-variables of the type float with
+the domain-composite-operator type 'new'. parameter-variables can have the
+same name as global domain-variables. In the procedure an ambiguous variable
+name refer to the parameter-variable. A procedure needs at least one
+parameter-variable. A Procedure can call other procedures,
+if the other procedures are defined before the actual procedure.
+<P>
+When a procedure is called, the parameter-values are assigned values and
+the statements in the procedure-block are executed sequentially until the
+ 'end'-statement is reached. Then execution continues at the calling
+statement (where the global-weight get the value it had before the
+procedure-call).
+<P>
+A user-defined function is defined by a list of statements:
+<PRE>
+function <func>(<v1>, <v2>, ..., <<vn>):
+  <statement>
+  <statement>
+       .
+       .
+       .
+  <statement>
+end;
+</PRE>
+Execution of a function is nearly identical to the execution of a
+procedure, but inside a function it is possible to use 'return' statements.
+A 'return' statement has the form:
+<PRE>
+   return <expr>;
+</PRE>
+When a 'return' statement is reached <expr> is calculated. If the global weight
+ != 0.0, then the value of <expr> is returned and execution continues at
+the calling statement. If execution of the function reaches the function's
+ 'end' statement, 0.0 is returned and execution is continued at the calling
+statement. Example:
+<PRE>
+function seconds(hour, min, sec):
+  min = min + 60 * hour;
+  sec = sec + 60 * min;
+  return sec;
+end;
+ .
+ .
+ .
+ usedseconds = seconds(h1, m1, s1) - seconds(h2, m2, s2);
+ .
+ .
+ .
+</PRE>
+
+!head JFL_limitations JFL limitations "Limitations"
+
+!ind "Limitations, JFL"
+There are some limitations in JFL:
+<PRE>
+The maximum size of a compiled program is 65K.
+
+The maximum number of hedges are 255.
+The maximum number of operators are 255.
+The maximum number of relations and domains are 255.
+
+The maximum number of domain variables are 255.
+
+The maximum number of fuzzy variables are 50.943.
+
+Maximum of 255 x:y-pairs in a pl-function.
+
+The maximum number of arguments to an 'extern' statement are 254.
+
+Only the first 15 characters of an identifier are significant.
+</PRE>
+
+!head JFL_reserved JFL reserved_words "Reserved words"
+
+These word cannot be used as identifiers:
+<P>
+adjectives, and, acos, arrays, asin, atan,
+<BR> call, case, ceil, clear, confidence,cos,
+<BR>decrease, default, dnormal, domains,
+<BR>end,
+<BR>fabs, false, floor, function,
+<BR>hedges,
+<BR>if, iif, ifw, in, increase, input,
+<BR>local, log,
+<BR>m_fzvar, max, min,
+<BR>operators, output,
+<BR>pow, procedure, program,
+<BR>random, relations, return, rules,
+<BR>s_fzvar, sin, synonyms, switch,
+<BR>tan, then, title, true,
+<BR>while, with, wset.
+
+
+!head JFL_changes JFL changes "Changes in version 2"
+!li intro_changes JFL
+!ref JFL_changes "Changes in JFL"
+!eli
+This chapter describes the differences between JFL version 1 and version 2.
+
+!head JFL_changes_new JFL_changes new_features "New features"
+<PRE>
+- In version 2 there can be several blocks of the same type (ex. each
+  variable can be placed in its own input/output/local block followed by an
+  adjective-block with only the adjectives bound to the variable).
+
+- Version 2 supports one dimensional arrays of float.
+
+- Version 2 supports definition of simple functions and procedures.
+
+- Version 2 supports multiline comments placed inside  /* and */ .
+
+- Pl-functions can be non-continues.
+
+- Adjectives now support trapez functions (without use of plf).
+
+- It is now possible to give an adjective name as the default value of a
+  variable.
+
+- New built-in-function: iif (iif(a,b,c)=a*b+(1-a)*c).
+
+- New operator type: similar.
+
+- More flexible use of hedges in operator definitions (hedgemode).
+
+- New variable function: confidence.
+
+- New built-in-functions:  sqr, sqrt, cut.
+
+- Increase/decrease statements (if <expr> then increase <var> with <expr).
+</PRE>
+
+!head JFL_changes_change JFL_changes changed_features "Changed features"
+<PRE>
+- The syntax of definitions has changed. In version 2 a definition always
+  has the form: <name> {<arg>}; where <arg>::=<keyword> <param>.
+
+- The 'flag'-argument of variables are replaced by the 'argument'-argument.
+
+- The default types of the predefined operators 'weightop', 'whileop' has
+  changed to 'prod' (from 'new').
+
+- The calculation of operators and defuz-functions based on 2 types has
+  changed. In the definition <type1> type2> <val> (for example: an operator defined as:
+  op1 min max 0.7;), <val> now has to be a number in [0.0,1.0] and the value in
+  x is calculated as: (1-val)*type1(x) + val*type2(x). To change from the
+  type definition <t1> <t2> <val_1> in version 1 to the definition in
+  version 2: <t1> <t2> <val_2>, set <val_2> = 1 / (1 + <val_1>).
+
+- The 'call' statement is replaced by the 'extern' statement.
+
+- The statements: 'clear' and 'extern' are now part of if-statements (ex:
+  if x > 7 then clear y;).
+</PRE>
+
+!head JFL_changes_rm JFL_changes removed_features "Removed features"
+<PRE>
+- Version 2 don't support the 'rem' statement (use /*..*/ comments).
+
+- The build-in hedges: ifhedge, casehedge, whilehedge are removed.
+
+- The hedgetype 'ident' is removed.
+</PRE>
+
+
+

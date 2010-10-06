@@ -1,0 +1,57 @@
+
+title "Weather conditions for golf-playing";
+
+operators
+    or bsum precedence 20;
+
+relations
+    leq -200:1 0:1 10:0;
+
+domains
+    pct "%" 0 100;
+    temperature 50 100;
+
+input
+    outlook "Outlook (0=rain, 100=sunny)" pct;
+    temp "Temperature (fahrenheid)" temperature;
+    humidity "Humidity" pct;
+    windy "Windy (0=false, 100=true)" pct;
+
+output
+    play "Weahter acceptable for golf-playing" pct;
+
+adjectives
+    outlook rain 0;
+    outlook overcast 50;
+    outlook sunny 100;
+
+    temp low 50;
+    temp medium 75;
+    temp high 100;
+
+    humidity low 50;
+    humidity medium 75;
+    humidity high 100;
+
+    windy false 0;
+    windy true 100;
+
+    play false 0;
+    play true 100;
+
+program
+  switch:
+    case outlook is overcast:
+      play is true;
+    case outlook is sunny:
+      switch;
+      case humidity leq 75:
+        play is true;
+      default:
+        play is false;
+      end;
+    default:
+      if windy is true then play is false;
+      if windy is false then play is true;
+  end;
+ 

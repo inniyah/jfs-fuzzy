@@ -1,0 +1,361 @@
+!head jhlp misc_programs jhlp "JHLP: the documentation creater"
+
+!ind JHLP
+!ind "Documentation, creating"
+!ind "Documentation, printing"
+The program JHLP is used to create documentation in HTML format
+from a collection of ascii files with special jhlp commands. In
+the jfs-system, JHLP is used to create and update the documentation.
+!if !UNIX
+Ordinarily JHLP is executed indirectly;
+when the 'Install tool' command in the main menu of JFS is executed,
+JHLP is also executed.
+!endif
+The details of JHLP and the jhlp-data-format are beyond the scope of this manual.
+<P>
+JHLP can be called directly from (a) the program JFS, or (b) a command line.
+This is typically done to (a) write part of the documentation
+to an HTML document in a format suitable for printing, (b) recreate the documentation
+using a style sheet to choose alternative colors, fonts, and so forth or (c) add
+notes to the documentation. (See
+!if UNIX
+!ref jhlp_options
+!else
+!ref jhlp_jfs_opts
+!endif
+for step-by-step guides to performing this tasks.)
+
+!head jhlp_options jhlp options "Calling JHLP from the command line"
+
+To invoke JHLP from the command line, type 'jhlp'
+and follow it with a set of command line arguments. The command line format
+is:
+<PRE>
+       jhlp {<option>} <jhi-file>
+</PRE>
+JHLP generates HTML from the module-files described in the file <jhi-file>.
+If called without options, the HTML files are written to the directory, in
+which <jfi-file> is positioned.
+<P>
+For Example:
+<PRE>
+	jhlp c:\programs\jfs2\html\jfs.jhi
+</PRE>
+generates HTML files from the modules described in 'jfs.jhi'. It writes the
+HTML files to the directory c:\programs\jfs2\html.
+<P>
+JHLP recognizes the following options:
+<P>
+!dtab jhlp_options "JHLP Options"
+!tab jhlp_options -o
+-o <htmf>
+!etc
+Write the generated HTML code to a single file (<htmf>) formatted for
+printing.
+!etab
+!tab jhlp_options -e
+-e <ef>
+!etc
+Write error messages to the file <ef> instead of writing them to standard
+output (i.e., the screen).
+!etab
+!tab jhlp_options -so
+-so <sout>
+!etc
+Write messages (like "compiling ..", etc.) to the file <sout> instead of
+writing them to standard output.
+!etab
+!tab jhlp_options -h
+-h <hname>
+!etc
+Convert only one chapter (with sub-chapters) to HTML. Convert the chapter
+defined by the header-name <hname>.
+<P>
+To find the header-name of a chapter: web-browse to the chapter, and
+ note the name of the HTML file. The header name is equal to the
+HTML filename without path and extension. For example: the header name of the
+chapter about the compiler JFC, found in the HTML file
+'c:\programs\jfs2\jfc.htm', is 'jfc'.
+!etab
+!tab jhlp_options -hi
+-hi <jhc>
+!etc
+Add a new module to the jhlp system before generating the HTML files. The new
+module is defined by the jhc-file <jhc> (the extension '.jhc' is added to filename).
+!etab
+!tab jhlp_options -s
+-s <cssf>
+!etc
+Link all generated HTML files to the style sheet file <cssf> ('.css' is
+added to filename).
+!etab
+!tab jhlp_options -An
+-An <n>
+!etc
+Allocate <n> memory-nodes to temporary data (default is 10000).
+!etab
+!tab jhlp_options -Am
+-Am <m>
+!etc
+Allocate <m> K to temporary data (default is 200).
+!etab
+!tab jhlp_options -w
+-w
+!etc
+wait for the user to press the return-key before exiting the program.
+!etab
+!tab jhlp_options -c
+-c
+!etc
+Copy image-files to destination directory instead of creating 
+links to them.
+!etab
+<p>
+<STRONG>Examples:</STRONG>
+<P>
+Generate a single HTML file from the modules in the file 'html\jfs.jhi'.
+Generate only HTML code for the chapter with header name 'jfr'.
+Write the generated HTML file to 'c:\tmp\jfrdoc.htm':
+<PRE>
+	  jhlp -o c:\tmp\jfrdoc -h jfr html\jfs
+</PRE>
+Generate HTML files from the modules described in the file 'html\jfs.jhi'.
+Before generating, add the module-file 'doc\runA.jhc' to the
+jhi-file 'html\jfs.jhi'. Write generated HTML files to the directory 'html'.
+Link all HTML files to the style sheet 'c:\ssheets\hsheet.css':
+<PRE>
+	  jhlp -hi doc\runA -s c:\ssheets\hsheet.css html\jfs
+</PRE>
+
+!head jhlp_jfs_opts jhlp options "Calling JHLP from JFS"
+!if !UNIX
+To invoke JHLP from the program JFS, shift the main window to option mode (by pressing
+the button 'Options'), select 'Jhlp' in the object-tree, and press the 'Runtool' button.
+<P>
+!dtab jhlp_jfs_options "JHLP Arguments"
+!tab jhlp_jfs_options -o
+Write help-system to
+!etc
+Write the generated HTML code to a single HTML file formatted for
+printing.
+!etab
+!tab jhlp_jfs_options -h
+Write only subsystem
+!etc
+Convert only one chapter (with sub-chapters) to HTML. Convert the chapter
+defined by the specified header-name.
+To find the header-name of a chapter: web-browse to the chapter, and
+ note the name of the HTML file. The header-name is equal to the
+HTML filename without path and extension.
+<BR>Example: the header-name of the chapter about the compiler JFC, found in the
+HTML file 'c:\programs\jfs2\jfc.htm', is 'jfc'.
+!etab
+!tab jhlp_jfs_options -hi
+Add new jhc-file
+!etc
+Add a new module to the jhlp-system before generating the HTML files. The new
+module is defined by the specified jhc-file.
+!etab
+!tab jhlp_jfs_options -s
+Use style-sheet-file
+!etc
+Link all generated HTML files to the specified style-sheet-file.
+!etab
+!tab jhlp_jfs_options -An
+Allocate nodes
+!etc
+Allocate the specified number of memory-nodes to temporary data
+(default is 10000).
+!etab
+!tab jhlp_jfs_options -Am
+Allocate K to tmp
+!etc
+Allocate the specified amount of memory (in Kilobytes) to temporary
+data (default is 200).
+!etab
+!tab jhlp_jfs_options -e
+Write errors to
+!etc
+Write error messages to the specified file instead of writing them to stdout.
+!etab
+!tab jhlp_jfs_options -so
+Redirect stdout to
+!etc
+Write messages (like "compiling .." etc) to the specified file instead of
+writing them to standard output.
+!etab
+!tab jhlp_jfs_options -a
+Append to stdout
+!etc
+Append stdout-messages to the file specified in 'Redirect stdout to'
+(instead of overwriting it).
+!etab
+!tab jhlp_jfs_options -w
+Wait for return
+!etc
+Wait for the user to press the return key before exiting the program.
+!etab
+!tab jhlp_jfs_options -c
+Copy image-files to dest-dir
+!etc
+Copy image-files to destination directory instead of creating links
+to them.
+!etab
+<P>
+
+!endif
+!if UNIX
+!head jhlp_ex01 jhlp_options example_1 "Printing part of the documentation"
+!else
+!head jhlp_ex01 jhlp_jfs_opts example_1 "Printing part of the documentation"
+!endif
+
+!ind "Documentation, printing"
+<P>
+A step-by-step guide to print the documentation to JHLP:
+<P>
+!if !UNIX
+Start the program JFS.
+!endif
+The first step is to find the header-name for the documentation about JHLP:
+!if !UNIX
+Select 'Contens' in the help-menu to open a web-browser on the documentation.
+!else
+Start a web-browser. Open the contens-page of the jfs-documentation
+( <jfshome>/doc/html/contens.htm),
+!endif
+ jump to the contens-page, and jump to the page about JHLP
+('JHLP: the documentation creater' under 'programs', 'Miscellaneous programs').
+The header name is the filename of the web page without path and extension. In
+this case the header-name is 'jhlp' (the full file name is something like
+!if UNIX
+ '<jfshome>/doc/html/jhlp.htm').
+<P>
+from the jfs-home-directory run:
+<PRE>
+     bin/jhlp  -o /tmp/jhlptmp.htm  -h jhlp  doc/html/jhlp.jhi
+</PRE>
+!else
+'c:\program files\jfs2\html\jhlp.htm').
+<P>
+Switch to the program JFS. Change the main window to option mode by pressing
+the button 'Options'. Select 'Jhlp' in the object-tree.
+<P>
+Change the following parameters:
+<UL>
+<LI>Set 'write only subsystem' to 'jhlp' (the header-name).
+<LI>Set 'Write help-system to' to the name of a temporary
+file with the extension '.htm', for example, 'c:\temp\jhlptmp.htm' (assuming
+a directory with the name 'c:\temp 'exists on the machine).
+</UL>
+<P>
+Press the button 'RunTool'. The JHLP program is executed. Press the return key
+to return to JFS.
+<P>
+!endif
+Switch to the web browser. Open the file
+!if UNIX
+  '/tmp/jhlptmp.htm'
+!else
+ 'c:\temp\jhlptmp.htm'.
+!endif
+Print the page. Delete the temporary file jhlptmp.htm.
+
+!if UNIX
+!head jhlp_ex02 jhlp_options example_2 "Regenerating the documentation in another style"
+!else
+!head jhlp_ex02 jhlp_jfs_opts example_2 "Regenerating the documentation in another style"
+!endif
+
+!ind "Stylesheet, use in documentation"
+!ind "Documentation, recreate with stylesheet"
+<P>
+A step-by-step guide to regenerate the documentation using a style sheet:
+<P>
+!if UNIX
+If the stylesheet-file is <jfsdir>/doc/sstyle.css, then from <jfsdir> run:
+<PRE>
+    bin/jhlp -s doc/jhlp/sstyle.css  doc/html/jfs.jhi
+</PRE>
+!else
+Start the program JFS. Change the main window to option mode by pressing
+the 'Options' button. Select 'Jhlp' in the object tree.
+<P>
+Change the following parameter: 'Use style-sheet file'. Enter or select the
+filename of a cascading style sheet file. A sample style sheet
+file is 'JFSDIR\doc\sstyle.css' (where JFSDIR is the directory in which jfs is
+installed).
+<P>
+Press the 'RunTool' button. The JHLP program is executed. Press the return key
+to return to JFS.
+!endif
+<P>
+All HTML pages in the documentation now uses the selected style sheet.
+
+!if UNIX
+!head jhlp_ex03 jhlp_options example_3 "Adding a note to the documentation"
+!else
+!head jhlp_ex03 jhlp_jfs_opts example_3 "Adding a note to the documentation"
+!endif
+
+!ind "Note, add to documentation"
+!ind "Documentation, add note"
+A step-by-step guide to add a note to the documentation about JHLP:
+<P>
+First write the note and save it as a text file (extension '.txt') or a HTML file.
+<P>
+The first step is to find the header-name for the documentation about JHLP:
+!if UNIX
+Start a web-browser. Open the jfs-contens-file ('<jfsdir>/doc/html/contens.htm'),
+!else
+Start the program JFS. Select 'Contens' in the help menu to open a web browser
+on the documentation. jump to the contens page,
+!endif
+and jump to the page about JHLP
+('JHLP: the documentation creater' under 'programs', 'Miscellaneous programs').
+The header name is the filename of the web page without path and extension. In
+this case the header name is 'jhlp' (the full filename is something like
+!if UNIX
+'<jfsdir>/doc/html/jhlp.htm').
+!else
+'c:\program files\jfs2\html\jhlp.htm').
+!endif
+<P>
+Use a text editor like Notepad to edit the file
+!if UNIX
+ '<jfsdir>/doc/html/jfs.jhn'
+!else
+ '<jfsdir>\doc\jfs.jhn'
+(where <jfsdir> is the directory in which the jfs-system is installed).
+!endif
+Add a line of the form:
+<PRE>
+      <header-name> "<note-text>" "<note-file-name>"
+</PRE>
+In this case it could be a line like:
+<PRE>
+!if UNIX
+      jhlp "Note about JHLP" "/home/notes/jhlpnot01.htm"
+!else
+      jhlp "Note about JHLP" "c:\notes\jhlpnot01.htm"
+!endif
+</PRE>
+Save the changed file.
+<P>
+!if UNIX
+  From <jfsdir> run:
+<PRE>
+     bin/jhlp doc/html/jfs.jhi
+</PRE>
+!else
+Switch to the program JFS. Change the main window to option mode by pressing
+the 'Options' button. Select 'Jhlp' in the object tree.
+<P>
+Press the 'RunTool' button. The JHLP program is executed. Press the return key
+to return to JFS.
+<P>
+!endif
+A link to the file 'c:\notes\jhlpnot01.htm' is now added to the page 'JHLP: the
+documentation creater'. It is placed in the notes section with the text: 'Note
+about JHLP".
+

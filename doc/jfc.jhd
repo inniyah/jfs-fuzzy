@@ -1,0 +1,191 @@
+!head jfc prog_bas jfc "JFC: the compiler"
+
+!ind JFC
+!ind "Compiler"
+JFC is the Jfs system's compiler. It does a two-step compilation, (i) from
+source code (jfs-file) to windows code (jfw-file), and (ii) from windows code
+to run code (jfr-file). Both steps are optional.
+<P>
+!if !UNIX
+The compiler can be run either from (a) the program JFS  or (b) a
+command line (DOS-prompt).
+
+!head jfc_commandline jfc commandline "Running JFC from the command line"
+!endif
+
+To invoke jfc from the command line, type 'jfc',
+and follow it with a set of command line arguments. The command
+ line format is:
+<PRE>
+       jfc {<option>} <filename>
+</PRE>
+jfc compiles the program <filename>. If called without options,
+the source code file <filename> (if no extension is specified, the
+extension '.jfs' is added) is compiled to the run-code file
+<filename>.jfr.
+<P>For example:
+<PRE>
+	jfc car
+	jfc a:\clock.txt
+</PRE>
+<UL><LI>
+The first example compiles the file 'car.jfs', writing output to the file
+'car.jfr'.
+<LI>The second example compiles the file 'a:\clock.txt', writing output
+to the file 'a:\clock.jfr'.
+</UL>
+<P>JFC recognizes the following options:
+<P>
+!dtab jfc_options "JFC Options"
+!tab jfc_options -m
+-m <cm>
+!etc
+Compilation mode. <cm> is one of {'sr', 'sw', 'wr', 'swr'}
+<UL>
+<LI> 'sr' means: source code to run code
+<LI> 'sw' means: source code to windows code
+<LI> 'wr' means: windows code to run code
+<LI> 'swr' means: source code to windows code followed by windows code to run code
+</UL>
+Default is 'sr'.
+!etab
+!tab jfc_options -s
+-s
+!etc
+Silent.
+<BR>
+Don't write messages (like 'compiling ..', etc.)  to standard output.
+!etab
+!tab jfc_options -e
+-e <errfile>
+!etc
+Write error messages to the file <errfile>.
+!etab
+!tab jfc_options -so
+-so <fileout>
+!etc
+Write messages (like 'compiling ..', etc.) to the file <fileout> instead of
+writing them to standard output.
+!etab
+!tab jfc_options -em
+-em <m>
+!etc
+Error message mode.
+<BR>
+<m> is one of {'s', 'c'}.
+<UL>
+<LI>
+ <m>='s' (the default): error-messages are written in standard form.
+<LI>
+ <m>='c': error messages are written in compact format.
+</UL>
+ A compact error message is a single line of the form:
+<BR>
+ <type>#<errno>#<lineno>#<errtext>
+<BR>
+where <type> is 'WARNING', 'ERROR' or 'FATAL'.
+<BR>
+For example:
+ERROR#130#18#Unknown_keyword:operator
+!etab
+!tab jfc_options -o
+-o <filename>
+!etc
+Write output to the file <filename>.
+<BR>
+If <filename> has no extension, '.jfr' or '.jfw' is added (depending
+on the compile mode).
+!etab
+!tab jfc_options -mt
+-mt <tc>
+!etc
+ <tc> specifies the maximal number of characters in a statement.
+The default is 1024.
+!etab
+!tab jfc_options -mw
+-mw <wc>
+!etc
+ <wc> is maximal number of tokens (words) in a statement. The
+default is 256.
+!etab
+!tab jfc_options -ms
+-ms <ss>
+!etc
+ <ss> is the size of the expression stack. The default is 100.
+!etab
+!tab jfc_options -w
+-w <m>
+!etc
+Wait for user to press the return key before exiting the program.
+<UL>
+<LI>
+ <m>='y':yes
+<LI>
+ <m>='n':don't wait (default)
+<LI>
+ <m>='e':wait if errors in compilation.
+</UL>
+!etab
+<p>
+<STRONG>Examples:</STRONG>
+<PRE>
+	  jfc -e x.err -o x car
+</PRE>
+compiles the source code file 'car.jfs' to a run code file. The destination
+file is 'x.jfr'. Error messages are written to 'x.err'.
+<PRE>
+	  jfc -m sw -s -em c -mt 1000 car
+</PRE>
+compiles the file 'car.jfc' to a windows code file. Output is written to
+'car.jfw'.
+Error messages are written in compact form, and no compiler messages are
+written to screen. The maximum number of characters in a sentence is 1000.
+<PRE>
+         jfc -m swr car
+</PRE>
+first compiles the source code file 'car.jfs' to windows code file 'car.jfw',
+and then compiles the windows code file to the run code file 'car.jfr'.
+
+!head jfc_from_jfr jfc from_jfs "Running JFC from JFS"
+!if !UNIX
+The compiler is called when the 'Compile' button is pressed,
+when the 'Run' button is pressed, and when a source code file is loaded.
+The following options can be changed:
+<P>
+
+!dtab jfc_jfr_options "jfc Options"
+!tab jfc_jfr_options -mt
+Max chars
+!etc
+Specifies the maximal number of characters in a statement.
+<BR>
+The default is 1024.
+!etab
+!tab jfc_jfr_options -mw
+Max words
+!etc
+Specifies the maximal number of tokens (words) in a statement.
+<BR>The default is 256.
+!etab
+!tab jfc_jfr_options -ms
+Stack-size
+!etc
+Specifies the size of the expression stack.
+<BR>The default is 64.
+!etab
+!endif
+!head jfc_changes jfc changes "Changes in JFC version 2"
+<P>
+!li intro_changes jfc
+!ref jfc_changes "Changes in JFC"
+!eli
+The most important change is that JFC now is a two-step compiler. First it
+compiles from source code (jfs-file) to windows code (jfw-file) and then
+from windows code to run code (jfr-file). To suppress one of the steps use
+the '-m' option.
+<P>
+To get error messages in compact form now use the '-em'-option ('-k' option
+in version 1).
+<P>
+JFC no longer support compiling to C source code (the '-c' option in version 1).
+

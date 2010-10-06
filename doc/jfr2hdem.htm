@@ -1,0 +1,531 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN">
+<HTML>
+
+<HEAD><TITLE>JFR2HTM demo</TITLE>
+
+       <LINK REL=STYLESHEET TYPE=TEXT/CSS HREF="jfr2hcss.css">
+<!-- JFS BEGIN -->
+<!--  -->
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+var glw; var rmw; var h 
+var x = new Array(1)
+var y = new Array(1)
+var excl = new Array(1)
+var t_stdout = "";
+var t_alert = "";
+var t_area2 = "";
+
+var v0; var c0; var cs0; var v1; var c1; var cs1; var v2; var c2; var cs2; var v3; var c3; var cs3; 
+var v4; var c4; var cs4; var v5; var c5; var cs5; var v6; var c6; var cs6; 
+var v7; var c7; var cs7; var v8; var c8; var cs8; var v9; var c9; var cs9; 
+var v10; var c10; var cs10; var v11; var c11; var cs11; var v12; var c12; var cs12; 
+var v13; var c13; var cs13; var v14; var c14; var cs14; var v15; var c15; var cs15; 
+var v16; var c16; var cs16; var v17; var c17; var cs17; var v18; var c18; var cs18; 
+var v19; var c19; var cs19; 
+var f0; var f1; var f2; var f3; var f4; var f5; 
+var f6; var f7; var f8; var f9; var f10; 
+var f11; var f12; var f13; var f14; var f15; 
+var f16; var f17; var f18; var f19; var f20; 
+var f21; var f22; var f23; var f24; var f25; 
+
+aar17 = new Array("Red",
+"Green",
+"Blue")
+aar18 = new Array("Red",
+"Green",
+"Blue")
+var sw = new Array()
+ var rw = new Array()
+function rmm(v, mi, ma)
+{var r = v;
+ if (r < mi) r = mi;
+ if (r > ma) r = ma;
+ return r
+}
+function rmin(v,mi)
+{ if (v<mi) return mi
+  else return v}
+function rmax(v,ma)
+{ if (v>ma) return ma
+  else return v}
+function cut(a,v)
+{ if (a<v) return 0.0
+  else return a}
+function r01(v)
+{ return rmm(v,0.0,1.0)}
+function fround(v) {
+var r=(Math.round(v*10000.0))/10000.0;
+return r;
+}
+function h0(v) {var a=r01(v); return (1.0-a)};
+function o0(x,y) { var a=r01(x);
+var b=r01(y);var r;r=a*b;
+return r};
+function o1(x,y) { var a=r01(x);
+var b=r01(y);var r;r=a*b;
+return r};
+function o2(x,y) { var a=r01(x);
+var b=r01(y);var r;if (a<b) r=a
+ else r=b;
+return r};
+function o3(x,y) { var a=r01(x);
+var b=r01(y);var r;if (a>b) r=a
+ else r=b;
+return r};
+function o4(x,y) { var a=r01(x);
+var b=r01(y);var r;r=a*b;
+return r};
+function d12(a,b) {var r=0.0
+ if (a>b) r=1.0;return r};
+function vr0() {}
+function vr1() {v1=rmm(v1,0.0,100.0)}
+function vr2() {var res=1.0; var bdist=Math.abs(v2-1.0);
+if (Math.abs(v2-2.0)<bdist) {res=2.0; bdist=Math.abs(v2-2.0)}
+if (Math.abs(v2-3.0)<bdist) {res=3.0; bdist=Math.abs(v2-3.0)}
+v2=res;}
+function vr3() {var res=1.0; var bdist=Math.abs(v3-1.0);
+if (Math.abs(v3-2.0)<bdist) {res=2.0; bdist=Math.abs(v3-2.0)}
+if (Math.abs(v3-3.0)<bdist) {res=3.0; bdist=Math.abs(v3-3.0)}
+v3=res;}
+function vr4() {var res=1.0; var bdist=Math.abs(v4-1.0);
+if (Math.abs(v4-2.0)<bdist) {res=2.0; bdist=Math.abs(v4-2.0)}
+if (Math.abs(v4-3.0)<bdist) {res=3.0; bdist=Math.abs(v4-3.0)}
+v4=res;}
+function vr5() {var res=0.0; var bdist=Math.abs(v5-0.0);
+if (Math.abs(v5-1.0)<bdist) {res=1.0; bdist=Math.abs(v5-1.0)}
+v5=res;}
+function vr6() {}
+function vr7() {v7=rmm(v7,0.0,100.0)}
+function vr8() {v8=rmm(v8,0.0,100.0)}
+function vr9() {}
+function vr10() {}
+function vr11() {}
+function vr12() {var res=1.0; var bdist=Math.abs(v12-1.0);
+if (Math.abs(v12-2.0)<bdist) {res=2.0; bdist=Math.abs(v12-2.0)}
+if (Math.abs(v12-3.0)<bdist) {res=3.0; bdist=Math.abs(v12-3.0)}
+v12=res;}
+function vr13() {var res=1.0; var bdist=Math.abs(v13-1.0);
+if (Math.abs(v13-2.0)<bdist) {res=2.0; bdist=Math.abs(v13-2.0)}
+if (Math.abs(v13-3.0)<bdist) {res=3.0; bdist=Math.abs(v13-3.0)}
+v13=res;}
+function vr14() {var res=1.0; var bdist=Math.abs(v14-1.0);
+if (Math.abs(v14-2.0)<bdist) {res=2.0; bdist=Math.abs(v14-2.0)}
+if (Math.abs(v14-3.0)<bdist) {res=3.0; bdist=Math.abs(v14-3.0)}
+v14=res;}
+function vr15() {}
+function vr16() {v16=rmm(v16,0.0,100.0)}
+function vr17() {var res=1.0; var bdist=Math.abs(v17-1.0);
+if (Math.abs(v17-2.0)<bdist) {res=2.0; bdist=Math.abs(v17-2.0)}
+if (Math.abs(v17-3.0)<bdist) {res=3.0; bdist=Math.abs(v17-3.0)}
+v17=res;}
+function vr18() {var res=1.0; var bdist=Math.abs(v18-1.0);
+if (Math.abs(v18-2.0)<bdist) {res=2.0; bdist=Math.abs(v18-2.0)}
+if (Math.abs(v18-3.0)<bdist) {res=3.0; bdist=Math.abs(v18-3.0)}
+v18=res;}
+function vr19() {}
+function v2id17() {var t; var r;
+  t=0;r=Math.abs(v17-1.0);
+  if (Math.abs(v17-2.0)<r) {t=1;r=Math.abs(v17-2.0);}
+  if (Math.abs(v17-3.0)<r) {t=2;r=Math.abs(v17-3.0);}
+  return t;
+};
+
+function v2id18() {var t; var r;
+  t=0;r=Math.abs(v18-1.0);
+  if (Math.abs(v18-2.0)<r) {t=1;r=Math.abs(v18-2.0);}
+  if (Math.abs(v18-3.0)<r) {t=2;r=Math.abs(v18-3.0);}
+  return t;
+};
+
+function vget(vno)
+{if (vno==0) return v15;
+if (vno==1) return v16;
+if (vno==2) return v17;
+if (vno==3) return v18;
+if (vno==4) return v19;
+}
+function vvget(vno)
+{if (vno==0) return c15;
+if (vno==1) return c16;
+if (vno==2) return c17;
+if (vno==3) return c18;
+if (vno==4) return c19;
+}
+function vput(vno, v, c)
+{if (vno==0) { v0=v;vr0();
+c0=r01(c);}
+if (vno==1) { v1=v;vr1();
+c1=r01(c);}
+if (vno==2) { v2=v;vr2();
+c2=r01(c);}
+if (vno==3) { v3=v;vr3();
+c3=r01(c);}
+if (vno==4) { v4=v;vr4();
+c4=r01(c);}
+if (vno==5) { v5=v;vr5();
+c5=r01(c);}
+if (vno==6) { v6=v;vr6();
+c6=r01(c);}
+if (vno==7) { v7=v;vr7();
+c7=r01(c);}
+if (vno==8) { v8=v;vr8();
+c8=r01(c);}
+if (vno==9) { v9=v;vr9();
+c9=r01(c);}
+if (vno==10) { v10=v;vr10();
+c10=r01(c);}
+if (vno==11) { v11=v;vr11();
+c11=r01(c);}
+if (vno==12) { v12=v;vr12();
+c12=r01(c);}
+if (vno==13) { v13=v;vr13();
+c13=r01(c);}
+if (vno==14) { v14=v;vr14();
+c14=r01(c);}
+}
+function init()
+{v0=0.0;c0=1.0;cs0=0.0;
+
+v1=50.0;c1=1.0;cs1=0.0;
+
+v2=0.0;c2=1.0;cs2=0.0;
+f0=0.0;f1=0.0;f2=0.0;
+v3=0.0;c3=1.0;cs3=0.0;
+f3=0.0;f4=0.0;f5=0.0;
+v4=0.0;c4=1.0;cs4=0.0;
+f6=0.0;f7=0.0;f8=0.0;
+v5=0.0;c5=1.0;cs5=0.0;
+f9=0.0;f10=0.0;
+v6=0.0;c6=1.0;cs6=0.0;
+
+v7=20.0;c7=1.0;cs7=0.0;
+
+v8=50.0;c8=1.0;cs8=0.0;
+
+v9=10.0;c9=1.0;cs9=0.0;
+
+v10=20.0;c10=1.0;cs10=0.0;
+
+v11=0.0;c11=1.0;cs11=0.0;
+
+v12=1.0;c12=1.0;cs12=0.0;
+f11=0.0;f12=0.0;f13=0.0;
+v13=2.0;c13=1.0;cs13=0.0;
+f14=0.0;f15=0.0;f16=0.0;
+v14=3.0;c14=1.0;cs14=0.0;
+f17=0.0;f18=0.0;f19=0.0;
+v15=0.0;c15=0.0;cs15=0.0;
+
+v16=0.0;c16=0.0;cs16=0.0;
+
+v17=0.0;c17=0.0;cs17=0.0;
+f20=0.0;f21=0.0;f22=0.0;
+v18=0.0;c18=0.0;cs18=0.0;
+f23=0.0;f24=0.0;f25=0.0;
+v19=0.0;c19=0.0;cs19=0.0;
+
+t_area2 = "";
+t_stdout = "";
+t_aalert = "";
+glw=1.0;rmw=1.0;
+}
+function run()
+{var t; var r
+
+rmw=glw;glw=r01(glw*(1.0));
+if (glw!=0.0) { }
+ glw=rmw;
+rmw=glw;glw=r01(glw*(1.0));
+if (glw!=0.0) { }
+ glw=rmw;
+rw[0]=glw;
+sw[0]=0.0;
+glw=(d12(v9,v10));sw[0]+=glw;glw=o0(rw[0],glw);
+rmw=glw;glw=r01(glw*(1.0));
+if (glw!=0.0) { t_alert="";
+t_alert += "Interval ERROR.\n"  + fround(v9) + " > "  + fround(v10);
+alert(t_alert);
+}
+ glw=rmw;
+glw=o0(rw[0],Math.max(0.0,1.0-sw[0]));
+rmw=glw;glw=r01(glw*(1.0));
+if (glw!=0.0) { h=v16; r=v1;
+v16=r;c16=glw;vr16();}
+glw=rmw;
+rmw=glw;glw=r01(o1(glw,0.6)*(1.0));
+if (glw!=0.0) { h=v17; r=v2;
+v17=r;c17=glw;vr17();}
+glw=rmw;
+rmw=glw;glw=r01(glw*(1.0));
+if (glw!=0.0) { h=v18; r=v2;
+v18=r;c18=glw;vr18();}
+glw=rmw;
+rmw=glw;glw=r01(glw*(1.0));
+if (glw!=0.0) { t_stdout +=  "This textarea is the unnamed textarea.\n" ;
+}
+ glw=rmw;
+rmw=glw;glw=r01(glw*(1.0));
+if (glw!=0.0) { t_stdout +=  "The text is written with the printf command.\n" ;
+}
+ glw=rmw;
+rmw=glw;glw=r01(glw*(1.0));
+if (glw!=0.0) { t_stdout += "from value: "  + fround(v9) + ", to value: "  + fround(v10) +  ".\n" ;
+}
+ glw=rmw;
+rmw=glw;glw=r01(glw*(1.0));
+if (glw!=0.0) { t_stdout += "Adjective output: "  + aar17[v2id17()] + ". Confidence "  + fround(c17*1.0) +  ".\n" ;
+}
+ glw=rmw;
+rmw=glw;glw=r01(glw*(1.0));
+if (glw!=0.0) { t_area2 +=  "This is written to the second textarea" ;
+}
+ glw=rmw;
+rmw=glw;glw=r01(glw*(1.0));
+if (glw!=0.0) { t_area2 +=  " with the fprintf command." ;
+}
+ glw=rmw;
+glw=rw[0];
+}
+function whichRadio(radioBtn)
+{ for (var i=0; i < radioBtn.length; i++)
+  {  if (radioBtn[i].checked)
+        return i
+  }
+  return "none"
+}
+function vhelp8() {var vcom="";
+vcom+="This is the comment to variable. The range and\n";
+vcom+="the text to the confidence field depends on \n";
+vcom+="JFR2HTM options. If this is run from the help-system\n";
+vcom+="the cofidence is entered as a percent.\n";
+alert(vcom);
+}
+function vhelp10() {var vcom="";
+vcom+="To input fields on the same line.\n";
+vcom+="If the program is calculated with\n";
+vcom+="a 'From'-value greater than the\n";
+vcom+=" 'To'-value an error-message is shown\n";
+vcom+="in an alert.\n";
+alert(vcom);
+}
+function vhelp17() {var vcom="";
+vcom+="Adjective and confidence output.\n";
+vcom+="Note the confidence output is the\n";
+vcom+="domain variable's confidence. Not\n";
+vcom+="always the same as the value of the \n";
+vcom+="fuzzy variable.\n";
+alert(vcom);
+}
+function f_validate(elem, minval, maxval)
+{ var res = 0;
+  if (isNaN(elem.value))
+  { res = 1
+  }
+  else
+  { if (elem.value != rmm(elem.value, minval, maxval))
+    { res = 2;
+    }
+  }
+  return res;
+}
+function validate(elem, minval, maxval)
+{ var res = f_validate(elem, minval, maxval);
+  if (res == 1)
+  { window.alert(elem.name+"="+elem.value+" is not a legal number");
+    elem.select();
+    elem.focus();
+  };
+  if (res == 2)
+  { window.alert("Invalid "+elem.name+". Value out of range: "+
+       minval+"<="+elem.name+"<="+maxval);
+    elem.select()
+    elem.focus()
+  }
+  clr_output();
+  return res;
+}
+function tot_validate()
+{ var r=0;
+ return r;
+}
+function clr_output()
+{
+document.jfs.op_num.value="";
+document.jfs.op_adj.value="";
+document.jfs.conf_op_adj.value="";
+document.jfs.op_pulldown.options[3].selected=true;
+document.jfs.stdout.value="";
+document.jfs.area2.value="";
+}
+function form2var() {
+v1=parseFloat(document.jfs.ip_num.value);c1=1.0;cs1=0.0;
+v2=parseFloat(document.jfs.ip_pulldown.options[document.jfs.ip_pulldown.selectedIndex].value);c2=1.0;cs2=0.0;
+v3=parseFloat(document.jfs.ip_radio[whichRadio(document.jfs.ip_radio)].value);c3=1.0;cs3=0.0;
+v4=parseFloat(document.jfs.ip_radio_m[whichRadio(document.jfs.ip_radio_m)].value);c4=1.0;cs4=0.0;
+v5=parseFloat(document.jfs.ip_checkbox.value);c5=1.0;cs5=0.0;
+v7=parseFloat(document.jfs.ip_com.value);c7=1.0;cs7=0.0;
+v8=parseFloat(document.jfs.ip_help.value);c8=parseFloat(document.jfs.conf_ip_help.value) / 1.0;cs8=0.0;
+v9=parseFloat(document.jfs.ip_from.value);c9=1.0;cs9=0.0;
+v10=parseFloat(document.jfs.ip_to.value);c10=1.0;cs10=0.0;
+v12=parseFloat(document.jfs.ip_color_1[whichRadio(document.jfs.ip_color_1)].value);c12=1.0;cs12=0.0;
+v13=parseFloat(document.jfs.ip_color_2[whichRadio(document.jfs.ip_color_2)].value);c13=1.0;cs13=0.0;
+v14=parseFloat(document.jfs.ip_color_3[whichRadio(document.jfs.ip_color_3)].value);c14=1.0;cs14=0.0;
+}
+function var2form()
+{var t;
+document.jfs.op_num.value=fround(v16);
+document.jfs.op_adj.value=aar17[v2id17()];
+document.jfs.conf_op_adj.value=fround(c17*1.0);
+t=v2id18();
+document.jfs.op_pulldown.options[t].selected=true;
+document.jfs.stdout.value = t_stdout;
+document.jfs.area2.value = t_area2;
+};
+function jfr() {
+  if (tot_validate()!=0)
+    return 1;
+  init();
+  form2var();
+  run();
+  var2form();
+};
+
+// -->
+</SCRIPT>
+<!-- JFS END -->
+</HEAD>
+
+<BODY>
+<H1>JFR2HTM demo</H1>
+
+<DIV CLASS="jfr2htm_comment">This program dosn't do anything useful. Its purpose is to 
+ demonstrate the different input/output-formats in JFR2HTM.
+ It was generated from this <A HREF="jfr2hdem.txt">source code</A> 
+  (source code is also in the samples directory with the 
+ name 'jfr2hdem.jfs').</DIV>
+<!-- JFS BEGIN -->
+<DIV CLASS="jfr2htm_form">
+<FORM NAME="jfs">
+<DIV CLASS="ip_block"><DIV CLASS="o_fieldset"><FIELDSET><SPAN CLASS="label_legend"><LEGEND>Fieldset 0</LEGEND></SPAN><DIV CLASS="i_fieldset"><DIV CLASS="fs_0"><DIV CLASS="label_fieldset">The first block shows the different field types.
+Note this block-comment is created by using the
+label_comment flag of a hidden variable.</DIV>
+<PRE>
+<SPAN CLASS="label_left">Numeric input (%):     </SPAN><INPUT TYPE="text" NAME="ip_num" SIZE = 16  VALUE=50.0
+onChange="validate(document.jfs.ip_num, 0.0, 100.0);">
+<SPAN CLASS="label_left">Pulldown list color:   </SPAN><SELECT name="ip_pulldown" SIZE=1 onChange="clr_output()">
+<OPTION selected value="1.0">Red
+<OPTION value="2.0">Green
+<OPTION value="3.0">Blue
+</SELECT>
+<SPAN CLASS="label_left">Radio box color:       </SPAN> <INPUT TYPE="radio" NAME="ip_radio" checked  onChange="clr_output();" value="1.0"> <SPAN CLASS="label_radio">Red</SPAN> <INPUT TYPE="radio" NAME="ip_radio"  onChange="clr_output();" value="2.0"> <SPAN CLASS="label_radio">Green</SPAN> <INPUT TYPE="radio" NAME="ip_radio"  onChange="clr_output();" value="3.0"> <SPAN CLASS="label_radio">Blue</SPAN>
+<SPAN CLASS="label_left">Radio buttons vertical:</SPAN>
+ <INPUT TYPE="radio" NAME="ip_radio_m" checked  onChange="clr_output();" value="1.0"> <SPAN CLASS="label_radio">Red</SPAN>
+ <INPUT TYPE="radio" NAME="ip_radio_m"  onChange="clr_output();" value="2.0"> <SPAN CLASS="label_radio">Green</SPAN>
+ <INPUT TYPE="radio" NAME="ip_radio_m"  onChange="clr_output();" value="3.0"> <SPAN CLASS="label_radio">Blue</SPAN>
+<SPAN CLASS="label_left">Checkbox (checked=yes):</SPAN><INPUT TYPE= "checkbox" NAME="ip_checkbox" onChange="clr_output();"  onClick="(this.checked) ? this.value='1.0': this.value = '0.0'">
+</PRE></DIV></DIV></FIELDSET></DIV>
+<DIV CLASS="o_fieldset"><DIV CLASS="i_fieldset"><DIV CLASS="fs_1"><DIV CLASS="label_fieldset">Block 1 (no HTML fieldset). This block shows the use of argument-flags
+to modify the input/output-fields.</DIV>
+<DIV CLASS="table_mcl"><TABLE>
+<TBODY>
+<TR><TD>
+<SPAN CLASS="label_table">The label to this field is taken
+from the variables comment and not from
+its text. Percent:</SPAN></TD><TD>
+<INPUT TYPE="text" NAME="ip_com" SIZE = 16  VALUE=20.0
+onChange="validate(document.jfs.ip_com, 0.0, 100.0);">
+</TD>
+</TR>
+<TR><TD>
+<SPAN CLASS="label_table">Percent:</SPAN></TD><TD>
+<INPUT TYPE="text" NAME="ip_help" SIZE = 16  VALUE=50.0
+onChange="validate(document.jfs.ip_help, 0.0, 100.0);"></TD><TD><SPAN CLASS="label_table"> Conf. </SPAN></TD><TD><INPUT TYPE="text" NAME="conf_ip_help" SIZE = 16  VALUE=1.0
+onChange="validate(document.jfs.conf_ip_help, 0, 1.0);"></TD><TD> <INPUT TYPE="button" value="Help" TABINDEX=-1 onClick="vhelp8();">
+</TD>
+</TR>
+<TR><TD>
+<SPAN CLASS="label_table">From:</SPAN></TD><TD>
+<INPUT TYPE="text" NAME="ip_from" SIZE = 16  VALUE=10.0
+onChange="validate(document.jfs.ip_from, document.jfs.ip_from.value, document.jfs.ip_from.value);"> </TD>
+
+<TD>
+<SPAN CLASS="label_table">To:</SPAN></TD><TD>
+<INPUT TYPE="text" NAME="ip_to" SIZE = 16  VALUE=20.0
+onChange="validate(document.jfs.ip_to, document.jfs.ip_to.value, document.jfs.ip_to.value);"></TD><TD> <INPUT TYPE="button" value="Help" TABINDEX=-1 onClick="vhelp10();">
+</TD>
+</TR>
+</TBODY></TABLE></DIV>
+</DIV></DIV></DIV>
+<DIV CLASS="o_fieldset"><FIELDSET><SPAN CLASS="label_legend"><LEGEND>Field set 2</LEGEND></SPAN><DIV CLASS="i_fieldset"><DIV CLASS="fs_2"><DIV CLASS="label_fieldset">This blocks shows how labels are placed in table-header if
+all variables uses radio buttons and comes from the same
+domain.</DIV>
+<DIV CLASS="table_mclhead"><TABLE>
+<THEAD><TR><TH></TH><TH>Red</TH><TH>Green</TH><TH>Blue</TH></TR></THEAD>
+<TBODY>
+<TR><TD>
+<SPAN CLASS="label_table">Color 1:</SPAN></TD><TD>
+ <INPUT TYPE="radio" NAME="ip_color_1" checked  onChange="clr_output();" value="1.0"></TD><TD> <INPUT TYPE="radio" NAME="ip_color_1"  onChange="clr_output();" value="2.0"></TD><TD> <INPUT TYPE="radio" NAME="ip_color_1"  onChange="clr_output();" value="3.0">
+</TD>
+</TR>
+<TR><TD>
+<SPAN CLASS="label_table">Color 2:</SPAN></TD><TD>
+ <INPUT TYPE="radio" NAME="ip_color_2" checked  onChange="clr_output();" value="1.0"></TD><TD> <INPUT TYPE="radio" NAME="ip_color_2"  onChange="clr_output();" value="2.0"></TD><TD> <INPUT TYPE="radio" NAME="ip_color_2"  onChange="clr_output();" value="3.0">
+</TD>
+</TR>
+<TR><TD>
+<SPAN CLASS="label_table">Color 3:</SPAN></TD><TD>
+ <INPUT TYPE="radio" NAME="ip_color_3" checked  onChange="clr_output();" value="1.0"></TD><TD> <INPUT TYPE="radio" NAME="ip_color_3"  onChange="clr_output();" value="2.0"></TD><TD> <INPUT TYPE="radio" NAME="ip_color_3"  onChange="clr_output();" value="3.0">
+</TD>
+</TR>
+</TBODY></TABLE></DIV>
+</DIV></DIV></FIELDSET></DIV>
+</DIV><DIV CLASS="button_block"><INPUT TYPE="button"
+value="         Calculate         "
+onClick="jfr();"><INPUT TYPE="RESET" VALUE="Reset">
+</DIV><DIV CLASS="op_block"><DIV CLASS="o_fieldset"><FIELDSET><SPAN CLASS="label_legend"><LEGEND>Field set 3</LEGEND></SPAN><DIV CLASS="i_fieldset"><DIV CLASS="fs_3"><DIV CLASS="label_fieldset">The output block shows the different output formats.</DIV>
+<DIV CLASS="table_mcl"><TABLE><TBODY>
+<TR><TD>
+<SPAN CLASS="label_table">Numeric output:</SPAN></TD><TD>
+<INPUT TYPE="text" NAME="op_num" SIZE = 16  READONLY>
+</TD>
+</TR>
+<TR><TD>
+<SPAN CLASS="label_table">Adjective output:</SPAN></TD><TD>
+<INPUT TYPE="text" NAME="op_adj" SIZE = 16  READONLY></TD><TD><SPAN CLASS="label_table"> Conf. </SPAN></TD><TD><INPUT TYPE="text" NAME="conf_op_adj" SIZE = 16  READONLY></TD><TD> <INPUT TYPE="button" value="Help" TABINDEX=-1 onClick="vhelp17();">
+</TD>
+</TR>
+<TR><TD>
+<SPAN CLASS="label_table">Pull down output:</SPAN></TD><TD>
+<SELECT name="op_pulldown" SIZE=1>
+<OPTION value="1.0">Red
+<OPTION value="2.0">Green
+<OPTION value="3.0">Blue
+<OPTION selected value = "0">
+</SELECT>
+</TD>
+</TR>
+</TBODY></TABLE></DIV>
+</DIV></DIV></FIELDSET></DIV>
+<DIV CLASS="o_fieldset"><FIELDSET><SPAN CLASS="label_legend"><LEGEND>Field set 4</LEGEND></SPAN><DIV CLASS="i_fieldset"><DIV CLASS="fs_4"><DIV CLASS="label_fieldset">The last output fieldset shows the use of text areas. </DIV>
+<DIV CLASS="table_mcl"><TABLE><TBODY>
+<TR><TD>
+<SPAN CLASS="label_table">first textarea</SPAN>
+</TD><TD>
+<TEXTAREA NAME="stdout" COLS=70 ROWS=5 READONLY>
+</TEXTAREA>
+</TD></TR>
+<TR><TD>
+<SPAN CLASS="label_table">Second textarea</SPAN>
+</TD><TD>
+<TEXTAREA NAME="area2" COLS=40 ROWS=3 READONLY>
+</TEXTAREA>
+</TD></TR>
+</TBODY></TABLE></DIV>
+</DIV></DIV></FIELDSET></DIV>
+</DIV>
+</FORM>
+</DIV>
+<!-- JFS END -->
+</BODY>
+</HTML>

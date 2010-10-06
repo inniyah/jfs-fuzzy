@@ -1,0 +1,56 @@
+!head jfrw prog_run jfrw "JFRW: run jfs-programs from Windows"
+!if !UNIX
+!ind "JFRW"
+!ind "Running from windows"
+The program JFRW is used to run compiled jfs-programs. It has
+a standard Windows interface (unlike JFR). JFRW can only read
+data from keyboard and write results to the screen.
+<P>
+The screen is split into an input section and an output section.
+Between the two section is a Run button and an exit button.
+When the run button is clicked, the loaded jfs-program
+is executed taking input from the input section and writing output
+to the output section.
+<P>
+JFRW has two menus: (a) a file menu and (b) a help menu. The file menu
+has two commands 'load' and 'exit'. The load command opens a
+standard file-open dialog used to load jfr-files. The exit command
+exits JFRW.
+<P>
+The help menu has three commands 'Row help', 'contens' and 'about jfrw'.
+<BR>&bull; <STRONG>Row help</STRONG>:
+gives help for the selected variable in the input section. The help message is build from
+(a) the comment to the variable, and (b) domain information about
+the variable (min-value and max-value).
+<BR>&bull; <STRONG>contens:</STRONG>
+displays the title comment in the jfs-program or opens a help file. A help file
+is opened if JFRW was called with a help file in the command-line (see below).
+<BR>&bull; <STRONG>about jfrw:</STRONG>
+displays version and copyright text for JFRW.
+<P>
+The command-line call of JFRW is:
+<PRE>
+jfrw [[<help-file-name>] <jfr-file-name>]
+</PRE>
+where <jfr-file-name> is the filename of a compiled jfs-program.
+<BR>&bull;
+If a filename is specified JFRW runs this jfs-program.
+<BR>&bull;
+If no filename is specified JFRW starts with an empty screen.
+<BR>&bull;
+If <help-file-name> is specified, then that file is opened when the menu command
+ help|contens is executed. How the file is opened depends on its
+extension (.hlp opens winhelp, .htm opens a web browser and so on).
+
+!head jfrw_changes jfrw changes "Changes in JFRW version 2"
+
+<H4>Changes in JFRW version 2.1.0.0</H4>
+<P>
+<UL>
+<LI>
+A bug, which resulted in wrong result if run with default-input, is fixed.
+<LI>
+A bug in the execution of return-statements is fixed.
+</UL>
+
+!endif

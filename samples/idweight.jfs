@@ -1,0 +1,24 @@
+
+title "Ideal weight";
+/*Calculate a persons ideal weigth.*/
+
+domains
+    Sexes categorical;
+    Metres "m.";
+    Kilograms "Kilo";
+
+input
+    sex "Sex" Sexes defuz avg;
+    height "Height" Metres defuz avg default 1.8;
+
+output
+    weight "Weight" Kilograms defuz avg;
+
+adjectives
+    sex female 0;
+    sex male 1;
+
+program
+
+  if sex is male then weight = 22.0 * height * height;
+  if sex is female then weight = 20.8 * height * height;

@@ -1,0 +1,780 @@
+!head jfs NULL jfs JFS
+
+<H2>A freeware fuzzy system</H2>
+<H3>Jan E. Mortensen  <CODE> (jemor@inet.uni2.dk)</CODE></H3>
+<HR>
+This manual (a collection of HTML documents) contains the
+documentation for JFS and its associated suite of programs/tools.
+It describes the JFL programming language and the development environment
+in which one can write jfs-programs. The manual can be read in ordinary
+manner with a suitable browser.
+!if !UNIX
+It is also used as a rather primitive context-sensitive
+help system. If one clicks a help button (or pressed F1) from the
+Windows interface, ones default browser is launched and aimed at the relevant
+HTML document.
+!endif
+<P>
+The manual should is be readable by anybody with basic understanding about programming.
+<P>
+!ind "manual overview"
+The manual is divided into four main sections: Introduction, Getting started,
+Language manual and Programs. The introduction gives an overview
+of the jfs-system and important information about notation and navigation in
+the manual. The section titled 'getting started' provides a brief and informal
+introduction to JFL , fuzzy logic (as it is used in jfs)
+!if !UNIX
+, and a step-by-step guide to writing a jfs-program using the Windows interface.
+!else
+.
+!endif
+The 'language manual' section describes Jfl in detail. The
+ 'programs' section describes the development environment and the
+available tools/programs (vix., the compiler, run-programs, conversion tools,
+learning tools and so forth).
+<P>
+!if !UNIX
+The manual is dynamic in the sense that when new tools are added to the jfs suite
+the manual is automatically updated (new chapters are added, indexes and tables are
+updated, etc).
+!endif
+
+!head intro jfs introduction "Introduction"
+
+!head started jfs getting-started "Getting started"
+
+This chapter gives an informal introduction to the jfs programming language (JFL)
+!if !UNIX
+.
+!else
+, and a step-by-step guide to writing and running a jfs-program using the
+JFS Windows interface.
+!endif
+
+!head tutorial jfs tutorial "Tutorials"
+!head JFL jfs language "Language manual"
+!head programs jfs programs "Programs"
+
+This chapter describes all the programs available in the jfs-system.
+!if !UNIX
+This includes the development environment program JFS and the various
+programs/tools which can be executed from JFS (most of the tools are console
+programs. They can alternatively be executed from a Command line (Dos-prompt)
+ or via batch files). The chapter describes not only programs installed together with
+the basic JFS package, but also programs that can be installed at a later time.
+!endif
+There are two types of programs: command line programs and programs with a
+graphical user interface. The programs with a graphical user interface
+only exists in the Windows-version of Jfs. The command line programs are
+executed from the gui-program JFS, from a script file, or from the command line.
+They use a syntax with Unix-like options. For example:
+<PRE>
+   jfr -D io -l log.txt -w -c bicycle
+</PRE>
+The option format differ from 'standard' Unix-options in two ways. Options
+cannot be combined (the jfs-programs uses multi letter options), and
+options and there arguments has to be separated by a space. The example
+above CANNOT be rewritten as:
+<PRE>
+  jfr -Dio -llog.txt -wc bicycle   !!WRONG!!
+</PRE>
+Summary information about a program's options is returned if the program is
+called without arguments.
+
+!head prog_input programs fileInput "Input from ascii file"
+<P>
+Some of the run tools and most of the learning tools reads input to jfs-programs
+from ascii files. An ascii file contains data sets. Each dataset contains values
+to input variables and in some cases expected values for output variables. Example
+
+<PRE>
+male 1.80
+female 2.04
+female 1.6
+</PRE>
+
+The example can be used as input to a run tool (for example JFR) when running the
+'ideal weight' program (
+!ref started_plan "ideal weight program"
+). The example contains 3 data sets. If JFR is run with this input, it will produce
+the output:
+<PRE>
+INPUT 1, file: id.dat
+  Sex            male
+  Height (m.)         1.800
+OUTPUT
+  Weight (Kilo)      71.280
+
+INPUT 2, file: id.dat
+  Sex            female
+  Height (m.)         2.040
+OUTPUT
+  Weight (Kilo)      86.561
+
+INPUT 3, file: id.dat
+  Sex            female
+  Height (m.)         1.600
+OUTPUT
+  Weight (Kilo)      53.248
+</PRE>
+
+Each dataset contains values for variables in the same order as the variables are
+defined in the jfs-program. Values are separated by spaces (or tabs, or carriage returns)
+or by a character defined by the user. Values can be placed in quotes ("").
+Within quotes separator-characters are ignored. There are no special dataset separator.
+A new data set starts when the appropriate number of values have been read.
+<P>
+A value is one of:
+<UL>
+<LI>A floating-point number without exponential notation (by default both '.' and
+ ',' are uses as decimal separators).
+<LI>The name of an adjective bound to the actual variable (the numeric value of
+an adjective is the adjective's center value).
+<LI>The character '?', meaning unknown or undefined. Typically '?' is replaced
+with the default value of the given variable with lowered confidence (can be changed
+by options).
+</UL>
+It is possible to add a confidence values to numeric values with the
+notation: <value>:<confidence>, but in the current version of Jfs, most tools
+ignore the confidence value.
+<P>
+The character '#' starts a comment. All characters from '#' to the end of the line
+are ignored.
+<P>
+It is possible to specify an extra identifier-value to each data set. Some tools
+can write the identifier to output. Other tools ignores the identifier. An example
+of a data file with comments and identifiers:
+<PRE>
+#Data to ideal weight program
+#Dataformat:
+#identifier sex height(metres)
+
+"Jan Mortensen"     male    1.78
+"Ingrid"          female ?  # height unknown
+"Jane Doe"     female   1.6
+</PRE>
+
+It is possible for the data sets to contain both values to input variables
+and values to output variables (called expected values).
+When a jfs-program is run with data from such a file, it calculates output
+from the input values and compares the calculated output values with the output
+values from the data file. The difference between the calculated and expected
+are used or reported to the user (see next chapter for details). Example:
+
+<PRE>
+#Data to ideal weight program
+#Dataset format: identifier, 2 input values, 1 expected values
+#Dataformat:
+#identifier         sex   height  idweight
+
+"Jan Mortensen"     male    1.78    65.00
+"Ingrid"            female 2.04     90
+"Jane Doe"          female    1.6   55
+</PRE>
+
+It is possible to specify the order of the blocks in data sets, for example
+'input before expected' or 'expected before input before identifier' (when
+called from a command line tool the order is specified by the order of
+letters in an option argument. For example 'ie' means input before expected,
+ 'eit' means expected before input before identifier).
+<P>
+Some of the tools allow an alternative data set format, where the values
+don't have to be in the order of the variables in the jfs-program. In this
+format the order of the variables are determined by the order of the values in the
+first line in the data file. For example:
+<PRE>
+Name<K>            sex     age  height  idweight
+
+"Ingrid"            female 17  2.04     90
+"Jan Mortensen"     male    40  1.78    65.00
+"Jane Doe"          female ?    1.6   55
+</PRE>
+
+The tokens in the first line specifies the order of the input and (maybe)
+output variables in the data sets in the rest of the file. If a token in the
+first line does not match the name of a domain variable, the corresponding
+values in the data sets are ignored (in the example 'age' and 'Name<K>' are
+tokens of this type).
+<P>
+A value ending with <K> is recognized as an identifier for the data set ('Name<K>'
+in the example).
+
+!head err_measures prog_input ErrorMeasure "Error calculation"
+<P>
+If a jfs-program is run from a run-tool or learning tool reading data
+from an ascii file containing input and expected output values, the
+jfs-program is run ones for each data set. For each calculation the
+calculated output values are compared with the expected values. Depending
+on the tool some statistical information describing the difference
+between the calculated and expected for the hole data file is reported
+to the user or (in some learning tools) used by the tool. Some tools also
+report differences between calculated and expected for each data set.
+<P>
+The simplest way of calculating the difference is for each output variable
+in each data set to calculate the absolute value of the expected value
+minus the calculated value (i.e., abs(expected - calculate)). The difference
+for the data set is the sum of difference of the output values (most jfs-programs
+has only a single output value, in which case the difference for the
+data set is the same as the difference for the output value). The difference
+between the expected and calculated for the data file is calculated as the
+sum of the difference for each data set. For example, if the ideal-weight program is
+run with the data file:
+<PRE>
+#sex     height  idweight
+
+female  2.04     90
+male    1.78    65.00
+female   1.60     78
+</PRE>
+the calculated output for the three data sets are: 86.56, 69.71, and 56.32. The
+difference between calculated and expected is calculated as:
+<BR>
+abs(90 - 86.56) + abs(65 - 69.71) + abs(78 - 56.32) = 3.44 + 4.71 + 21.68 = 29.83
+<P>
+Most tools can use variants of this process. The final result can be divided
+with the number of data sets to give the average difference (9.94 in the example).
+The differences between expected values and output values can be squared before
+they are summed (in the example the squared sum is 503,98) or the differences
+can be rounded to values between zero and one.
+<P>
+Some tools can round the expected values and calculated values to closest
+adjective (i.e., the numeric value is replaced with the name of the adjective, whose
+center value is closest to the numeric value) and report the number of differences
+between the adjective values. (No rounding if the output variables are categorical.)
+<P>
+If a jfs-program has a single categorical output variable, the difference
+between expected and calculated for each data set can be calculated by a
+penalty-matrix, i.e. a table giving the difference value for each possible
+combination of expected and calculated value. The table below shows an
+example penalty-matrix used to classify mushrooms:
+<P>
+<TABLE BORDER>
+<TBODY>
+<TR>
+<TD>
+</TD>
+<TD ALIGN=CENTER>
+CALCULATED
+</TD>
+</TR>
+<TR>
+<TD>
+EXPECTED
+</TD>
+<TD>
+
+<TABLE RULES=ALL>
+<TBODY>
+<TR>
+<TD>
+</TD>
+<TD>
+Delicious
+</TD>
+<TD>
+Neutral
+</TD>
+<TD>
+Poisonous
+</TD>
+</TR>
+<TR>
+<TD>
+Delicious
+</TD>
+<TD>
+0.00
+</TD>
+<TD>
+5.00
+</TD>
+<TD>
+5.00
+</TD>
+</TR>
+<TR>
+<TD>
+Neutral
+</TD>
+<TD>
+2.00
+</TD>
+<TD>
+0.00
+</TD>
+<TD>
+1.00
+</TD>
+</TR>
+<TR>
+<TD>
+Poisonous
+</TD>
+<TD>
+200.0
+</TD>
+<TD>
+100.0
+</TD>
+<TD>
+0.0
+</TD>
+</TR>
+</TBODY>
+</TABLE>
+
+</TD>
+</TR>
+</TBODY>
+</TABLE>
+<P>
+For example, if a jfs-program classifies a delicious mushroom as poisonous,
+the score for the data set is 5.00. If the jfs-program classifies a poisonous
+mushroom as delicious, the penalty-score is  200.0.
+<P>
+The difference between calculated and expected for the data file is the sum
+of the penalty-values.
+<P>
+To use a penalty-matrix in a jfs-program, the matrix is specified in
+a ascii file with three fields for each value: <calculated> <expected> <penalty>.
+The penalty-matrix above can be specified in a file with the content:
+
+<PRE>
+# calculated expected penalty
+  Delicious  Delicious  0.0
+  Delicious  Neutral    2.0
+  Delicious  Poisonous  200.0
+  Neutral    Delicious  5.0
+  Neutral    Neutral    0.0
+  Neutral    Poisonous  100.0
+  Poisonous  Delicious  5.0
+  Poisonous  Neutral    1.0
+  Poisonous  Poisonous  0.0
+</PRE>
+<P>
+A few shortcuts in the penalty-files are allowed:
+<DL>
+<LI>If no value is specified for an given calculated/expected-combination
+the penalty value is 0.0.
+<LI>The character '!' (or '-') in front of a adjective name means 'not'. For
+example '-Poisonous Poisonous 100.0' returns a value of 100 for all data sets
+with expected equal to 'Poisonous' and calculated different from 'Poisonous'.
+</DL>
+!head prog_bas programs basicPrograms "Basic programs"
+
+!if !UNIX
+This chapter describes the development-environment program JFS and the
+basic tools (installed together with JFS): JFC (the compiler), JFR (the
+basic run-program) and JFR2S (the inverse compiler).
+!else
+This chapter describes the jfs-system's basic tools: JFC (the compiler),
+JFR (the basic run-program) and JFR2S (the inverse compiler).
+!endif
+
+!head prog_run programs runPrograms "Alternative run-programs"
+
+!ind "Running jfs-programs"
+The alternative run-programs are programs used to run jfs-programs.
+This category of programs includes alternatives to JFR: programs which load
+and run compiled jfs-programs, and programs which converts jfs-programs to
+other programming languages.
+
+!if !runa
+!if !UNIX
+!ind "JFRW, runnings jfs-program with windows interface"
+!ind "JFRL200.DLL, running from other languages"
+!ind "Visual Basic, running from"
+!endif
+!ind "JFR2HTM, convert to html (java script)"
+!ind "Java script, converting to"
+!ind "C-source, converting to"
+<P>
+The 'RunA'-collection of programs contains alternative run-programs:
+JFRW is a windows-alternative to JFR. It is used to load and run compiled
+jfs-programs using a windows-interface.
+!include runa_desc
+!text runa_desc 2.01
+JFRW can only read input from the keyboard, and write output to the screen.
+!etext
+JFR2HTM is a conversion-tool. It converts a compiled jfs-program to Javascript.
+The Javascript-program is either placed in a separate file or included in a
+html-file. The html-file is created with input/output form-fields and buttons to
+run the program. An example of a html-file created with JFR2HTM is found at
+<A HREF="http://inet.uni2.dk/~jemor/ngolf.htm">EXTERN Golf-example</A>.
+The third run-program JFRL200.DLL is a dll-library to load and run
+compiled jfs-programs from Visual Basic and other programming languages with
+the ability to execute DLL files. The last program in the RunA-collection is
+JFR2C. It is another conversion-tool. It converts a compiled jfs-program to
+source-code in ansi-C.
+<P>
+The RunA-tools are not installed on this computer. To install them first download
+the tools from:
+<A HREF="http://inet.uni2.dk/~jemor/download.htm">EXTERN download jfs-tools</A>.
+After download, unzip the jfsruna-file to a temporary
+directory, run the install-program, and finally run 'install tools' from the
+program JFS (installing the programs in the tools-menu and updating the
+documentation).
+<P>
+!endif
+
+!head learn programs learn "Learning tools"
+!ind "learning tools"
+
+In this manual a
+<STRONG>learning tool</STRONG>
+ means a program, which changes a compiled jfs-program.
+
+!head learn_ex learn learn-example "Learning from example-data"
+!head learn_methods learn learn-methods "Learning methods"
+!if "!learna"
+!ind "learnA-module"
+!ind "learning tools, download"
+!ind JFI
+!ind JFRD
+!ind JFID3
+!ind JFFAM
+!ind JFGP
+!ind "Wang-Mendel method"
+!ind "Genetic programming"
+!ind "Evolutionary algorithm"
+!ind "Cellular automat"
+The 'learnA'-collection of programs contains programs, which all uses
+ascii-files of example input-values and correct output-values to
+improve jfs-programs. The collection includes the programs JFI, JFRD, JFID3,
+JFFAM, JFEA and JFGP.
+JFI is a program improver. It uses an evolutionary algorithm to change
+constants (typical used to change the shape of fuzzification-functions
+or the weight-values of 'ifw'-statements).
+JFRD, JFID3, JFFAM all uses the Wang-Mendel algorithm to create rules of
+the type 'if {<var> is <adjectiv> {and <var> is <adj>} then <var> is <ajd>;'.
+The rules are inserted directly into the program (JFRD) or reduced/expanded
+before they are inserted. JFID3 reduces (by the
+ID3-algorithm) the rules to a fuzzy decision-tree. JFRD can reduce the
+rules by generalization. JFFAM expands the rules to a complete FAM using a
+cellular automat. JFEA inserts statements of the type
+ 'if <var> between <adj> and <adj> {and <var> between <adj> and <adj>} then
+ <var> is <adj>;'. The statements are created by an evolutionary algorithm.
+The program JFGP uses genetic programming to insert statements. The expressions
+in the statements can include operators (both user-defined and predefined),
+hedges, relations and functions.
+<P>
+The learnA-collection isn't installed on this computer. To install the
+collection first download it from:
+<A HREF="http://inet.uni2.dk/~jemor/download.htm">EXTERN download jfs-tools</A>.
+After download, unzip the downloaded-file to a temporary
+directory, run 'install' from this directory, and finally run 'install tools' from the
+program JFS (installing the programs in the tools-menu and updating the
+documentation).
+<P>
+!endif
+
+!head misc_programs programs misc_programs "Miscellaneous programs"
+
+The JHLP-program is the tool used to convert this manual to html-pages.
+<P>
+!ind "JFPLOT, plot of adjectives, operators etc"
+!ind "plot adjectives etc"
+!ind "GNUPLOT, with JFPLOT"
+The jdoc-collection of programs contains the programs JFPLOT and JFRPLT.
+The programs are
+used together with the freeware program GNUPLOT, to get plots of a
+compiled jfs-program's output-function, hedges, relations,
+operators, fuzzification functions and defuzzification functions.
+<P>
+!if "!jdoc"
+The jdoc-collection isn't installed on this computer. To install the
+collection first download it from:
+<A HREF="http://inet.uni2.dk/~jemor/download.htm">EXTERN download jfs-tools</A>.
+After download, unzip the downloaded-file to a temporary
+directory, run 'install' from this directory, and finally run 'install tools' from the
+program JFS (installing the programs in the tools-menu and updating the
+documentation).
+<P>
+!endif
+
+!head source jfs source "Source code"
+!if "!source1"
+!ind "source code"
+!ind "source code, download"
+The source code files contains 3 libraries jfr_lib, jfg_lib, jfp_lip used
+to run, get information about and change a compiled jfs-program. The source
+code files also includes complete (but undocumented) source code to JFC, JFR2S,
+JFR, JFI, JFRD, JFID3, JFEA, JFGP, JFR2HTM, JFPLOT and JHLP. All source code
+are written in Ansi C (but only checked on Borland's C++builder 3 and the Linux
+C-compiler GCC).
+<P>
+The source code files are not installed on this computer. To install them,
+first download 'source code' from:
+<A HREF="http://inet.uni2.dk/~jemor/download.htm">EXTERN download jfs-tools</A>.
+After download, unzip the jfsso-file to a temporary
+directory, run the install-program, and finally run 'install tools' from the
+program JFS (to update the documentation).
+<P>
+!endif
+!head appendixes jfs appendixes Appendixes
+!head ap_more appendixes books "Books and Internet resources"
+!ind "Books"
+!ind "Online Resources"
+<P>
+<B>References</B>
+<P>
+!lab cox1
+ [Cox1]: Earl Cox, Michael O'Hagan, Lotfi Zadeh:
+The fuzzy system handbook
+Paperback - 750 pages (October 1998)
+Academic Press Inc; ISBN: 0121944557
+
+<P>
+!lab cox2
+ [Cox2]: Earl Cox: Fuzzy logic for business and industry.
+Paperback (October 1995)
+Charles River Media; ISBN: 1886801010
+
+<P>
+!lab mich
+ [Mich]: Zbigniew Michaelewicz: Genetic algorithms + data structure =
+evolution programs.
+Hardcover - 387 pages (30 March, 1996)
+Springer-Verlag Berlin and Heidelberg GmbH & Co. KG; ISBN: 3540606769
+<P>
+<HR>
+<P>
+<B>Online resources</B>
+<P>
+<A HREF="http://inet.uni2.dk/~jemor/jfs.htm">Jfs Homepage</A>
+<P>
+Questions and comments about Jfs can be send to:
+<A HREF="MAILTO:jemor@inet.uni2.dk">jemor@inet.uni2.dk</A>
+<BR>
+<P>
+Other resources about fuzzy logic can be found at:
+<P>
+<A HREF="http://lslwww.epfl.ch/~penha/ci_bkmrks.html">Computational intelligence bookmarks for
+Carlos Andres Pena Reyes
+</A>
+<BR>
+<A HREF="http://www.ecf.utoronto.ca/~bruno/fzlnk.html">Bruno Di Stefano's Fuzzy Logic Links</A>
+<BR>
+<A HREF="http://www.dbai.tuwien.ac.at/marchives/archives.html">Fuzzy logic mail-archive</A>
+<BR>
+<P>
+Searches about genetic programming and evolutionary algorithms can start here:
+<A href="http://www.geneticprogramming.com/">the genetic programming notebook</A>
+<P>
+Newsgroups about fuzzy logic and evolutionary algorithms:
+<PRE>
+      comp.ai.fuzzy
+      comp.ai.genetic
+</PRE>
+!lab uci
+A large collection of data sets can be found at:
+<A HREF="http://www.ics.uci.edu/~mlearn/MLRepository.html">UCI machine learning Repository
+</A>
+<P>
+!ind "GNUPLOT homepage"
+The
+<B>Gnuplot</B> function drawing program can be downloaded from:
+<A HREF="http://www.gnuplot.org/">Gnuplot-homepage</A>.
+
+!head ap_dif appendixes differences "Differences between Jfl and other fuzzy systems"
+
+!ind "Differences between Jfs and other fuzzy systems"
+!ind "Fuzzy systems, and Jfl"
+<P>
+There are several differences between Jfl and traditional
+fuzzy systems:
+
+!dlist ap_dif
+!li ap_dif 1
+Jfl is a procedural language. Statements are executed sequentially.
+It has no support for 'fire the rules in parrallel'.
+!eli
+!li ap_dif 2
+Jfl doesn't use fuzzy sets. Instead it uses fuzzy values, fuzzification
+functions, and defuzzification functions. A fuzzy value is the same as
+the membership value
+in traditional fuzzy systems. the method used in Jfl is something between
+full fuzzy sets and singleton fuzzy sets.
+!eli
+!li ap_dif 3
+Jfl does not use the strict structure of traditional fuzzy systems: numerical input,
+fuzzificate, fuzzy rules, defuzzificate, numeric output. Instead Jfl allows
+free use of numeric and fuzzy variables in the program. Fuzzification and
+defuzzification is done when needed.
+!eli
+<P>
+Traditional fuzzy controllers be simulated with Jfs, but there might
+be small differences in output.
+The fuzzification process and the calculation of membership values from
+the rule base will give the same results in Jfl and traditional (Mandami-like)
+fuzzy systems. It is the defuzzification process that can evoke
+differences. The centroid defuzzification method in Jfl is not equal
+to a true "center of gravity" of the composite fuzzy set. The centroid method
+Centroid in Jfl uses an average of center values weighted with the area
+of symmetric triangles. The Jfl method is equal to the method Bart Kosko
+recommended as an improvement of the "center of gravity" method. In most
+cases,  differences between the two methods are small due to the
+symmetric structure of the fuzzy output sets used in most practical
+fuzzy systems.
+
+
+!head ap_examples appendixes examples "Example Jfs-programs"
+<P>
+!ind "Sample jfs-programs"
+!ind "Example jfs-programs"
+The following demonstration applications are included with Jfs. Although
+they might have little practical value, they help one learn about fuzzy
+systems and the alternative ways of using Jfs.
+!if UNIX
+  <jfsdir>/samples. All samples are in jfs-format (extension: '.jfs').
+!else
+  <jfsdir>\samples. All samples are in jfw-format (extension '.jfw').
+!endif
+<P>
+!dlist samp_progs
+!li samp_progs bicycle
+<B>BICYCLE</B>
+ The bicycle-stopping fuzzy associative memory (FAM) used in:
+!ref started_first
+!eli
+!li samp_progs truck
+<B>TRUCK</B>
+ The "backing up a truck" problem introduced by Bart Kosko,
+and used in many textbooks about fuzzy logic. The
+program is a FAM that uses
+<B>plf</B>s to define the fuzzification functions.
+!eli
+!li samp_progs etruck
+<B>ETRUCK</B>
+This is the same program as TRUCK.JFW, but it is placed within a
+primitive simulator. The simulator uses a
+<B>while</B> loop and <B>extern</B> statements
+to print the trucks movement.
+!eli
+!li samp_progs golf
+<B>GOLF</B>
+ Another classic that was introduced by Quinland: Is the weather acceptable for
+playing golf?. The program shows how the solution can be implemented
+as a fuzzy decision tree using
+<B>switch/case</B> statements.
+!eli
+!li samp_progs hello
+<B>HELLO</B>
+ The "hello world" program, which simply
+<I>must</I> be included with all programming languages.
+!eli
+!li samp_progs idweight
+<B>IDWEIGHT</B>
+ The "calculate ideal weight" program refereed to in:
+!ref started_plan
+!eli
+!li samp_progs price
+<B>PRICE</B>
+This program suggest the retail price for an item, calculated from its cost
+and customer statistics. The program uses free-form rules mixing
+fuzzy variables and domain variables.
+!eli
+
+!head ad_error_codes appendixes errorcodes "Error-codes"
+!head ad_registry appendixes registry "Entries in the registry"
+!if !UNIX
+!ind "Registry, entries in"
+!ind "Notepad, replacement"
+!ind "Backup file, JFS"
+
+<P>
+Values are inserted into the registry when Jfs is first installed, and
+when expansion-modules to Jfs are added. The values are placed in:
+<PRE>
+HKEY_LOCAL_MACHINE\SOFTWARE\Jfs\2.x
+</PRE>
+The values are: installation-directory, and version-number for the installed
+module. They should only be changed if Jfs is moved to another
+directory. (In that case the ascii-file: 'jfs.jhi' in <HTMLDIR> has to be
+changed to).
+<P>
+Several other values in the registry can be inserted/changed:
+<P>
+!dtab registry "Values in registry"
+!tab registry headers
+<STRONG>Name</STRONG>
+!etc
+<STRONG>Default value</STRONG>
+!etc
+<STRONG>Used by</STRONG>
+!etc
+<STRONG>Explanation</STRONG>
+!etab
+!tab registry Notepad
+Notepad
+!etc
+notepad.exe
+!etc
+JFS
+!etc
+The value of 'Notepad' is the filename of a text editor to replace the
+default editor launched from the 'Edit File' window in the program JFS.
+For example:
+<CODE>C:\Program Files\BetterNotePad.exe</CODE>.
+!etab
+!tab registry JFS_backup
+JFS_backup
+!etc
+no
+!etc
+JFS
+!etc
+Possible values are "no" and "yes". If "yes", then the program JFS
+saves old versions of jfs-files and jfw-files with the extensions
+ '.~fs' and '.~fw'.
+!etab
+!tab registry JFS_memory
+JFS_memory
+!etc
+60
+!etc
+JFS
+!etc
+The amount of memory (in kilobytes) used internally by JFS to store
+the definition part of a jfs-program. Programs with a lot of variables
+and adjectives might need more memory.
+!etab
+!tab registry JFS_nodes
+JFS_nodes
+!etc
+3000
+!etc
+JFS
+!etc
+The number of nodes defines how many objects JFS can store internally. A
+higher number of nodes might be needed for jfs-programs with many variables
+and adjectives.
+!etab
+!head ad_uninstal appendixes uninstal "Uninstalling Jfs"
+
+!ind "Uninstalling Jfs"
+!ind "Jfs, uninstalling"
+<P>
+To make a full uninstall of jfs and all installed tools, do the following:
+!dlist uninstall
+!li uninstall jfs
+Run a standard Windows uninstall of the program JFS.EXE.
+!eli
+!if jfrw
+!li uninstall jfrw
+Run a standard windows uninstall of the program  JFRW.EXE.
+!eli
+!li uninstall jfrw_lib
+Delete the file 'jfrl200.dll' from the Windows system directory.
+!eli
+!endif
+!li uninstall programs
+Delete the directory in which jfs was installed and all files and subdirectories
+in this directory.
+!eli
+!li uninstall registry
+In the registry, delete the key 'HKEY_LOCAL_MACHINE\SOFTWARE\Jfs' and all
+subkeys.
+!eli
+<P>
+!endif

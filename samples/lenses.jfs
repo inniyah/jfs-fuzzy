@@ -1,0 +1,44 @@
+
+title "Contact-lenses";
+/* Sample program to be used with JFRD, JFEA, JFID3. 
+ To be used with the database for for fitting contact lenses in 
+ the file 'lenses.dat'.*/
+
+domains
+    age_dom categorical;
+    spect_dom categorical;
+    ast_dom categorical;
+    tear_dom categorical;
+    lens_dom categorical;
+
+input
+    age "Age of patient" age_dom;
+    spect_presc "Spectacle prescription" spect_dom;
+    astigmatic "Astigmatic" ast_dom;
+    tear_rate "Tear production rate" tear_dom;
+
+output
+    lenses "Lenses should be" lens_dom defuz firstmax;
+
+adjectives
+    age_dom young 1;
+    age_dom pre_presbyopic 2;
+    age_dom presbyopic 3;
+
+    spect_dom myope 1;
+    spect_dom hypermetrope 2;
+
+    ast_dom no 1;
+    ast_dom yes 2;
+
+    tear_dom reduced 1;
+    tear_dom normal 2;
+
+    lens_dom hard 1;
+    lens_dom soft 2;
+    lens_dom none 3;
+
+program
+
+    extern jfrd input age spect_presc astigmatic tear_rate    
+               output lenses;

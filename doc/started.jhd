@@ -1,0 +1,982 @@
+!head started_plan started JFL "Introduction to jfs-programs"
+
+!ind "JFL, introduction"
+This chapter gives an informal introduction to the core concepts of JFL. The chapter
+describes JFL as an extension of traditional programming languages like Basic, C, and
+Pascal.
+<P>
+A jfs-program looks much like a program written in a traditional programming language,
+like C or Pascal. It contains the same type of declarations and statements.
+See for example the following jfs-program (source code):
+!ind "JFL-program, sample"
+!ind "Ideal weight, sample-program"
+<PRE>
+title "Ideal weight"; /*Calculate a persons ideal weight */
+
+domains
+    Metres  type float;
+    Kilograms  type float;
+    Sexes  type categorical;
+
+adjectives
+   Sexes is female;
+   Sexes is male;
+
+input
+    sex "Sex"  domain Sexes;
+    height "Height"   domain Metres  default 1.8;
+
+output
+    weight "Weight"  domain Kilograms;
+
+program
+  if sex is male then weight = 22.0 * height * height;
+  if sex is female then weight = 20.8 * height * height;
+</PRE>
+
+This program calculates a person's "ideal" weight based on the persons sex and height.
+<P>
+Domain types are declared in the 'domains' block. There are just three predefined
+types in JFL: 'float', 'integer' and 'categorical'. 'float' and 'integer' are like in
+other languages. A variable of the type 'categorical'
+can take one of a fixed set of values. In the example, variables of the type
+'sexes' can take the value 'male' or 'female'.
+<P>
+The 'adjectives' block defines the possible values for categorical domains.
+<P>The 'input' and 'output' blocks define
+the program's variables (more complicated programs often includes a third
+section 'local', used to define variables that are neither input nor output).
+<P>
+The 'program' block contains
+two 'if' statements (two statements are needed because JFL has
+no 'else' statement).
+<P>
+When the program is executed, it asks the user to input values for 'sex' and
+'height', then the program block is executed and the calculated weight is written as
+output. Say for example sex=male and
+height=1.80 metres, then the ideal weight is calculated as 71.28 Kilograms.
+
+!head started_p_fuzzy started_plan fuzzy-values "Fuzzy values"
+
+!ind "Fuzzy values"
+There is no boolean type in JFL. Instead it uses fuzzy values. A fuzzy value
+is a floating-point number between zero and one (inclusive). zero means false,
+ one means true, and other values means something in between. For example, assume
+a the vertical distance from the floor to the top of a standing person's head
+is 1.90 meters. Assume also that we agree that in context, a person surely is
+not tall at 1.0 meter, but a person surely is tall at 2.0 meters. At 1.9
+meters, the expression 'x is tall'  might have the
+fuzzy value 0.8, where the fuzzy value describes the degree of the persons tallness.
+<P>
+All expressions that would return a boolean values in ordinary programming
+languages return fuzzy values in JFL.
+
+!head started_p_fzvar started_plan fuzzy-vars "Fuzzy variables"
+
+!ind "Domain variable"
+!ind "Fuzzy variable"
+!ind "Variable, domain"
+!ind "Variable, fuzzy"
+JFL allows the specification of
+<STRONG>domain variables</STRONG> and <STRONG>fuzzy variables</STRONG>.
+<P>
+Domain variables are declared in the
+<STRONG>input</STRONG>, <STRONG>output</STRONG> and <STRONG>local</STRONG> sections.
+There are three sorts of domain variables:
+<STRONG>float</STRONG>, <STRONG>integer</STRONG>, and <STRONG>categorical</STRONG>.
+<P>
+Fuzzy variables are declared in the
+<STRONG>adjectives</STRONG> section. They take floating-point values
+between 0.0 and 1.0, and are always
+bound to a domain variable. Ordinarily, several fuzzy variables are bound to one
+domain variable. For example, consider the following part of a jfs-program:
+<PRE>
+domain
+  colortype  type categorical;
+input
+  color  domain colortype;
+adjectives
+  color red;
+  color blue;
+  color green;
+program
+  if color red then x = 27;
+  if
+  .
+  .
+  .
+</PRE>
+
+Four variables are defined: the domain variable "color" and the three fuzzy variables
+ "color red", "color blue", and "color green".
+In the program-statement: "if color red then ...", it is the value of the fuzzy variable
+"color red" that is used in the if-expression,
+<EMP>not</EMP> the value of the domain variable <STRONG>color</STRONG>.
+<P>
+If the domain variable "color" is assigned the value "green" then the values of the fuzzy
+variables bound to "color" are automatically calculated, setting "color red"=0.0,
+ "color blue"=0.0 and "color green"=1.0.
+<P>
+The example might give the false impression that a domain variable and the fuzzy variables
+bound to it are the same as a variable defined on a type definition in Pascal:
+ "type colortype = (red, blue, green); var color:colortype;".
+In the example's if-statement, the expression
+ "color red" refer to the fuzzy variable "color red", not the value of the
+domain variable "color" (in JFL the statement "if color=red then ..." is not
+syntactical correct).
+<P>
+A domain variable, and the fuzzy variables bound to the domain variable,
+represent two different ways of dealing with the same information. When the value of
+a domain variable is changed, the values of all fuzzy variables bound to that
+domain variable are recalculated. On the other hand, when the value of a fuzzy
+variable is changed, the value of the domain variable to which it is bound
+is recalculated.
+<P>
+!lab fuzzification
+!ind Fuzzification fuzzification
+!ind "Fuzzification-function" fuzzification
+The process just described--when a domain variable is assigned a value and
+, the values of all the bound fuzzy variables are calculated-- is called
+<STRONG>fuzzification</STRONG>. If the domain variable is categorical, the
+fuzzification process is straightforward, but if the domain type is "float" or
+ "integer" the process is more complicated. There are several methods to define the
+fuzzification functions. The simplest uses center values to create "triangular"
+fuzzification functions. See the following code fragment
+(part of a sports-selecting program):
+<PRE>
+domain
+  Metres   type float;
+input
+  height  domain Metres   defuz avg;
+adjectives
+  height low    center 1.5;
+  height medium center 1.8;
+  height tall   center 2.0;
+  height xtall  center 2.20;
+program
+  if height is tall then basketball is increased with 5;
+  if height is xtall then basketball is increased with 20;
+</PRE>
+
+A center value is one way of defining the fuzzification function for a
+fuzzy variable. If "height" is assigned the value 2.0 in the example,
+then "height tall" gets the value 1.0 and the other fuzzy variables
+bound to "height" gets the value 0.0. If "height" is assigned a value,
+which is not a center-value (2.05, for example), then several fuzzy variables gets
+none-zero values.
+<BR>
+For each fuzzy variable a fuzzification function is defined from
+its center value. The function is defined as yielding 0.0 if the
+input value is equal to or less than the center value of the fuzzy variable
+defined before it, 1.0 if the value is equal to the center value, 0.0 if
+the value is greater than or equal to the next fuzzy variable's center value,
+and linear between this points. The functions look somewhat like triangles:
+<P>
+<IMG SRC="%%\height.gif" ALT="fuzzification functions">
+<P>
+If "height" is assigned the value 1.95, then "height tall" gets the
+value 0.75, "height medium" gets the value 0.25 and the other fuzzy variables
+bound to "height" get the value 0.0.
+<P>
+There are several alternative methods to define fuzzification-functions, see:
+!ref JFL_decl_fuzz
+ for details.
+<P>
+!lab defuzzification
+!ind defuzzification defuzzification
+When a fuzzy variable is assigned a value, the value of the
+domain variable to which the fuzzy variable is bound is recalculated from all the
+the relevant bound fuzzy variables.
+That process is called
+<STRONG>defuzzification</STRONG>. There are several methods of
+defuzzification. The method is specified as a parameter in the definition of
+the domain variable. The method used in the example above is called "avg",
+and is often used. It calculates the value as the weighted average of the fuzzy
+variables' center values. The weights are the values of the fuzzy variables.
+If, in the example, the fuzzy variables are assigned the values:
+<PRE>
+ 'height short'  = 0.0
+ 'height medium' = 0.3
+ 'height tall'   = 0.5
+ 'height xtall'  = 0.0
+</PRE>
+then the value of "height" is calculated by:
+<PRE>
+      height := (0.0*1.5 + 0.3*1.8 + 0.5*2.0 + 0.0*2.2) / (0.3 + 0.5) = 1.925
+</PRE>
+Detailed description of defuzzification in:
+!ref JFL_decl_defuz
+
+!head started_p_stat started_plan statements "Fuzzy statements"
+
+!ind "If-statement"
+<P>
+The statements most often used in jfs-programs are
+<STRONG>assign</STRONG> statements and
+<STRONG>if</STRONG> statements. Examples:
+<PRE>
+if speed is very low and distance < 10 then brake hard;
+x = 0.5 + cos(y) - sin(y + phi / 2);
+if x > 10 then x = 10;
+</PRE>
+An assign statements is just a special case of an if statement because:
+<PRE>
+ <var> = <expression>;
+</PRE>
+is the same as:
+<PRE>
+ if true then <var> = <expression>;
+</PRE>
+An If-statement in JFL look much like an if statement in other
+programming languages, but it is executed differently. The following
+two chapters describes that difference.
+
+!head started_p_expr started_p_stat expressions "Expressions"
+!ind "Fuzzy logic"
+!ind "Expressions"
+The most common type of if statements in JFL contains one or two expressions:
+<PRE>
+if <expr> then <fuzzy variable>;
+if <expr1> then <var> = <expr2>;
+</PRE>
+Expressions in JFL has a lot in common with expressions in other languages.
+Numeric constants, variables, numeric operators and parentheses are used just
+like in C or Pascal. For example:
+<PRE>
+sprice + 25 * (cprice - 27.17)
+</PRE>
+All operators (and functions) in JFL are floating-point operators. All constants and
+integer variables are converted to float before executing the operators. Fuzzy variables
+are used in expressions just like domain variables. The value of a domain variable of the
+type 'categorical' is also a float (the center value of the fuzzy variable bound to the
+domain variable with the highest value).
+<P>
+JFL includes the usual relational operators:
+<PRE>
+ >   (greater than)
+ >=  (greater than or equal to)
+ <   (less than)
+ <=  (less than or eqaul to)
+ ==  (equal to; alternative: = )
+ !=  (not equal to; alternative: <> )
+</PRE>
+It also includes most of the built-in float-functions in C, including:
+<PRE>
+ cos(), sin(), log(), max(), floor() etc
+</PRE>
+It also contains some more unusual function like 'iif()', 'dnormal()' etc. see
+!ref JFL_prog_expr
+ for details.
+<P>
+All operators and functions are protected. They will return a value
+for all input values instead of stopping a program with an error like:
+ 'division with zero' or 'cannot take sqrroot of negative number'.
+The typical return value for an "illegal" input value is zero.
+<P>
+Here is an example of an expression using built-in-functions:
+<PRE>
+  x + cos(y + 3.14) > max(sin(x), speed low)
+</PRE>
+JFL uses the same logical operators as Pascal, but they are replaced by fuzzy
+variants of the operators. By default the logical operators are defined as:
+<PRE>
+      a and b     :=    min(a, b)
+      a or b      :=    max(a, b)
+      not(a)      :=    1.0 - a
+</PRE>
+The following expression calculates to 0.7:
+<PRE>
+      0.5 or not(0.9 and 0.3)       (= max(0.5, 1.0 - min(0.9, 0.3))  =  0.7)
+</PRE>
+The operators are generalizations of the traditional logical operators in
+the sense that if then the input values are crisp (zero or one), then
+the fuzzy variants and the boolean variants returns the same
+values.
+<P>
+For example: the traditional
+<STRONG>and</STRONG> operator is defined as
+and(1,1) = 1, and(0,0) = and(0,1) = and(1,0) = 0, which is the same as
+min(1,1)=1 and min(0,0)=min(0,1)=min(1,0)=0.
+<P>
+!lab operators
+!ind "Fuzzy operators" operators
+!ind "Operators, fuzzy" operators
+In JFL the logical operators can be redefined and new operators
+can be created. The operators are often redefined as:
+<PRE>
+      a and b    :=  a * b         (prod)
+      a and b    :=  a + b - a * b (psum)
+      not(a)     :=  1.0 - a
+</PRE>
+which is another generalization of the traditional logical operators (based on
+the probability of independent outcome). A lot of other definitions are possible. See
+!ref JFL_decl_ops
+for details.
+<P>
+!lab hedges
+!ind "Hedges" hedges
+In JFL a function which takes a single fuzzy value as input and
+returns a fuzzy values is called a
+<STRONG>hedge</STRONG>. The boolean function 'not'
+is a (predefined) hedge. New hedges can be defined. Often the hedges
+'exactly' (defined using a square function), and 'around'
+(using a square-root function) are defined.
+<P> In expressions hedges can be used as other functions. An alternative
+notation can be used for hedges used on
+fuzzy variables:
+<PRE>
+    <hedge>(<var> <adjectiv>)
+</PRE>
+can be replaced by
+<PRE>
+    <var> <hedge> <adjectiv>
+</PRE>
+The alternative notation is introduced to make expressions more
+like natural language.
+<P>
+Here is an example of an expression using fuzzy operators
+and hedges:
+<PRE>
+     speed is around low and not(distance short or distance medium)
+</PRE>
+There are several other possibilities in expressions.
+These include:
+<UL>
+<LI>user-defined fuzzy relational operators (see
+!ref JFL_decl_rels
+ for details).
+<LI> 'in' functions (e.g., "speed in (low, medium)") (see
+!ref JFL_prog_expr
+ for details).
+<LI> 'between' functions ("speed between low and high" ) (see
+!ref JFL_prog_expr
+ for details).
+</UL>
+
+!head started_p_assign started_p_stat if_statements "If-statements"
+
+!ind "Fuzzy composite operator"
+!ind "Domain composite operator"
+!ind "Increase/decrease statement"
+In this chapter the evaluation of the three most common types of if-statements is
+described.
+<P><STRONG>Type 1</STRONG><P>
+The first type of if-statement has the syntax:
+<PRE>
+if <expression> then <fuzzy variable>;
+</PRE>
+For example:
+<PRE>
+if speed is high and distance close then brake hard;
+</PRE>
+The if-statement is executed in two steps:
+<OL>
+<LI> calculate the value of the expression
+<LI> update the fuzzy variable with the (rounded)
+expression value using the domain variable's composite-fuzzy-operator.
+</OL>
+The composite-fuzzy-operator is a property of every domain variable.
+The value is the name of a fuzzy operator. By default it is
+defined as 'or'.
+<P>
+Assume, in the example above, 'speed high'=0.8, 'distance close'=0.7,
+'brake hard'=0.5, the composite-fuzzy-operator of 'brake' is 'or', and
+default operators ('and'=min, 'or'=max). when the statement
+is executed, first the
+expression 'speed is high and distance close' calculates to
+0.7 (=min(0.8, 0.7)), and then
+ 'brake hard' is updated to 0.7 (=max(0.5, 0.7)).
+<P>
+<STRONG>Type 2</STRONG><P>
+The second type of if-statements is the type found in traditional languages:
+<PRE>
+if <expr_1> then <var> = <expr_2>;
+</PRE>
+The statement is executed in three steps:
+<OL>
+<LI>
+  <expr_1> is calculated
+<LI>
+  <expr_2> are calculated
+<LI>
+the domain variable <var> is updated with the value <of expr_2> using
+the value of <expr_1>, the variables domain-composite-operator, and the
+variable's confidence value.
+</OL>
+The
+<STRONG>domain-composite-operator</STRONG>
+ is a property of every domain variable. It is selected from a fixed list of possible
+functions. The default is 'new'.
+<P>A variable's
+<STRONG>confidence value</STRONG> is a fuzzy value bound to the variable.
+It is changed when the variable is updated by an assignment
+or by fuzzification. Given the example:
+<PRE>
+if speed low then brake = 10.0;
+if speed high then brake = 80;
+</PRE>
+Assume 'speed low'=0.7, 'speed high'=0.2 and confidence value of
+'brake' equal to 0.0 (this is the starting value for output and
+local variables).
+<P>
+If the domain-composite-operator is 'new', then
+execution of the 2 statements is as in other languages. The 'new'-operator
+changes the variable if the if-expression calculates to something greater than 0.0.
+<BR>In the first statement the if-expression ('speed low') is calculated to 0.7,
+so 'brake' is set to 10.0, and the confidence-value for brake is set to 0.7.
+<BR>In the second statement the if-expression calculates to 0.2, so the value of
+brake is set to 80 and the confidence of brake is set to 0.2.
+<P>
+Alternatively, if the domain-composite-operator 'max' is used, the result will be different.
+The 'max' operator only changes value and confidence if the if-expression is greater
+than the confidence value.
+<BR>In the example the first statement is executed like before
+because 0.7>0.0: the value of brake is set to 10 and the confidence of brake is set
+to 0.7.
+<BR>
+The second statement doesn't change anything because the value of the
+if-expression (0.2) is less than the value of brake's confidence (0.7). The value of
+brake after the statement is still 10.
+<P>
+A third possible domain-composite-operator 'avg' will calculate the weighted avg
+of the expression (weighted with the if-expressions). In the example the value of
+brake after the 2 statements is 25.5 ((0.7*10+0.2*80)/(0.7+0.2)).
+<P>See
+!ref JFL_prog_thenva
+for details.
+<P>
+<STRONG>Type 3</STRONG><P>
+A third form of if-statements is the type:
+<PRE>
+if <if-expression> then increase <var> with <inc-expression>;
+</PRE>
+for example:
+<PRE>
+if p is tall then increase score with 20;
+</PRE>
+The value of the variable is increased with <if-expression> multiplied
+with <inc-expression>. Assume 'score'=100 and 'p tall'=0.2. The statement changes the
+value of score to 104 (100 + 0.2*20). See:
+!ref JFL_prog_thenin
+for details.
+
+!head started_p_glw started_plan glweight "The global weight"
+
+!ind "Global weight"
+!ind "Switch-statements"
+!ind "Case-statement"
+!ind "Default-statement"
+!ind "If-then-else in JFL"
+Traditional programming languages includes conditional block-statements (if <e> then
+begin .... end;) and if-then-else statements. JFL includes fuzzy forms of
+block-statements and if-then-else statements, but with a very different syntax.
+<P>
+Fuzzy block statements use the 'global weight'. The global weight is a fuzzy
+value which is multiplied to if-expressions before the then-part of
+if-statements are executed.
+<P>
+The global weight can directly be assigned values using the wset-statement:
+<PRE>
+  wset 0.6;
+  if distance close then brake hard;
+  wset 0.2;
+  if distance close then brake medium;
+  brake lightly;
+</PRE>
+For example, if 'distance close'=0.3, the if-expression in the first if-statement
+calculates to 0.18 (0.6*0.3) and the if-expression in the second if-statement
+calculates to 0.12. In the assign-statement 'brake lightly', the if-expression
+(remember that
+an assignment is a special-case of an if) is calculated to 0.2 (0.2*1.0).
+<P>
+When a JFL-program starts, the global weight is assigned the value 1.0.
+Direct assignment of values to the global weight is rarely done. Instead,
+statements which indirectly change its value are used. The most important
+are the switch-block-statements.
+<P>
+A switch block contains a 'switch' statement followed by other statements, and
+terminates with an 'end' statement.
+Between 'switch' and 'end' all statements can be used, but the
+ 'case' statement is used most frequently. For example:
+<PRE>
+wset 0.8;
+switch:
+  case distance close:
+    if speed high then brake xhard;
+    if speed low then brake normal;
+  case distance medium:
+    brake normal;
+  default:
+    brake off;
+end;
+</PRE>
+
+In the example, long notation for a switch-block, is used.
+A shorter form--more like the C-syntax--could have been used:
+ 'switch distance: case close:...'. The longer notation is more
+general, because all types of expressions can be used in the case statements
+ (the switch block in JFL are more like a cond statement in Lisp than a
+switch statement in C).
+<P>
+The execution of the switch-block differs from
+the switch/case-statements in other languages. There are no jumps! all
+statements are executed sequentially. The jump-effect is achieved by
+changes to the global weight.
+<P>
+Upon execution of a 'switch' statement, the only thing that happens
+is the global weight is remembered. When the corresponding 'end'
+statement is executed the value of the global weight is returned
+to the value it had prior to the switch block. It is the 'case' statements,
+that change the global weight.
+<P>
+A 'case' statement changes the global weight to the value it had when the
+switch statement was executed, multiplied with the value of the
+'case' statement's expression.
+<P>
+A 'default' statement changes the global weight to the value it had when the
+'switch' statement was executed multiplied with: 1.0 minus the sum of all prior case
+expressions in the switch block.
+<P>Look at
+the example and assume 'distance close'=0.3 and 'distance medium'=0.5.
+When the switch statement is executed, the value of the global weight is
+0.8 (set by the 'wset' statement).
+<UL>
+<LI>
+The first case statement changes the global weight to 0.24 (0.8*0.3). This is
+the global-weight-value, which affect the 2 if-statements
+<LI>
+The second case statement changes the global weight to 0.4 (0.8*0.5)
+<LI>
+The default statement changes the value to 0.16 (0.8*(1.0-0.3-0.5))
+<LI>
+The end statement changes the value of the global weight back to 0.8.
+</UL>
+<P>
+A switch block with a single case statement and a default statement:
+<PRE>
+switch:
+  case <expr>:
+    <block-1>
+  default:
+    <block-2>
+end;
+</PRE>
+is JFL's version of the if-then-else-block in traditional languages:
+ 'if <expr> then begin <block-1> end else begin <block-2> end;'.
+
+!head started_p_more started_plan more "Other possibilities"
+<P>
+JFL includes some other possibilities:
+<UL>
+<LI>
+A primitive form of arrays (see:
+!ref JFL_decl_array
+ for details).
+<LI>
+User-defined functions and procedures (see:
+!ref JFL_prog_proced
+ for details).
+<LI>
+A fuzzy-form of a 'while' statement (see:
+!ref JFL_prog_while
+ for details).
+<LI>
+An 'external' statement to call functions outside the jfs-program (a form of
+user-exit). See:
+!ref JFL_prog_thenex
+ for details.
+</UL>
+
+!head started_first started first-program "Writting and running a jfs-program"
+
+!ind "Bicycle-example"
+!ind "FAM"
+!ind "Mandami-controller"
+!if !UNIX
+!ind "Ins.Adj"
+!ind "Fam-wizard"
+!endif
+This chapter provides a step-by-step guide to writting and running a jfs-program
+!if !UNIX
+using the JFS Windows development environment
+!endif
+. The program to be written will predict the braking force necessary to
+stop a bicycle given the bicycle's current speed and its distance to the
+desired stopping point.
+<P>
+The program uses a FAM-like (Fuzzy Associative Memory) fuzzy system,
+often called a Mandami-controller.
+Programs of this type are used in micro-controllers in
+air conditioners (thermostat-control), cameras (auto focus), cars
+(gear selection, idle-speed controllers, brake controllers), trains
+(acceleration/brake-control) and so forth.
+<P>
+A FAM is a function from a few (typical two or three) floating-point
+input values to a single floating-point output value. The output value is calculated
+using a 3-step method:
+<OL>
+<LI> Fuzzify the input values.
+<LI> Use a sort of decision table to calculate the values of the
+     fuzzy output values; for each combination of fuzzy input values
+     state the fuzzy output value.
+<LI> Defuzzify the output value.
+</OL>
+<P>
+The fuzzy variables in this imaginary example are defined as:
+<PRE>
+speed slow   10;  # in kilometers/hour
+speed normal 20;
+speed high   30;
+
+distance near    5; # in meters
+distance medium  15;
+distance far     30;
+
+brake none    0;  # in percent
+brake  low   25;
+brake medium 50;
+brake hard  100;
+</PRE>
+The decision table could look like this:
+<P>
+<TABLE FRAME=VOID RULES=ALL>
+<TBODY>
+<TR><TD></TD><TD><B>speed slow</B></TD><TD><B>speed normal</B></TD>
+<TD><B>speed high</B></TD></TR>
+<TR><TD><B>distance near</B></TD><TD>brake low</TD><TD>brake medium</TD>
+<TD>brake hard</TD></TR>
+<TR><TD><B>distance medium</B></TD><TD>brake none</TD><TD>brake low</TD>
+<TD>brake hard</TD></TR>
+<TR><TD><B>distance far</B></TD><TD>brake none</TD><TD>brake none</TD>
+<TD>brake low</TD></TR>
+</TBODY>
+</TABLE>
+<P>
+In JFL the rules are written as:
+<PRE>
+if speed slow and distance near then brake low;
+if speed slow and distance medium then brake medium;
+if speed slow and distance far  then brake none;
+if speed normal and distance near then brake medium;
+   .
+   .
+   .
+</PRE>
+
+!head started_fi_write started_first writing "Writing the program"
+
+This chapter continues the step-by-step guide to writing the
+bicycle stopping function introduced in the previous chapter.
+Writing the program is done in the same 3 steps used in most programming
+languages:
+<OL>
+<LI>
+Declare the types (called 'domains' in JFL).
+<LI>
+Declare the variables.
+<LI>Write the program.
+</OL>
+<P>
+!if UNIX
+To write the program start a standard text editor (vi, emacs etc) on a new
+text. The first statement in the bicycle stopping program is the (optional)
+title-statement:
+<PRE>
+  title "Stopping a bicycle";
+</PRE>
+All statements ends with a semicolon. Texts are placed in double-quotes.
+The next section of the program is the domain declaration block. It is started
+by the word 'domains', followed by domain declaration statements:
+<PRE>
+  domains
+    metres  type float  text "metres"  min 0.0  max 50.0;
+    speed_dom "kilometres pr hour" min 0 max 50;
+    percent "%" 0 100;
+</PRE>
+The first statement declares 'metres' as a floating-point value with legal
+values in the interval 0.0 to 50.0. The text-argument is only used (by some
+programs) to give the user help in entering values for the given domain.
+<P>
+All declaration statements uses the same syntax:
+<PRE>
+    <name> {<argument-text> <argument-value>};
+</PRE>
+The order of the arguments doesn't matter. Some of the argument-texts are
+optional. This is shown in the declaration of 'speed_dom' and 'percent'. Most
+arguments are optional in the sense, that if they are not present, then
+default values are assumed. The default value for the argument 'type' is 'float'.
+Written in full form the definition of 'percent' would be:
+<PRE>
+   percent  type float  text "%"  min 0  max 100;
+</PRE>
+The next sections in the program declares the domain variables:
+<PRE>
+  input  # input domain-variables
+    distance  text "Distance to stop point"  domain metres;
+      /* distance to stopping point,
+         measured in metres. */
+    speed "Speed" speed_dom;
+
+  output  # Output domain variables
+    brake "Brake force" percent   defuz avg;
+</PRE>
+Three domain variables are declared in the two sections. Many programs has
+a third section 'local', used to declare internal domain variables. There
+are two types of comments in jfs. The first uses the character '#'. The
+compiler ignores the character and the rest of the line (like '//'-comments
+in C++). The second type of comment start with the characters '/*' and ends
+with '*/'. The comments are not limited to a single line. They look like
+comments in most programming languages (like C), but they are treated a
+little different. They are not removed by he compiler, but included in the
+compiled program. A comment is bound to the data object before it (in the
+code above the comment 'distance to stop point, measured in metres.' is
+bound to the variable 'distance'. Jfs-tools can use
+the comments (for example: the run-program JFR display the comments
+bound to input variables if the user answer with a '?' when asked for a
+value for the variable).
+<P>
+The last declaration section declares the adjectives:
+<PRE>
+  adjectives
+    speed slow   10;  # in kilometers/hour
+    speed normal 20;
+    speed high   30;
+
+    distance near    5; # in meters
+    distance medium  15;
+    distance far     30;
+
+    brake none     0;  # in percent
+    brake low     25;
+    brake medium  50;
+    brake hard   100;
+</PRE>
+This ends the declaration part of th bicycle stopping program. More complex
+programs typical has more declaration-blocks (hedges, relations etc). Declaration
+blocks can come in any order, but a data object has to be declared before it is
+used; for example the domain section has to come before the input section, because
+domain variables refer to the domains. The normal order of sections in a jfs-program
+is: title, synonyms, hedges, relations, operators, domains, input, output, local,
+arrays, adjectives.
+<P>
+The calculation-part of the bicycle program is started with the keyword 'program':
+<PRE>
+  program
+    if speed is slow and distance is near then brake is low;
+    if speed is slow and distance is medium then brake is none;
+    if speed is slow and distance is far then brake is none;
+
+    if speed is normal and distance is near then brake is medium;
+    if speed is normal and distance is medium then brake is low;
+    if speed is normal and distance is far then brake is none;
+
+    if speed high and distance near then brake hard;
+    if speed high and distance medium then brake hard;
+    if speed high and distance far then brake low;
+</PRE>
+The word 'is' is a (predefined) synonym. It is ignored by the compiler. It
+is possible to declare other synonyms. See:
+!ref JFL_syntax_syn
+for details. This ends the writing of the bicycle stopping program. Save it
+with the name 'bicycle.jfs' (the complete code can be found
+in <jfsdir>/samples/bicycle.jfs).
+<P>
+Before the program can be run, it has to be compiled. On the command line type:
+<PRE>
+jfc bicycle
+</PRE>
+The compiler JFC compiles 'bicycle.jfs'. If no errors are found, the compiled
+program is written to 'bicycle.jfr'. To run the program use the jfs-runner JFR:
+<PRE>
+jfr bicycle
+</PRE>
+
+!else
+<UL>
+<LI>
+Start the program JFS from Windows
+<LI>
+Choose File|New from the main menu to start editing a new jfs-program.
+</UL>
+First the domains are created. Three domains are needed to describe
+the unit types of the variables: distance (measured in metres) ,
+speed (kilometres-pr-hour), and brake-force (measured in percent).
+To declare the domains:
+<UL>
+<LI>Click on 'Domains' in the object tree (the left side of the window).
+<LI>Click on the button
+<STRONG>Ins</STRONG> (insert).
+</UL>A new domain with the name 'Domain1' is created and selected.
+The properties of this domain are shown in the right side of the
+window (the object inspector).
+<UL><LI>
+Click on 'Name' and change the name to 'metres'. Navigate to the other fields
+with the down-arrow (or the mouse) and change 'Unit text' to
+metres, 'Minimum' to 0.0, and 'Maximum' to 50.0.
+</UL>
+Use the same method to create the second and the third domains:
+<UL>
+<LI>The second
+should be: Name='speed_dom', Unit-text='Kilometres pr hour', Type=float,
+Minimum=0.0 and Maximum=50.0.
+<LI>The Third should be: Name='percent', Unit text='%', Type=float, Minimum=0.0,
+and Maximum=100.0.
+</UL>
+The next step is to create the domain variables: distance, speed and brake.
+<UL><LI>
+Click on 'Variables' in the object tree.
+<LI>
+Click the 'Ins' button.
+</UL>
+A new variable named 'Variable1' is created. Change its
+properties: Name=distance, Text='distance to stop point', Type=input,
+Domain=metres.
+<P>Create the second and third variables using the same method.
+<UL>
+<LI>Give the second variable these properties: Name=speed,
+Text=Speed, Type=input, Domain=speed_dom.
+<LI>Give the third variable these properties:
+Name=brake, Text='brake force', Type=output, Domain=percent.
+</UL>
+The next step is to create the fuzzy variables bound to the domain
+variables (distance near, distance medium and so on). This is done
+indirectly by creating adjectives.
+<UL>
+<LI>
+Click on the 'distance' variable in the object tree.
+<LI>
+Click the 'Ins.Adj' button.
+</UL>
+A pop-up window 'Insert adjectives' is activated.
+<UL>
+<LI>
+Change the 'number of adjectives' to 3.
+<LI>
+Select Names='small, medium, large' (the value closest to the correct
+names -- don't worry, they'll be refined in a moment).
+<LI>
+Set 'Left shoulder' to 5 (the center value of the first fuzzy variable).
+<LI>
+Set 'Right shoulder' to 30 (the center value of the last fuzzy variable).
+<LI>
+Click the 'Insert' button.
+</UL>
+The window is closed and the 3 fuzzy variables 'small', 'medium' and
+'large' are inserted in the object tree under 'distance'.
+<UL>
+<LI>
+Change the properties of 'small'. Set Name=near.
+<LI>
+Change the properties 'medium': center=15.
+<LI>
+Change the properties of 'large': name=far.
+<LI>
+Use the same method to create three fuzzy variables bound to 'speed' with the
+properties  (i):name=slow, center=10; (ii):name=normal, center=20; (iii) name=high,
+ center=30.
+<LI>
+Create four fuzzy variables bound to 'percent' with the properties:
+ (i): name=none, center=0; (ii) name=low, center=25; (iii) name=medium,
+center=50; (iv) name=hard, center=100.
+</UL>
+Now the program block is entered.
+<UL><LI>
+Click the 'Code' button.
+</UL>
+The code window is opened.
+<UL><LI>
+In the templates menu select 'Fam'.
+</UL>
+A pop-up window 'Fam wizard' is opened.
+<UL><LI>
+Set 'input variable 1' to "speed", 'input variable 2' to "distance",
+and 'output variable' to "brake".
+<LI>
+Click the 'Ok' button.
+</UL>
+The window is closed and rules are inserted in the code window.
+<UL><LI>
+Change the output adjectives of the rules so the code window look like:
+<PRE>
+if speed is slow and distance is near then brake is low;
+if speed is slow and distance is medium then brake is none;
+if speed is slow and distance is far then brake is none;
+
+if speed is normal and distance is near then brake is medium;
+if speed is normal and distance is medium then brake is low;
+if speed is normal and distance is far then brake is none;
+
+if speed is high and distance is near then brake is hard;
+if speed is high and distance is medium then brake is hard;
+if speed is high and distance is far then brake is low;
+</PRE>
+</UL>
+<P>
+The program is complete! It just needs a
+meaningful name.
+<UL><LI>
+Switch back to the main window by clicking the 'Data' button.
+<LI>
+Click the 'Program' node in the object tree.
+<LI>
+Set title to 'stopping a bicylce'.
+</UL>
+Now is a good time to save the program:
+<UL><LI>
+Select File|Save as.. from the main menu. Save the program as a jfw-file.
+</UL>
+Test the program for syntax errors by compiling it:
+<UL><LI>
+Press the 'Compile' button.
+</UL>
+If no error are found (a pop-up window will inform you one way or another), the
+program is ready to run.
+<P>
+<UL><LI>To run the program simply click the run-button in the
+main window. First the program is compiled and then the
+program is run from a Dos-window.
+</UL>
+!endif
+
+The program asks the user to enter values to the input-variables. For example,
+to answer the first question 'Distance to stop point' you might type 10 and
+press return. To the second question about 'Speed' you might type 20 and
+press return. The program calculates the required brake force from the input values
+and displays the result. Having performed its task, the program asks for new
+values for distance and speed. Try entering a few more sets of trial values if you like,
+and then exit the program by entering an '!' as answer to one of the questions.
+<P>
+To try some of the other possibilities with the run-program:
+!if UNIX
+type:
+<PRE>
+jfr -O io bicycle
+</PRE>
+!else
+<UL><LI>
+click on the 'Options' button in the main window.
+</UL>
+The object tree area now shows a list of the available tool programs.
+<UL><LI>
+Click on the tool labeled 'jfr'.
+</UL>
+The properties for JFR is shown in the right part of the window.
+<UL>
+<LI>
+Change the property: 'write text' from yes to no.
+<LI>
+Change the property 'Write input' from no to yes.
+<LI>
+Return to the main window by clicking on the 'Data' button.
+<LI>
+Run the program again.
+</UL>
+!endif
+When prompted, answer '20' to 'distance to stopping point' and
+answer '*10' to 'Speed' (note the leading asterisk). The
+program calculates the brake force for distance=20 and for ten different
+values of speed. Both input and output are displayed on a single line.
+<P>
+For more information about JFR, see:
+!ref jfr
+.

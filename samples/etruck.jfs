@@ -1,0 +1,112 @@
+
+title "Backing up a truck";
+/* The well-known "backing up a truck"-problem (described by B. Kosko (and S.
+ Kong) in the book "Neural networks and fuzzy systems" Prentice_Hall 1992
+ ISBN 0-13-612334-1).
+ The truck is placed in a loading zone corrensponding to the plane
+ [0,100] x [0, 100]. The truck's coordinates in this plane is "x", "y".
+ The truck's angle with the x-axis is "Phi". The goal is to reach the
+ loading dock at (50,100) at an angle of 90 degrees.
+ This version of the program includes a simulator. Input is start coordinates
+ and start angle (Phi). The program will write the truck's moves to output
+ until the loading dock is reached or 200 steps are executed.*/
+
+domains
+    axis_dom "plane axis" 0 100;
+    phi_dom "degrees" 0 360;
+    theta_dom "degrees" -30 30;
+    idom integer;
+
+input
+    x "X" axis_dom default 10;
+    y "Y" axis_dom default 10;
+    phi "Phi" phi_dom default 45;
+
+local
+    theta "Theta" theta_dom default 0;
+/* stearing angle (the change of phi).*/
+    count "count" idom;
+/* used to count steps in loop.*/
+
+adjectives
+    axis_dom le 0:1 10:1 35:0;
+    axis_dom lc 30:0 40:1 50:0;
+    axis_dom ce 45:0 50:1 55:0;
+    axis_dom rc 50:0 60:1 70:0;
+    axis_dom ri 65:0 90:1 100:1;
+
+    phi_dom ru 0:0.25 30:1 70:0 350:0 360:0.25;
+    phi_dom rv 63:0 76.5:1 90:0;
+    phi_dom lv 90:0 103.5:1 117:0;
+    phi_dom ve 85:0 90:1 95:0;
+    phi_dom lu 105:0 147.5:1 190:0;
+    phi_dom lb 175:0 225:1 275:0;
+    phi_dom rb 0:0.1 5:0 265:0 315:1 360:0.1;
+
+    theta_dom nb -30:1 -15:0;
+    theta_dom nm -25:0 -15:1 -5:0;
+    theta_dom ns -10:0 -5:1 0:0;
+    theta_dom ze -5:0 0:1 5:0;
+    theta_dom ps 0:0 5:1 10:0;
+    theta_dom pm 5:0 15:1 25:0;
+    theta_dom pb 15:0 30:1;
+
+program
+    count = 0;
+    extern printf "       tick          x             y         
+   phi\n";
+
+    while y < 100 and count < 200:
+      clear theta; 
+      if x is le and phi is rb then theta is ps;  
+      if x is le and phi is ru then theta is ns;  
+      if x is le and phi is rv then theta is nm;
+      if x is le and phi is ve then theta is nm;  
+      if x is le and phi is lv then theta is nb;  
+      if x is le and phi is lu then theta is nb;  
+      if x is le and phi is lb then theta is nb;  
+    
+      if x is lc and phi is rb then theta is pm;  
+      if x is lc and phi is ru then theta is ps;  
+      if x is lc and phi is rv then theta is ns;  
+      if x is lc and phi is ve then theta is nm;  
+      if x is lc and phi is lv then theta is nm;  
+      if x is lc and phi is lu then theta is nb;  
+      if x is lc and phi is lb then theta is nb;  
+    
+      if x is ce and phi is rb then theta is pm;
+      if x is ce and phi is ru then theta is pm;  
+      if x is ce and phi is rv then theta is ps;
+      if x is ce and phi is ve then theta is ze;  
+      if x is ce and phi is lv then theta is ns;  
+      if x is ce and phi is lu then theta is nm;  
+      if x is ce and phi is lb then theta is nm;  
+    
+      if x is rc and phi is rb then theta is pb;  
+      if x is rc and phi is ru then theta is pb;  
+      if x is rc and phi is rv then theta is pm;  
+      if x is rc and phi is ve then theta is pm;  
+      if x is rc and phi is lv then theta is ps;
+      if x is rc and phi is lu then theta is ns;  
+      if x is rc and phi is lb then theta is nm;  
+    
+      if x is ri and phi is rb then theta is pb;  
+      if x is ri and phi is ru then theta is pb;  
+      if x is ri and phi is rv then theta is pb;  
+      if x is ri and phi is ve then theta is pm;  
+      if x is ri and phi is lv then theta is pm;  
+      if x is ri and phi is lu then theta is ps;
+      if x is ri and phi is lb then theta is ns;
+
+      phi = phi + theta;
+      if phi > 360 then phi = 360 - phi;
+      x = x + cos(phi / 57.2958);  
+             /* = cos(phi converted to radians */
+      y = y + sin(phi / 57.2958); 
+      count = count + 1;
+      extern printf "%f   %f   %f   %f\n", count, x, y, phi;
+    end;
+
+    extern printf "       tick          x             y         
+   phi\n";
+

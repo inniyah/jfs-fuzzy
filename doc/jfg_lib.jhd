@@ -1,0 +1,430 @@
+!head source_jfg source jfg_lib "JFG_LIB: C-library to get program information"
+
+!ind Jfg_lib
+!ind "C, reading from jfs-programs"
+!ind "C, information about jfs-programs"
+Jfg_lib is a source code library used to get information about a compiled
+jfs-program. The functions in jfg_lib can get information about operators,
+variables, hedges, statements, and so on. Jfg_lib is complete in the sense
+that it is possible to write an inverse compiler (like jfr2s) using the
+functions in jfg_lib.
+<P>
+Typical uses of jfg_lib:
+!dlist source_jfg_use
+!li source_jfg_use 1
+When executing 'extern' statements, jfg_lib functions are often used to find
+a variable's identification-number from its name (example: the 'extern read'
+statements in JFR).
+!eli
+!li source_jfg_use 2
+To write log information from a jfs-program (the log file from JFR is
+created by jfg_lib functions).
+!eli
+!li source_jfg_use 3
+To get information about a variable's text and type (the input-reading and
+output-writing in JFR).
+!eli
+!li source_jfg_use 4
+To get information about objects, to be changed by the jfp_lib library
+(this is done in JFI).
+!eli
+<P>
+The data structures and functions in jfg_lib are described in the file
+'jfg_lib.h'. To use jfg_lib from a C-program do the following:
+!dlist source_jfg_run
+!li source_jfg_run 1
+1. Compile 'jfg_lib.cpp', 'jfr_lib.cpp' and 'jfs_text.cpp' producing
+ '.obj'-files.
+!eli
+!li source_jfg_run 2
+2. Include the header files 'jfg_lib.h' and 'jfr_lib.h' in  your program.
+!eli
+!li source_jfg_run 3
+3. Call the functions jfr_init(), jfg_init(), jfr_load(),
+jfg_lib functions and finally jfr_close(), jfg_free() and jfr_free()
+ from the C-program (see example below).
+!eli
+!li source_jfg_run 4
+4. Compile the program and link it with 'jfr_lib.obj' , 'jfg_lib.obj', and
+ 'jfs_text.obj'.
+!eli
+
+The following code fragment shows how jfg_lib is used to write information
+about the jfs-program 'truck.jfr'. The complete code is in the file
+'jfg_ex01.c'.
+<PRE>
+{
+  char fname[] = "truck.jfr";  /* filename      */
+  struct jfg_sprog_desc spdesc;
+  void *head;
+  int res;
+
+   jfr_init(0);
+   res = jfg_init(JFG_PM_NORMAL, 0, 0);
+   if (res == 0)
+   { res = jfr_load(&head, fname);
+     if (res == 0)
+     {
+       jfg_sprg(&spdesc, head);   /* get general information about program */
+
+       printf("name of program ....: %s\n", spdesc.title);
+       printf("number of variables : %d\n", spdesc.var_c);
+       printf("number of hedges ...: %d\n", spdesc.hedge_c);
+       printf("number of operators : %d\n", spdesc.operator_c);
+
+       jfr_close(head);
+       jfg_free();
+     }
+     else
+     { printf("Error loading program. Error code %d\n", res);
+       jfg_free();
+     }
+   }
+   else
+     printf("Error initialising jfg_lib. Error code %d\n", res);
+   jfr_free();
+}
+</PRE>
+The functions in jfg_lib and jfr_lib addresses a data object (variable, hedge,
+etc.) by an internal number, and not by the objects name. jfg_lib is often
+used to find the internal number from the objects name. The following function
+shows how to find the internal number of a variable from its name (in a
+compiled and loaded jfr-program identified by the variable 'jfr_head'):
+<PRE>
+int find_var(char *varname)   /* returns the identification-number of the */
+			      /* variable <varname> or -1 if no variable  */
+{                             /* has this name.                           */
+  int v, var_no;
+  struct jfg_var_desc vdesc;
+  struct jfg_sprog_desc spdesc;
+
+  jfg_sprg(&spdesc, jfr_head);
+  var_no = -1;
+  for (v = 0; var_no == -1 && v < spdesc.var_c; v++)
+  { jfg_var(&vdesc, head, v);
+    if (strcmp(vdesc.name, varname) == 0)
+      var_no = v;
+  }
+  return var_no;
+}
+</PRE>
+The following code-fragment shows jfg_lib used to write information about the
+hedges in the jfr-program 'jfr_head':
+<PRE>
+{
+   struct jfg_sprog_desc spdesc;
+   struct jfg_hedge_desc hdesc;
+   struct jfg_limit_desc plfunc[256];
+   int hno, p;
+
+   jfg_sprg(&spdesc, jfr_head);
+   for (hno = 0; hno < spdesc.hedge_c; hno++)
+   { jfg_hedge(&hdesc, jfr_head, hno);
+     printf("Hedge no %d\n", hno);
+     printf("name %s\n", hdesc.name);
+     printf("hedgetype %s\n", jfs_t_hts[hdesc.type]);
+     if (hdesc.type != JFG_HT_NEGATE && hdesc.type != JFG_HT_LIMITS)
+       printf("hedge argument: %f\n", hdesc.hedge_arg);
+     if (hdesc.flags & JFS_HF_IARG)
+       printf("\Improve before hedge-argument.\n");
+     if (hdesc.type == JFG_HT_LIMITS)
+     {                               /* Hedge is defined as a pl-function */
+       printf("pl-function: ");
+       jfg_hlimits(plfunc, jfr_head, hno);
+       for (p = 0; p < hdesc.limit_c; p++)
+	 printf("%f : %f ", plfunc[p].limit, plfunc[p].value);
+       printf("\n");
+     }
+     printf("\n\n");
+   }
+}
+</PRE>
+
+The jfg_lib function jfg_var() returns information about a domain variable,
+but it doesn't tell if the variable is an input variable, an output variable,
+or a local variable. To get this information use the 'jfg_sprog_desc'
+where the field 'f_ivar_no' gives the internal number of the first input
+variable, and 'ivar_c' is the number of input variables. To test if the
+variable with the internal number <vno> is an input variable do something
+like:
+<PRE>
+    struct jfg_sprog_desc spdesc;
+
+    jfg_sprg(&spdesc, jfr_head);
+    if (vno >= spdesc.f_ivar_no && vno < spdesc.f_ivar_no + spdesc.ivar_c)
+      printf("The variable is an input-variable");
+    .
+    . use f_ovar_no, ovar_c, f_lvar_no, lvar_c to test for output and
+    . local variable.
+</PRE>
+
+The following code fragment uses the 'f_ovar_no' and 'ovar_c' to print
+the values of all output variables:
+<PRE>
+{
+  struct jfg_sprog_desc spdesc;
+  int vno;
+  struct jfg_var_desc vdesc;
+  float val;
+
+  jfg_sprg(&spdesc, jfr_head);
+  for (vno = spdesc.f_ovar_no;
+       vno < spdesc.f_ovar_no + spdesc.ovar_c; vno++)
+  {
+    jfg_var(&vdesc, jfr_head, vno);
+    val = jfr_vget(jfr_head, vno);
+    printf("%s = %f\n", vdesc.text, val);
+  }
+}
+</PRE>
+The adjectives are reordered by the compiler. They are sorted primary by
+the variable/domain to which they are bound. A result of this is that the
+internal number of the adjectives bound to a variable follow each other
+sequentially. Given the following definitions:
+<PRE>
+input
+  x dom1;
+  y dom1;
+adjectives
+  x low 0;
+  y small 1;
+  y medium 2;
+  x high 1;
+  y large 3;
+</PRE>
+then the internal numbers of the adjectives are:
+<PRE>
+0: x low
+1: x high
+2: y small
+3: y medium
+4: y large
+
+x.f_adjectiv_no = 0   /* internal number first adjectiv */
+y.f_adjectiv_no = 2
+</PRE>
+If adjectives are defined as bound to a domain both the domain description
+and the variable description of variables bound to this domain (with no
+adjectives bound directly to the variable) will point to the same block
+of adjectives. For example if:
+<PRE>
+domains
+  speed 0 100;
+input
+  sp1 speed;
+  sp2 speed;
+adjectives
+  speed low 0;
+  speed medium 50;
+  speed high 100;
+  sp2 low 10;
+  sp2 high 50;
+</PRE>
+then the internal numbers of the adjectives, the variable-descs and domain-
+descs are:
+<PRE>
+0: speed low
+1: speed medium
+2: speed high
+3: sp2 low;
+4: sp2 high
+
+speed.f_adjectiv_no = 0
+speed.f_adjectiv_c  = 3
+
+sp1.f_adjectiv_no =   0
+sp1.fzvar_c       =   3   /* the variable-description has no 'adjectiv_c',
+			     but the number of adjectives are the same as
+			     the number of fuzzy-variables.              */
+
+sp2.f_adjectiv_no =   3
+sp2.fzvar_c       =   2
+</PRE>
+The fuzzy-variables are numbered the same way as the adjectives. The
+following function return the value of the fuzzy variable with the
+name <vname> <aname>:
+<PRE>
+float fzvalue(char *vname, char *aname)
+{
+  int vno, m;
+  float val;
+  struct jfg_var_desc vdesc;
+  struct jfg_adjectiv_desc adesc;
+
+  vno = find_var(vname);   /* find_var is defined in an earlier example */
+  if (vno >= 0)
+  { jfg_var(&vdesc, jfr_head, vno);
+    for (m = 0; m < vdesc.fzvar_c; m++)
+    { jfg_adjectiv(&adesc, jfr_head, vdesc.f_adjectiv_no + m);
+      if (strcmp(adesc.name, aname) == 0)
+      { val = jfr_fzvget(jfr_head, vdesc.f_fzvar_no + m);
+        return val;
+      }
+      printf("No adjectiv with the name %s bound to %s\n", aname, vname);
+    }
+  }
+  else
+    printf("No variable with the name %s\n", vname);
+}
+</PRE>
+Other examples of using jfg_lib to find information about variables,
+adjectives, and fuzzy variables are found in the files 'jfg_ex02.c' and
+'jfg_ex03.c'.
+<P>
+The statement-part of a compiled jfs-program, consists of low level
+(machine code like) operators. It can be accessed on a statement level
+and on an operator level. A typical use of accessing statements is from
+a jfs-program started with jfr_arun() with a debug-function or an
+'extern' handling function. The function jfg_dprg()
+returns information about the last statement executed (the current
+statement if called from a 'extern' function). This includes information about
+which variable was changed by the last statement, what the calculated
+weight was, and the program-address of the beginning of the last statement
+(the program-counter pc). Using this program-address the statement can
+be extracted as text, or if it is an 'extern' statement, as an argument list.
+The following code fragment shows a typical extern-function:
+<PRE>
+void this_extern(void)
+{
+  struct jfg_dprog_desc ddesc;
+  int argc;
+  char *extern_args[100];
+
+  jfg_dprg(&ddesc, jfr_head);
+
+  argc = jfg_a_statement(extern_args, 100, jfr_head, ddesc.pc);
+  if (argc > 0)
+  { if (strcmp(extern_args[0], "printf") == 0)
+    { .
+      .
+      .
+    }
+    else
+    if (strcmp(extern_args[0], "read") == 0)
+    { .
+      .
+      .
+    }
+  }
+}
+</PRE>
+Two examples of the use of 'jfg_dprg' is found in 'jfg_ex02.cpp'.
+<P>
+Another way of accessing the statements in a compiled jfs-program, is
+by the function jfg_statement(). This functions returns information about
+a statement. This information includes the program-address (pc) of the
+next statement. To find the program address of the first statement use
+the jfg_sprg() function. The following code fragment uses the jfg_statement()
+function to step through a jfs-program statement by statement:
+<PRE>
+{
+  unsigned char *pc;
+  struct jfg_sprog_desc pdesc;
+  struct jfg_statement_desc sdesc;
+  int finished;
+
+  finished = 0;
+  jfg_sprg(&sdesc, jfr_head);
+  pc = sdesc.pc_start;
+  while (finished == 0)
+  { jfg_dprg(&sdesc, jfr_head, pc);
+
+    switch (sdesc.type)
+    { case JFG_ST_EOP:  /* end-of-program */
+	finished = 1;
+	break;
+      case JFG_ST_IFVAR:
+	.
+	.
+	.
+    }
+    pc = sdesc.n_pc;  /* pc := pc next-statement */
+  }
+}
+</PRE>
+The example above ignores statements in user-defined functions.
+The program-address of the first statement in a user-defined functions is
+found by using the jfg_function() function. The example program
+ 'jfp_ex03.cpp' shows how to step through all statements including statements
+in user-defined functions.
+<P>
+The function 'jfg_t_statement' returns a statement as text. The text is
+formatted with spaces, newlines etc. (see the file 'jfg_ex02.c' for an
+example of the use of jfg_t_statement). The expressions in 'if', 'case' and
+'while'-statements can also be read as trees. This is done by the function
+'jfg_if_tree'. The expression in the statement:
+<PRE>
+		if x + 2 > 3 and x low then y high;
+</PRE>
+converted to a tree looks graphicaly like:
+<PRE>
+			and
+		       /   \
+		      >    x low
+                     / \
+                    +   3
+                   / \
+		  x   2
+</PRE>
+and as a jfg_tree_desc-array (see 'jfg_lib.h' for details about the
+jfg_tree_desc structure):
+<PRE>
+no type	         operator  sarg_1              sarg_2               farg
+-------------------------------------------------------------------------
+0  JFG_TT_OP     2 (and)   1 (left branch)     6 (right branch)
+1  JFG_TT_DFUNC  12 (>)    2     -"-           5    -"-
+2  JFG_TT_DFUNC  0  (+)    3     -"-           4    -"-
+3  JFG_TT_VAR              0 (var-no 'x')
+4  JFG_TT_CONST                                                     2.0
+5  JFG_TT_CONST                                                     3.0
+6  JFG_TT_FZVAR            3 (fzvar-no 'x low')
+</PRE>
+The function 'jfg_if_tree' is used in the example file 'jfg_ex04.c'.
+
+!head source_jfg_changes source_jfg changes "Changes in JFG_LIB version 2"
+!li intro_changes jfg_lib
+!ref source_jfg_changes "Changes in JFG_LIB"
+!eli
+Jfg_lib now uses the constant_definitions from the file jfs_cons.h (all
+starting with JFS_ instead of JFG_).
+<P>
+Changes to data structures:
+<UL><LI>
+Comments are added to all definition types.
+<LI>
+jfg_sprog_desc now includes 'function_c' and 'pc_start'.
+<LI>
+Jfg_dprog_desc is no longer a member of jfg_lib. It is now in jfr_lib (jfr_stat_desc).
+<LI>
+jfg_adjectiv_desc now includes trapez-info.
+<LI>
+jfg_limit_desc now includes exclusive-flag.
+<LI>jfg_var_desc has new handling of default-values.
+</UL>
+<P>
+New structures:
+<UL>
+<LI>
+jfg_array_desc, jfg_function_desc,
+jfg_func_arg_desc and jfg_oc_desc (low-level-instructions).
+<LI>
+hedge_mode is added to jfg_operator_desc.
+<LI>
+jfg_statement_desc is changed radically (to cover the new if-variants).
+</UL>
+<P>
+The program-address 'pc' is now a pointer to char.
+<P>
+The values in jfg_tree_desc are changed. For JFG_TT_HEDGE the hedge-number is
+now returned in 'op'. New types: JFG_TT_UFUNC, JFG_TT_ARGLIST, JFG_TT_UF_VAR,
+JFG_TT_IIF, JFG_TT_ARVAL are added.
+<P>
+The function jfg_dprog() no longer exists (use jfr_statement_info instead).
+<P>
+New functions jfg_array(), jfg_function(), jfg_func_arg(), jfg_comment().
+<P>
+New function jfg_oc() to get low level info about a statement is added.
+<P>
+The argument func_no is added to jfg_t_statement().
+<P>
+The argument index_tree is added to jfg_if_tree().

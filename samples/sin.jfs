@@ -1,0 +1,34 @@
+
+title "Sinus";
+/* Improve a poor sinus-function using JFI on the data-file 'jfi.dat'.
+ Improve adjectiv-centers, rule-weights (ifw) and defuz-function.*/
+
+domains
+    x_dom 0 6.3;
+    y_dom -1 1;
+
+input
+    x "X" x_dom;
+
+output
+    y "Y" y_dom defuz centroid cmax %0.5;
+
+adjectives
+    x s %0;
+    x sm %1.575;
+    x m %3.15;
+    x ml %4.725;
+    x l %6.3;
+
+    y s %-1;
+    y m %0;
+    y l %1;
+
+program
+
+    ifw %0.5 x s then y m;
+    ifw %0.5 x sm then y l;
+    ifw %0.5 x m then y m;
+    ifw %0.5 x ml then y s;
+    ifw %0.5 x l then y m;
+

@@ -1,0 +1,201 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN">
+<HTML>
+
+<HEAD><TITLE>Ideal weight</TITLE>
+
+       <LINK REL=STYLESHEET TYPE=TEXT/CSS HREF="jfr2hcss.css">
+<!-- JFS BEGIN -->
+<!--  -->
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+var glw; var rmw; var h 
+var x = new Array(1)
+var y = new Array(1)
+var excl = new Array(1)
+var t_stdout = "";
+var t_alert = "";
+
+var v0; var c0; var cs0; var v1; var c1; var cs1; var v2; var c2; var cs2; 
+var f0; var f1; 
+function rmm(v, mi, ma)
+{var r = v;
+ if (r < mi) r = mi;
+ if (r > ma) r = ma;
+ return r
+}
+function rmin(v,mi)
+{ if (v<mi) return mi
+  else return v}
+function rmax(v,ma)
+{ if (v>ma) return ma
+  else return v}
+function cut(a,v)
+{ if (a<v) return 0.0
+  else return a}
+function r01(v)
+{ return rmm(v,0.0,1.0)}
+function fround(v) {
+var r=(Math.round(v*10000.0))/10000.0;
+return r;
+}
+function h0(v) {var a=r01(v); return (1.0-a)};
+function o0(x,y) { var a=r01(x);
+var b=r01(y);var r;r=a*b;
+return r};
+function o1(x,y) { var a=r01(x);
+var b=r01(y);var r;r=a*b;
+return r};
+function o2(x,y) { var a=r01(x);
+var b=r01(y);var r;if (a<b) r=a
+ else r=b;
+return r};
+function o3(x,y) { var a=r01(x);
+var b=r01(y);var r;if (a>b) r=a
+ else r=b;
+return r};
+function o4(x,y) { var a=r01(x);
+var b=r01(y);var r;if (a>b) r=a
+ else r=b;
+return r};
+function d2(a,b) {var r=0.0
+ r=a*b;return r};
+function vr0() {var res=0.0; var bdist=Math.abs(v0-0.0);
+if (Math.abs(v0-1.0)<bdist) {res=1.0; bdist=Math.abs(v0-1.0)}
+v0=res;}
+function vr1() {}
+function vr2() {}
+function fu0() {if (v0!=h) {
+if (v0<=0.0) f0=1.0 
+else if (v0<=0.0) f0=1.0
+ else {if (v0>=1.0) f0=0.0
+ else f0=(1.0-v0)/1.0};
+if (v0<=1.0) {if (v0<=0.0) f1=0.0
+ else f1=(v0-0.0)/1.0} else if (v0<=1.0) f1=1.0
+ else f1=1.0;
+}};
+function vget(vno)
+{if (vno==0) return v2;
+}
+function vvget(vno)
+{if (vno==0) return c2;
+}
+function vput(vno, v, c)
+{if (vno==0) { v0=v;vr0();
+c0=r01(c);}
+if (vno==1) { v1=v;vr1();
+c1=r01(c);}
+}
+function init()
+{v0=0.0;c0=1.0;cs0=0.0;
+f0=0.0;f1=0.0;
+v1=1.8;c1=1.0;cs1=0.0;
+
+v2=0.0;c2=0.0;cs2=0.0;
+
+t_stdout = "";
+t_aalert = "";
+glw=1.0;rmw=1.0;
+}
+function run()
+{var t; var r
+h=v0+1.0;fu0();
+rmw=glw;glw=r01(glw*(f1));
+if (glw!=0.0) { h=v2; r=d2(d2(22.0,v1),v1);
+v2=r;c2=glw;vr2();}
+glw=rmw;
+rmw=glw;glw=r01(glw*(f0));
+if (glw!=0.0) { h=v2; r=d2(d2(20.8,v1),v1);
+v2=r;c2=glw;vr2();}
+glw=rmw;
+}
+function f_validate(elem, minval, maxval)
+{ var res = 0;
+  if (isNaN(elem.value))
+  { res = 1
+  }
+  else
+  { if (elem.value != rmm(elem.value, minval, maxval))
+    { res = 2;
+    }
+  }
+  return res;
+}
+function validate(elem, minval, maxval)
+{ var res = f_validate(elem, minval, maxval);
+  if (res == 1)
+  { window.alert(elem.name+"="+elem.value+" is not a legal number");
+    elem.select();
+    elem.focus();
+  };
+  if (res == 2)
+  { window.alert("Invalid "+elem.name+". Value out of range: "+
+       minval+"<="+elem.name+"<="+maxval);
+    elem.select()
+    elem.focus()
+  }
+  clr_output();
+  return res;
+}
+function tot_validate()
+{ var r=0;
+ if (r==0)
+r=validate(document.jfs.sex, document.jfs.sex.value, document.jfs.sex.value);
+ if (r==0)
+r=validate(document.jfs.height, document.jfs.height.value, document.jfs.height.value);
+ return r;
+}
+function clr_output()
+{
+document.jfs.weight.value="";
+}
+function form2var() {
+v0=parseFloat(document.jfs.sex.options[document.jfs.sex.selectedIndex].value);c0=1.0;cs0=0.0;
+v1=parseFloat(document.jfs.height.value);c1=1.0;cs1=0.0;
+}
+function var2form()
+{var t;
+document.jfs.weight.value=fround(v2);
+};
+function jfr() {
+  if (tot_validate()!=0)
+    return 1;
+  init();
+  form2var();
+  run();
+  var2form();
+};
+
+// -->
+</SCRIPT>
+<!-- JFS END -->
+</HEAD>
+
+<BODY>
+<H1>Ideal weight</H1>
+
+<DIV CLASS="jfr2htm_comment">Calculate a persons ideal weight.</DIV>
+<!-- JFS BEGIN -->
+<DIV CLASS="jfr2htm_form">
+<FORM NAME="jfs">
+<DIV CLASS="ip_block"><SPAN CLASS="label_above">Sex:</SPAN><BR><SELECT name="sex" SIZE=1 onChange="clr_output()">
+<OPTION selected value="0.0">female
+<OPTION value="1.0">male
+</SELECT>
+<BR>
+<BR>
+<SPAN CLASS="label_above">Height:</SPAN><BR><INPUT TYPE="text" NAME="height" SIZE = 16  VALUE=1.8
+onChange="validate(document.jfs.height, document.jfs.height.value, document.jfs.height.value);">
+<BR>
+<BR>
+</DIV><DIV CLASS="button_block"><INPUT TYPE="button"
+value="         Calculate         "
+onClick="jfr();"><INPUT TYPE="RESET" VALUE="Reset">
+<BR><BR>
+</DIV><DIV CLASS="op_block"><SPAN CLASS="label_above">Weight:</SPAN><BR><INPUT TYPE="text" NAME="weight" SIZE = 16  READONLY>
+<BR>
+<BR>
+</FORM>
+</DIV>
+<!-- JFS END -->
+</BODY>
+</HTML>

@@ -1,0 +1,605 @@
+!head jfr prog_bas jfr "JFR: Running Jfs-programs"
+
+!ind JFR
+!ind "Running Jfs-programs"
+!ind "Executing Jfs-programs"
+JFR is a console application, it is used as the Jfs system's standard interpreter.
+It executes a compiled jfs-program.
+!if !UNIX
+It can be run either (a) from a DOS prompt or (b) from the Windows-program JFS.
+!endif
+<P>
+When called without options JFR takes input from the keyboard, and writes output
+to the screen. It asks for values for the input variable in the jfs-program
+being executed, executes the jfs-program, and writes the value of output
+variables to output. Input can be read from files, and output can be written
+to a file.
+
+<P><STRONG>Input variable values</STRONG><P>
+A value to an input variable can be
+<UL>
+<LI>A number (without exponential notation, and with both '.' and ','
+accepted as decimal separators)
+<LI>The name of an adjective bound to the input variable. (If input is read
+from the keyboard, answer '?' to get a list of the possible adjectives, and the minimum and maximum values for the variable).
+</UL>
+<P>
+When input is read from the keyboard, it is possible to answer with
+the asterisk character '*' followed by (a) just one number, or (b) three
+numbers separated by colons.
+The answer: *<f>:<t>:<c> will cause the jfs-program to run <c> times. The first
+time, the value for the input variable will be <f>. In the c'th
+run, the variable's value is <t>. For the runs in-between, the range [f,t]
+is apportioned evenly. For example: let the value of an input be entered as *0:100:6 .
+The jfs-program the will be executed six times in succession using the
+input values of: 0, 20, 40, 60, 80, 100.
+If only a single number, say "6" for example, is specified after a '*',
+then the jfs-program is executed 6 times. It will start the sequence using the variable's
+domain minimum value, and will end the sequence with the variables domain maximum value. If
+asterisk input entries are used with several variables, all combinations of values
+are calculated. Say for example a program has two input variables, and the values
+are entered as '*6' and '*7'. The program will run 42 times.
+<P>
+If input is read from the keyboard, it is possible to specify confidence in regard to an
+to input value. This is done by writing <value>:<confidence>, where confidence is
+a number between 0.0 and 1.0, for example:  50:0.7.
+<P>
+If input is read from a file, the file has to be a character-separated ascii-file as
+described in
+!ref prog_input
+.
+
+<P><STRONG>Output format and values</STRONG><P>
+Output is written either as (a) numbers or (b) adjective names. By default, output
+is written as numbers for variables of the domain-type 'float' and
+'integer', and as adjective names for variables of the type 'categorical'.
+It is possible to force all outputs to be either numbers or names.
+<P>
+When taking input from a file, it is possible to enter both input values and
+expected output values (using an option).  If expected values are read,
+JFR will output some statistical information:
+<UL><LI>
+The Euclidean distance between output and expected for the data set.
+<LI>The average Euclidean distance for all data sets.
+<LI>The number of errors when all calculated and expected values are rounded to
+closest adjective (nearest adjective center).
+</UL>
+Output of statistical information can be suppressed by an option.
+<P>
+<P><STRONG>Extern statements</STRONG><P>
+!lab jfr_extern
+!ind "Printf, extern-statement" jfr_extern
+!ind "Read, extern-statement" jfr_extern
+!ind "Extern statements JFR" jfr_extern
+If the Jfs-program  executed by JFR, has 'extern' statements, these are ignored
+except 'extern' statements of the form:
+<PRE>
+     extern printf <args>;
+     extern read <args>;
+</PRE>
+The full syntax of the 'extern printf' statement is:
+<PRE>
+     extern printf "<format-string>" {, <varname>};
+</PRE>
+The <format-string> is written to output except:
+<PRE>
+'\n' is replaced by a newline.
+'%f' is replaced by a variable value.
+</PRE>
+The first occurrence of '%f' is replaced by the value of the first
+variable name in the {<varname>}-list. The next '%f' is replaced with the
+second value in the list and so on. For example:
+<PRE>
+     extern printf "x=%f, y=%f\n  output=%f\n", x, y, op;
+</PRE>
+When the 'extern' statement is executed something like this will be written to
+output:
+<PRE>
+     x= 125.203, y= 23.000
+       output= 11.237
+</PRE>
+The full syntax of the 'extern read' statement is:
+<PRE>
+     extern read <vname> [<eofvname>];
+</PRE>
+It reads a value into the variable <vname> from input (either
+from keyboard or from a file). The value overwrites the value of <vname>
+(even if <vname> is defined with a d_comp operator different from 'new'). If
+ <eofvname> is specified, a value is read into the variable <eofvname>).
+The value is one if there is no more input in the data file (EOF),
+else the value is zero. The example program (packaged with JFS) named 'price.jfw'
+uses a extern read statement.
+<P>
+<STRONG>Debug-information</STRONG><P>
+!lab jfr_debug
+!ind "Debugging jfs-programs"
+JFR can write debug-information to a log file (controlled by options). The
+log file contains information about the calculation for each input set.
+The values of input variables and fuzzified values for input variables
+are written to the log file. For each statement in the jfs-program, the value
+of if-expressions, then-expressions and new values for variables are written. (If
+compact log is used this info is only written for statements which either changes
+variables or the global weight). The value of fuzzy variables bound to an
+output variable, and the values of (defuzzificated) output
+variables are written.
+<P>
+Here is a partial example of a log file:
+<PRE>
+LOGFILE from JFR version 2.00
+
+PROGRAM bicycle.jfr Stopping a bicycle
+
+INPUT 1, file:
+  Distance to stop point (metres)      10.000
+  Speed (kilometers pr hour)            20.000
+FUZZY IP-VARS
+  distance is near = 0.6000
+  distance is medium = 0.4000
+  speed is normal = 1.0000
+RULES
+  rule main: 4
+    if speed normal and distance near then brake medium;
+    if 0.6000. brake is medium = 0.6000.
+  rule main: 5
+    if speed normal and distance medium then brake low;
+    if 0.4000. brake is low = 0.4000.
+FUZZY OP-VARS
+  brake is low = 0.4000
+  brake is medium = 0.6000
+OUTPUT                             calculated
+  brake force (%)                      40.000
+</PRE>
+
+!head jfr_options jfr options "Running JFR from the command line "
+
+To invoke JFR from a command line, type 'jfr' at the prompt, and follow
+it with a set of arguments. The command line format is:
+<PRE>
+     jfr {<options>} <jfrf>
+</PRE>
+where <jfrf> is the filename of a compiled Jfs-program (a jfr-file). If
+no extension is specified in <jfrf>, then '.jfr' is added.
+<P>
+JFR recognizes the following options:
+<P>
+!dtab jfr_options "JFR options"
+!tab jfr_options -p
+-p <dec>
+!etc
+Precision. Numbers are written using <dec> digits after the
+decimal-point (default is 3).
+!etab
+!tab jfr_options -m
+-m <md>
+!etc
+Output is only written for data sets with distance(calc, expect) >= <md>.
+<BR>
+This option is only possible if data is read from a data file, that contains
+expected values.
+!etab
+!tab jfr_options -e
+-e
+!etc
+Output is only written for a data set, if at least one output
+variable has calculated value different from expected value, when
+both are rounded to nearest adjective.
+!etab
+!tab jfr_options -c
+-c
+!etc
+Use decimal commas instead of decimal points (i.e.,
+<STRONG>3,47</STRONG> instead of <STRONG>3.47</STRONG>) in output.
+!etab
+!tab jfr_options -wa
+-wa <wm>
+!etc
+Describes what types of warnings are written to stdout. <wm> is
+build from the characters 'v', 'c' and 's'. The meaning of
+the characters are:
+<UL>
+<LI>v: warnings about variables out of range,
+<LI>c: warnings about calculations (division with 0, log(-1) etc),
+<LI>s: warnings if stack overflow/underflow.
+</UL>
+The default is 's'.
+!etab
+!tab jfr_options -D
+-D <dam>
+!etc
+describes the contents of the input file. <dam>='f' (contents of input file
+is described in the files first line), or <dam> is build of
+{'i', 'e', 't'}, where 'i' is input values, 'e' is expected values,
+and 't' is a text-identifier. The order of letters is used to specify the
+order of values in the data-sets.
+<BR>For examples:
+<UL><LI>
+ <dam>='ie' means that the
+data sets consists of input values and expected output values,
+first the input values and then the output values.
+<LI>
+ <dam>='ei' is the same except that the expected comes before the input values.
+See
+!ref prog_input
+ for details.
+</UL>
+The default <dam> is 'i' (input only).
+<P>
+ -D without an argument (don't ask
+for input-values) can be used when input is read form keyboard (typical in
+combination with -u).
+!etab
+!tab jfr_options -u
+-u <um>
+!etc
+ask for undefined variables. <um> is build from { 'i', 'l'}.
+<UL>
+<LI> <STRONG>i:</STRONG> when the execution of the program reaches a point where
+a undefined input variable is
+needed, then ask for a value (only meaningful in combination with -D
+without an 'i'-argument).
+<LI> <STRONG>l:</STRONG> ask for values to undefined local variables.
+</UL>
+!etab
+!tab jfr_options -uv
+-uv <m>
+!etc
+Specifies what values are assigned to domain input-variables and the fuzzy
+variables bound to them, when the input is unknown (i.e., '?' is encountered in a
+input file). The default is to assign the domain variable default value with confidence 0.0.
+<BR>
+Alternatives:
+<UL><LI>
+ <m>='z': set domain-variable to undefined (value=default), and set fuzzy
+variables to 0.0. <m>='o': set domain-variable to undefined, fuzzy
+<LI>
+ <m>='a': set domain variable to undefined, and set fuzzy variables
+to 1.0 / number-of-fuzzy-variables.
+</UL>
+!etab
+!tab jfr_options -d
+-d {<daf>}
+!etc
+Read input from the file(s) <daf>. If no extension is specified
+	     to a file '.dat' is added. If -d is used without arguments, data
+	     is read from the file <jfrf>.dat.
+!etab
+!tab jfr_options -f
+-f <fs>
+!etc
+Extra field separators: <fs> is a string of characters. The characters in <fs>
+are used as extra field-separators in the data files.
+!etab
+!tab jfr_options -l
+-l [<lf>]
+!etc
+Write log information to the file <lf>. If no extension is specified
+ '.log' is added to the filename. If no argument is given to
+ '-l', log information is written to <jfrf>.log.
+!etab
+!tab jfr_options -lm
+lm <lm>
+!etc
+Log mode. <lm> is one of 's', 'f'.
+<UL>
+<LI>
+ <lm>='s' means: just write log information to the log file from statements
+that changes a variables value (or the global weight).
+<LI>
+ <lm>='f' means: write information about a statement if its if-part doesn't
+calculate to 0.0.
+</UL>
+ The default log mode is 's' (the log mode is ignored if no log file is specified).
+!etab
+!tab jfr_options -o
+-o [<opf>]
+!etc
+Write output to the file <opf>. If there is no extension in
+   <opf>, '.jfo' is added to the filename. If no argument is
+given to -o, output is written to <jfrf>.jfo.
+!etab
+!tab jfr_options -O
+-O <opm>
+!etc
+Describes what is written to output. <opm> is built from the
+characters : i, o, e, u, t, s, f, a, k, h.
+<UL>
+<LI><STRONG> t: </STRONG>write text
+<LI><STRONG> h: </STRONG>write header-line, i.e. the first line contains the names
+names of the variables written to output
+<LI><STRONG> i: </STRONG>write input values
+<LI><STRONG> o: </STRONG>write output values
+<LI><STRONG> e: </STRONG>write expected values
+<LI><STRONG> u: </STRONG>write values of fuzzy variables bound to output variables
+<LI><STRONG> s: </STRONG>write statistical information
+<LI><STRONG> f: </STRONG>write all values as floats
+<LI><STRONG> a: </STRONG>write all values as adjective names
+<LI><STRONG> k: </STRONG>write identifier for dataset to output
+</UL>
+The default is '-O iots'.
+<P>
+Examples:
+<UL>
+<LI> '-O iot': write input values and output values.
+Before each value write the variable's text (or the
+variable's name if no text).
+<LI> '-O s':   write only statistical information.
+</UL>
+!etab
+!tab jfr_options -pm
+-pm [<penfile>]
+!etc
+Read a penalty-matrix from the file <penfile>. If no extension is
+specified add '.pm' to the file. If no argument is given to '-pm' the
+penalty-matrix is read from the file <jfrf>.pm. A penalty-matrix can
+only be specified if data is read from a file with input and expected values
+and the jfs-program has a single categorical output variable. The penalty-score
+calculated from the penalty-matrix is written to output in the statistical
+section. For details about the penalty file see:
+!ref err_measures
+.
+!etab
+!tab jfr_options -rs
+-rs <ss>
+!etc
+Stacksize. <ss> is stacksize (in bytes) of the run-stack (default 1024).
+!etab
+!tab jfr_options -a
+-a
+!etc
+Append output to output file (instead of overwriting it).
+!etab
+!tab jfr_options -w
+-w
+!etc
+Wait for the user to press the return-key before exiting the program.
+!etab
+<p>
+<STRONG>Examples of JFR-calls:</STRONG>
+<p>
+Execute the jfs-program 'truck.jfr' taking input from the keyboard,
+write output to the file 'test.txt'. Information about how the output is
+calculated, is written to 'test.log':
+<PRE>
+   jfr -o test.txt -l test.log truck
+</PRE>
+The program 'truck.jfr' is executed. Input is taken from the file
+'tr2.dat', which contains sets of input values followed by expected values.
+The values are comma-separated. Output is to be analyzed by another program.
+It is written to 'op.sta'. Output consists of a line from each data set with
+input values, output values and expected values:
+<PRE>
+   jfr -o op.sta -O ioe -D ie -d tr2  -f ',' truck
+</PRE>
+The program 'truck.jfr' is executed. Output is to be a 3D-graph of the
+output variable as a function of the two input-variables. Input values and
+output values are written to the file 'gr.plt':
+<PRE>
+   jfr -o gr.plt -O io truck
+</PRE>
+when the program asks for values for the 2 input variables it is answered
+by '*21'.
+
+
+!head jfr_jfs_opts jfr options "Running JFR from JFS"
+!if !UNIX
+<P>
+JFR (when run from JFS) recognizes the following options:
+<P>
+!dtab jfr_jfs_opts "JFR options"
+!tab jfr_jfs_opts -f
+Separators
+!etc
+The argument is a string of characters. The characters
+are used as extra field separators in the input files.
+!etab
+!tab jfr_jfs_opts -D
+Data-order
+!etc
+Describes the contents and order of the input file. The possible answers are:
+<UL>
+<LI><STRONG> input</STRONG>: the file contains input values
+<LI><STRONG> text-input</STRONG>: the file contains an identifier followed
+by input values.
+<LI><STRONG> input-expected</STRONG>: the file contains
+input values followed by expected output values.
+<LI><STRONG> expected-input</STRONG>: the file
+contains expected output values followed by input values.
+<LI><STRONG> text-input-expected</STRONG>: the file contains
+an identifier followed by input values followed by expected values.
+<LI><STRONG> first-line</STRONG>: the first line in the input file is used to
+determine the order of input and output variables. The line is a list of
+variable names (see
+!ref prog_input
+ for details).
+<LI><STRONG> none</STRONG>: don't ask for input values.
+</UL>
+!etab
+!tab jfr_jfs_opts -u
+Ask undefined
+!etc
+Ask for undefined variables. The possible answers are:
+<UL>
+<LI><STRONG>none</STRONG>: Don't ask for values for undefined variables (use default values).
+<LI><STRONG>input</STRONG>: When the execution of the program reaches a point where
+a undefined input variable is needed, then ask for a value (only meaningful
+in combination with 'Data order: None').
+<LI><STRONG>local</STRONG>: Ask for values to undefined local variables.
+<LI><STRONG>input-local</STRONG>: Ask for values both for input variables
+and local variables.
+</UL>
+!etab
+!tab jfr_jfs_opts -uv
+Undef fzv-values
+!etc
+Specifies what values are assigned to domain input-variables and the fuzzy
+variables bound to these, when the input is unknown (i.e., '?' in a input file).
+<UL>
+<LI><STRONG>default</STRONG>: assign the domain variables default value with confidence 0.0.
+<LI><STRONG>zero</STRONG>: set domain variables to undefined (value=default),
+fuzzy variables to 0.0.
+<LI><STRONG>one</STRONG>: set domain variables to undefined, fuzzy
+variables to 1.0.
+<LI><STRONG>avg</STRONG>: set domain variables to undefined, fuzzy variables
+to 1.0 / number-of-fuzzy-variables.
+</UL>
+!etab
+!tab jfr_jfs_opts -d
+Data file
+!etc
+Read input from the specified data file.
+!etab
+!tab jfr_jfs_opts -d2
+Data file 2
+!etc
+Read input from the specified data file.
+!etab
+!tab jfr_jfs_opts -Oi
+Write input
+!etc
+<STRONG>yes</STRONG>: write the entered values of input variables to output.
+!etab
+!tab jfr_jfs_opts -Oo
+Write output
+!etc
+<STRONG>yes</STRONG>: write the calculated values of output variables to output.
+!etab
+!tab jfr_jfs_opts -Oe
+Write expected
+!etc
+<STRONG>yes</STRONG>: write the expected values of output variables to output.
+!etab
+!tab jfr_jfs_opts -Ou
+Write adjectives
+!etc
+<STRONG>yes</STRONG>: write the fuzzy value for fuzzy variables bound to output variables
+to output.
+!etab
+!tab jfr_jfs_opts -Ot
+Write texts
+!etc
+<STRONG>yes</STRONG>: write each variable value on its own line preceded by the
+variable's descriptive text or the variable's name.
+!etab
+!tab jfr_jfs_opts -Os
+Write statistics
+!etc
+<STRONG>yes</STRONG>:write statistical information (average values, total
+difference between calculated and expected) to output.
+!etab
+!tab jfr_jfs_opts -o
+Output file
+!etc
+Write output to the specified file. If not specified write output to the screen.
+!etab
+!tab jfr_jfs_opts -p
+Precision
+!etc
+Numbers are written with the specified number of digits after the
+decimal point (E.g., enter "3" for three digits after decimal point).
+!etab
+!tab jfr_jfs_opts -m
+Error filter
+!etc
+output is only written for data sets with distance(calc, expect)
+greater than or equal to that specified here.
+!etab
+!tab jfr_jfs_opts -e
+Adj. err.filter
+!etc
+<STRONG>yes</STRONG>: output is only written for a data set, if at least one output
+variable has calculated value different from expected value when
+both are rounded to nearest adjective.
+!etab
+!tab jfr_jfs_opts -c
+Decimal comma
+!etc
+<STRONG>yes</STRONG>:use "," instead of "." as a decimal point (e.g.,
+<STRONG>3.47</STRONG> instead of <STRONG>3.47</STRONG>) in output.
+!etab
+!tab jfr_jfs_opts -lm
+Log-file mode
+!etc
+<UL>
+<LI><STRONG>standard</STRONG>: write information to
+log file from statements which change a variable's value (or the
+global weight).
+<LI><STRONG>full</STRONG>: write information about a statement
+if its if-part doesn't calculate to 0.0.
+</UL>
+The log-mode is ignored if no log-file is specified.
+!etab
+!tab jfr_jfs_opts -l
+Log-file
+!etc
+Write log information to the file specified here.
+!etab
+!tab jfr_jfs_opts -rs
+Stack-size
+!etc
+Number of bytes in run-stack (default 1024).
+!etab
+!tab jfr_jfs_opts -wav
+Warn var-values
+!etc
+<STRONG>yes</STRONG>: Write warnings about variables out of range.
+!etab
+!tab jfr_jfs_opts -wac
+Warn function args
+!etc
+<STRONG>yes</STRONG>: Write warnings about calculations (division with by zero,
+ log(-1), etc.).
+!etab
+!tab jfr_jfs_opts -was
+Warn stack overflow
+!etc
+<STRONG>yes</STRONG>: Write warnings if stack overflow/underflow.
+!etab
+!tab jfr_jfs_opts -w
+Wait for return
+!etc
+<STRONG>yes</STRONG>: Wait for the user to press the return key before
+exiting the program.
+!etab
+!tab jfr_jfs_opts -pm
+Penalty-file
+!etc
+Read a penalty-matrix from the specified file. See
+!ref err_measures
+ for details about penalty-matrixes).
+!etab
+
+!endif
+!head jfr_changes jfr changes "Changes in JFR version 2"
+<P>
+Changes in JFR version 2.02
+<UL>
+<LI>
+The data file to JFR can have its variables ordered using the 'first-line method'
+described in:
+!ref prog_input
+.
+<LI>
+Score can be calculated with a penalty matrix.
+</UL>
+<P>
+Changes in JFR version 2.00:
+<P>
+!li intro_changes jfr
+!ref jfr_changes "Changes in JFR"
+!eli
+<UL>
+<LI>The write-warnings-about option is now '-wa' (instead of '-w' in version 1).
+<LI>New option-argument to 'datamode' ('-D'): 't' (read text).
+<LI>The log-mode options has changed. Now '-l' specifies the log-file and
+ '-lm' specifies the log-mode (normal or full).
+<LI>New option '-rs' to specify the stack-size.
+<LI>New option '-u': ask for undefined variables.
+<LI>New option '-uv': specify how unknown values '?' in input-file are
+handled.
+<LI>It is now possible to specify a range, when answering with '*' to
+input value ('*<from>:<to>:count').
+<LI>JFR no longer recognizes the extern-statement 'extern cread'
+(use '-u' instead).
+</UL>
+
+

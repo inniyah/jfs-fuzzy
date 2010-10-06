@@ -1,0 +1,15 @@
+# 4 input, 1 output
+sunny 85 85 false 0
+sunny 80 90 true  0
+overcast 83 78 0 100
+rain 70 96 false 100
+rain 68 80 false 100
+rain 65 70 true 0
+overcast 64 65 true 100
+sunny 72 95 false 0
+sunny 69 70 false 100
+rain 75 80 false 100
+sunny 75 70 true 100
+overcast 72 90 true 100
+overcast 81 75 false 100
+rain 71 80 true 0

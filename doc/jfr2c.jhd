@@ -1,0 +1,368 @@
+!head jfr2c prog_run jfr2c "JFR2C: C source code converter"
+
+!ind JFR2C
+!ind "C, converting to"
+<P>
+JFR2C converts a compiled jfs-program to a source code program in ansi C.
+The converted program is written to two files: a program file and a
+header file. The header file contains just a single function declaration
+of the type:
+<PRE>
+     void <func-name>(float *op, float *ip, float *conf);
+</PRE>
+where <func-name> is the user-defined name of the function, and
+the array <op> is the output values, <ip> the input values, and <conf>
+the confidences of the input values (with an option it is possible to
+change 'float' to 'double').
+<P>
+Assume, as an example, that the backing-up-a-truck program is converted
+to the C-code function truck() in the files 'truck.c' and 'truck.h'.
+A simple C-program to run this function could look like this:
+
+<PRE>
+#include <stdio.h>
+#include <math.h>
+#include "truck.h"
+
+int main(int argc, char **argv)
+{
+   float ip[2];
+   float op[2];
+   float conf[2];
+   int m;
+
+   for (m = 0; m < 2; m++)
+     conf[m] = 1.0;
+   ip[0] = 30.0;  /* X */
+   ip[1] = 10.0;  /* Phi */
+
+   truck(op, ip, conf);
+
+   printf("Theta = %6.2f \n", op[0]);
+
+   return 0;
+}
+</PRE>
+<P>
+By default JFR2C creates a C-program, which calculates exactly the same
+function as the original jfs-program. An option controls if the
+produced C-program is optimized for minimal size or maximal speed.
+<P>
+Like the original jfs-program, the C-program uses protected functions
+and rounding in operator-execution. Using options, it is possible to
+further optimize the C-programs, by turning of the protected functions and
+the rounding. If protected functions are turned of, expression like 'log(-1.0)'
+or '100 / 0' will result in errors in the C-programs (they calculates to 0.0 if
+the jfs-program is executed). Turning of rounding means. that an expression like
+ '7.0 or 0.2' calculate to 7.0 in the C-program (if 'or' is defined as 'max'), but
+to 0.2 if the jfs-program is executed.
+
+!head jfr2c_options jfr2c options "Running JFR2C from the command line"
+<P>
+To invoke JFR2C from the command line type 'jfr2c' at the prompt and
+follow it with a set of command line arguments. The command line
+format is:
+<PRE>
+      jfr2c {<option>} <rf>
+</PRE>
+where <rf> is the filename of a compiled jfs-program. If JFR2C is run without
+options, then the C-files are written to <rf>.cpp and <rf>.h.
+<P>JFR2C recognizes the following options:
+<P>
+!dtab jfr2c_options "JFR2C options"
+!tab jfr2c_options -o
+-o <of>
+!etc
+Write the C-source-code to the file <of> (if no extension is specified,
+ '.cpp' is added to the filename). The header-file is written to <ofm>.h,
+where <ofm> is equal to <of> without extension.
+!etab
+!tab jfr2c_options -n
+-n <name>
+!etc
+Give the jfs-program the C-function name <name> (default 'jfs').
+!etab
+!tab jfr2c_options -om
+-om <mode>
+!etc
+Optimize method.
+<BR>
+ <mode>='sp': optimize for speed (default),
+<BR>
+ <mode>='si': optimize for minimal size.
+!etab
+!tab jfr2c_options -np
+-np
+!etc
+Use non-protected versions of the functions acos(), asin(),
+tan(), log(), pow(), and / (division). If non-protected
+functions are used, then an expression like 'log(-7)' gives
+a run-time error when the C-program is executed.
+!etab
+!tab jfr2c_options -nr
+-nr
+!etc
+Turn of rounding to [0,1] before execution of hedges and
+fuzzy operators. Turns of rounding of variables to domain
+limits.
+!etab
+!tab jfr2c_options -ur
+-ur
+!etc
+Use C's standard compare operators (>, >=, <, <=, ==, !=)
+instead of JFS's compare operators. Using C's operators might
+increase speed, but C's operators returns integer, while
+Jfs's operators returns float. Expressions like '(2>1) / ((2>1)+(2>1))'
+can give different results in the C-program and the jfs-program.
+!etab
+!tab jfr2c_options -um
+-um
+!etc
+Use the min/max-functions build into some C-compilers (not
+ansi-C !) and in C++compilers, instead of the jfs-versions of
+minimum and maximum. Can give syntax errors with C++ if combined
+with '-ur' (because the operands are of different type).
+!etab
+!tab jfr2c_options -ui
+-ui
+!etc
+Define small often used functions as inline-functions (C++ only).
+!etab
+!tab jfr2c_options -nc
+-nc
+!etc
+Don't include the confidence-array in the generated C-function
+(if needed, all confidence values are set to 1.0).
+!etab
+!tab jfr2c_options -d
+-d
+!etc
+Use doubles instead of floats in all functions and variables in the
+generated C-program.
+!etab
+!tab jfr2c_options -g
+-g <digits>
+!etc
+ <digits> is the maximal number of digits after the decimal
+point in constants (<digits> has to be in [1,9]). Default 4.
+!etab
+!tab jfr2c_options -St
+-St <size>
+!etc
+Maximum number of nodes in conversion tree (default 128).
+!etab
+!tab jfr2c_options -Ss
+-Ss <size>
+!etc
+Maximum stack-size conversion stack (default 64).
+!etab
+!tab jfr2c_options -s
+-s
+!etc
+Silent; don't write messages to standard output.
+!etab
+!tab jfr2c_options -so
+-so <s>
+!etc
+Redirect standard output to the file <s>.
+!etab
+!tab jfr2c_options -a
+-a
+!etc
+Append to the standard output file (instead of overwriting it).
+!etab
+!tab jfr2c_options -w
+-w
+!etc
+Wait for the user to press the return key before exiting the program.
+!etab
+<P>
+Examples of jfr2c-calls:
+<P>
+Convert the compiled jfs-program 'truck.jfr' to the C-files 'nt.c'
+and 'nt.h' giving the C-function the name 'calctruck':
+<PRE>
+       jfr2c -o nt.c -n calctruck truck
+</PRE>
+Convert the jfs-program 'truck.jfr' to a C-program. Write the C-files to
+ 'truck.cpp' and 'truck.h'. Optimize for minimal size. Turn of protected
+functions and rounding:
+<PRE>
+   jfr2htm -np -nr -om si truck
+</PRE>
+
+!head jfr2c_jfs_run jfr2c options "Running JFR2C from JFS"
+!if !UNIX
+JFR2C is run from the 'Tools' menu or by the 'RunTool' button in
+the main window in option mode. The following options can be set:
+<P>
+!dtab jfr2c_jfs_opts "JFR2C options"
+!tab jfr2c_jfs_opts -o
+Output file
+!etc
+Write the C-source-code to the specified  file.
+The header-file is written to <ofm>.h,
+where <ofm> is the specified filename without extension.
+!etab
+!tab jfr2c_jfs_opts -n
+Function name
+!etc
+Use the specified name as C-function for the jfs-program.
+!etab
+!tab jfr2c_jfs_opts -om
+Optimize for
+!etc
+Optimization method.
+<BR><STRONG>speed:</STRONG>:
+ optimize for speed
+<BR><STRONG>size:</STRONG>
+ optimize for minimal size.
+!etab
+!tab jfr2c_jfs_opts -np
+Non-protected functions
+!etc
+<STRONG>yes:</STRONG>
+use non-protected versions of the functions acos(), asin(),
+tan(), log(), pow(), and / (division). If non-protected
+functions are used, then an expression like 'log(-7)' gives
+a run-time error when the C-program is executed.
+<BR><STRONG>no:</STRONG>
+Use protected version of the functions.
+!etab
+!tab jfr2c_jfs_opts -nr
+Turn of rounding
+!etc
+<STRONG>yes:</STRONG>
+turn of rounding to [0,1] before execution of hedges and
+fuzzy operators. Turns of rounding of variables to domain limits.
+!etab
+!tab jfr2c_jfs_opts -ur
+Use C's relation
+!etc
+<STRONG>yes:</STRONG>
+use C's standard compare operators (>, >=, <, <=, ==, !=)
+instead of jfs's compare operators. Using C's operators might
+increase speed, but C's operators returns integer, while
+Jfs's operators returns float. Expressions like '(2>1) / ((2>1)+(2>1))'
+can give different results in the C-program and the jfs-program.
+!etab
+!tab jfr2c_jfs_opts -um
+Use C's min/max-functions
+!etc
+<STRONG>yes:</STRONG>
+use the min/max-functions build into some C-compilers (not
+ansi-C !) and in C++compilers, instead of the jfs-versions of
+minimum and maximum. Can give syntax errors with C++ if combined
+with 'Use C's relation' (because the operands are of different type).
+!etab
+!tab jfr2c_jfs_opts -ui
+Use inline functions
+!etc
+<STRONG>yes:</STRONG>
+Define small often used functions as inline-functions (C++ only).
+!etab
+!tab jfr2c_jfs_opts -nc
+Function without confidence
+!etc
+<STRONG>yes:</STRONG>
+ don't include the confidence-array in the generated C-function
+(if needed, all confidence values are set to 1.0).
+!etab
+!tab jfr2c_jfs_opts -d
+Use doubles
+!etc
+<STRONG>yes:</STRONG>
+Declare all variables and functions to be of the type 'double'.
+<BR><STRONG>no:</STRONG>
+Declare variables and functions of the type 'float'.
+!etab
+!tab jfr2c_jfs_opts -g
+Digits
+!etc
+Specify the maximum number of digits after the decimal
+point in constants (has to be in [1,9]).
+!etab
+!tab jfr2c_jfs_opts -St
+Nodes conv-tree
+!etc
+Maximum number of nodes in conversion tree (default 128).
+!etab
+!tab jfr2c_jfs_opts -Ss
+Stack-Size
+!etc
+Maximum stack-size conversion stack (default 64).
+!etab
+!tab jfr2c_jfs_opts -s
+Silent
+!etc
+Silent (don't write messages to standard output).
+!etab
+!tab jfr2c_jfs_opts -so
+Redirect stdout to
+!etc
+Redirect standard output to the file specified file.
+!etab
+!tab jfr2c_jfs_opts -a
+Append to stdout
+!etc
+<STRONG>yes:</STRONG>
+append to the standard output file (instead of overwriting it).
+!etab
+!tab jfr2c_jfs_opts -w
+Wait for return
+!etc
+<STRONG>yes:</STRONG>
+Wait for the user to press the return-key before exiting the program.
+!etab
+<P>
+
+!endif
+!head jfr2c_limitations jfr2c options "Limitations in JFR2C version 2.02"
+
+Limitations/known bugs in JFR2C version 2.03:
+<P>
+!dlist jfr2c_lims
+!li jfr2c_lims 1
+No support for extern statements.
+!eli
+!li jfr2c_lims 2
+The created C-programs are difficult to understand/change.
+!eli
+!li jfr2c_lims 3
+No handling of unknown input values.
+!eli
+!li jfr2c_lims 4
+The optimizer is not perfect.
+!eli
+
+!head jfr2c_v2 jfr2c changes "Changes in JFR2C version 2"
+<P>
+<H4>Changes in version 2.03</H4>
+<UL>
+<LI>
+A bug in the handling of return-statements is fixed.
+<LI>
+A bug in the jfr2c_lib.cpp, when called several times is fixed.
+</UL>
+<P>
+<H4>Changes in version 2.02</H4>
+<UL>
+<LI>
+A bug in the generation of header files is fixed. Earlier version of JFR2C
+could define some non-used functions with random names.
+<LI>
+The created C-program can now use variables and functions of the type 'double'
+instead of 'float'.
+</UL>
+<P>
+
+<H4>Changes in JFR2C version 2.01</H4>
+<P>
+<UL>
+<LI>
+A bug, where JFR2C used minimum instead of maximum in global-weight-calculation, is
+fixed.
+<LI>
+A bug, where the standard min/max-operators was used instead of the correct
+rmin/rmax-function, is fixed.
+</UL>

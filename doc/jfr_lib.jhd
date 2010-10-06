@@ -1,0 +1,151 @@
+!head source_jfr source jfr_lib "JFR_LIB: C-library to run jfs-programs"
+
+!ind "Jfr_lib"
+!ind "C, running jfs-programs from"
+JFR_LIB is a source-code library, used to load and run compiled JFS
+programs. jfr_lib is written in Ansi C but has has only been
+tested on Borland's 'C++ Builder 3' compiler.
+<P>
+To run a jfs-program from a C program do the following:
+<P>
+!dlist source_jfr_run
+!li source_jfr_run 1
+Compile 'jfr_lib.cpp' producing an object file ('.obj'-file).
+!eli
+!li source_jfr_run 2
+ Include the header file  'jfr_lib.h' in your program.
+!eli
+!li source_jfr_run 3
+Call the functions: jfr_init(), jfr_load(), jfr_run(), jfr_close()
+ and jfr_free() from your program (see example below).
+!eli
+!li source_jfr_run 4
+Compile your program and link it with 'jfr_lib.obj'.
+!eli
+<P>
+The following code fragment shows how to load and run the jfs-program
+'truck.jfr'. The complete code is in the file 'jfr_ex01.cpp' in the 'source\samples'
+directory.
+<PRE>
+
+{
+  float ip[10];                /* input values  */
+  float op[10];                /* output values */
+  char fname[] = "truck.jfr";  /* filename      */
+  void *head;
+  int res;
+
+   jfr_init(0);
+   res = jfr_load(&head, fname);
+   if (res == 0)
+   { ip[0] = 40.0;  /* x-value   */
+     ip[1] = 108.0; /* phi-value */
+     printf("Input : x = %-.2f, phi = %-.2f\n", ip[0], ip[1]);
+     jfr_run(op, head, ip);
+     printf("Output: theta = %-.2f\n", op[0]);
+     jfr_close(head);
+   }
+   else
+     printf("Error loading program. Error code %d\n", res);
+   jfr_free();
+}
+</PRE>
+The functions in jfr_lib are described in the file 'jfr_lib.h'. Many of
+the functions are only useful, if jfr_lib is used together with the
+jfg_lib library. That is the case for all functions in the sections
+'variable-handling' and 'expression-calculating'. Examples of how to use those
+functions are given in the documentation to the jfg_lib library.
+<P>
+The previous example showed how to use the standard load-function and
+run-function. Jfr_lib includes a set of extended functions to load and
+run. They are: jfr_aload() and jfr_arun().
+<BR>
+jfr_aload() allocates extra memory to the loaded jfs-program. This allows the program to grow by inserting new
+statements in the compiled jfs-program. The jfp_lib is needed to do this.
+See the example program 'jfp_ex04.cpp' for an example of the use of
+jfr_aload().
+<BR>
+jfr_arun() is an extended version of jfr_run().
+When a jfs-program is run by jfr_arun(), it is possible to
+specify what C-function is called, when an 'extern' statement in the
+jfs-program is executed. It is also possible to specify a debug-function.
+That function is called (a) after execution of each statement, (b) before execution
+of the first statement, and (c) after execution of the last statement. 
+Log-writing in JFR is done by a debug-function. When running programs by jfr_arun()
+it is possible to specify confidence values to input variables (a special
+confidence value is used to set the value of an input variable to undefined).
+It is Also possible to specify a function to be called when the running jfs-program
+needs the value of an undefined variable.
+<P>
+The example-program 'jfg_ex02.cpp' uses several of the possibilities in jfr_arun().
+<P>
+<STRONG>NOTE</STRONG>:
+The jfs-function 'random' calls the C-function 'rand'. There is no
+initialisation of the random numbers in jfr_lib. To get different random
+numbers at every run of a C-program calling jfr_lib, the C-function 'srand()'
+(or randomise()) should be called from the C-program before the first call
+of jfr_run().
+<P>
+jfr_lib also includes a set of functions to get and set the values of
+domain variables and fuzzy variables. These functions are typical used by
+the 'extern'-handling function specified in jfr_aload(). The functions
+identifies variables by there internal variable numbers. To find the
+variable numbers use the functions in jfg_lib. The example program
+'jfg_ex02.cpp' uses jfg_lib-functions to find variable numbers and
+jfr_lib functions to get variable values.
+<P>
+Jfr_lib includes a set of functions to calculate hedges, user-defined
+operators, and user-defined relations. For example the call:
+<PRE>
+  jfr_op_calc(JFS_ONO_AND, 0.7, 0.4)
+</PRE>
+ returns the value of '0.7 and 0.4'.
+<P>
+The calculate functions and the functions to set and get variable values
+can be used without running the loaded jfs-program. However the jfs-program
+has to be activated by calling jfr_activate() before calling the functions.
+<P>
+One possible use of the calculating functions is to get a graphical
+description of hedges operators and fuzzification-functions. The example
+program 'jfg_ex03.cpp' is an example of this.
+
+!head source_jfr_changes source_jfr changes "Changes in JFR_LIB version 2"
+<P>
+<H4>Changes in jfr_lib version 2.03</H4>
+<P>
+<UL>
+<LI>A bug in the handling of 'return' statements has been fixed.
+</UL>
+<P>
+!li intro_changes jfr_lib
+!ref source_jfr_changes "Changes in JFR_LIB"
+!eli
+<H4>Changes in jfr_lib version 2.00</H4>
+<P>
+<UL>
+<LI>
+Jfr_lib now uses a central stack and an active program. The jfr_lib
+is initialised by calling the function jfr_init() and memory is
+set free by calling jfr_free().
+<LI>
+The new function jfr_close() is used to free the memory reserved
+to a jfs-program (in version 1, this was done by jfr_free()).
+<LI>
+Fewer arguments to jfr_aload (the stack are now allocated by jfr_init()).
+<LI>
+Extra parameter 'uvget' to jfr_arun (function to get values for undefined).
+Extra types of confidence-values.
+<LI>
+jfr_lib no longer includes the functions: jfr_cload(), jfr_iload(),
+jfr_p_init(), jfr_irun(), jfr_check(), jfr_abort(), jfr_goto(),
+jfr_sfunc_calc(), jfr_dfunc_calc(), jfr_between_calc() and
+jfr_vfunc_calc() functions.
+<LI>
+New structure and function: jfr_stat_desc and jfr_statement_info()
+(replaces jfg_dprog_desc and jfg_dprog() placed in jfg_lib in version 1).
+<LI>
+New function jfr_activate() to make a jfs-program the active program.
+<LI>
+The variable-functions takes fewer arguments (uses the active program).
+</UL>
+

@@ -1,0 +1,81 @@
+
+title "Pricing model";
+/* Calculates sales price for an article. 
+   
+   input: cost_price,
+          amount (number of pieces of the article, the customer want to buy),
+          customer_age (number of months the customer has been in database),
+          total_amount (total of what the customer has bought in the past). 
+
+  output: sales_price (sales price for the article).*/
+
+operators
+    or bsum precedence 20;
+    fmax max;
+
+domains
+    dollar "$" 0 100000;
+    amount "pieces" 0 10000;
+    percent "%" 0 100;
+    months "months" 0 1000;
+    customer_type 1 3;
+
+input
+    cost_price "Cost price" dollar default 50;
+    qty "Qty" amount default 15;
+    customer_age "Number of months the customer has been in database" months
+        default 10;
+
+output
+    sales_price "Sales price" dollar;
+
+local
+    total_amount "Total amount in the past" dollar default 40000;
+    avg_amount "Avg amount a month" dollar default 0;
+    customer "Customer-type" customer_type default 1;
+    discount "Discount" percent defuz avg f_comp fmax default 0;
+
+adjectives
+    avg_amount small 1000;
+    avg_amount medium 5000;
+    avg_amount large 10000;
+
+    customer bad 1;
+    customer normal 2;
+    customer good 3;
+
+    discount none 0;
+    discount small 5;
+    discount medium 10;
+    discount large 15;
+
+    qty small 5;
+    qty normal 20;
+    qty large 100;
+
+program
+  switch; 
+  case customer_age != 0:
+    extern read total_amount;  
+    avg_amount = total_amount / customer_age;
+  end;
+
+  if avg_amount is small then customer is bad;
+  if avg_amount is medium then customer is normal;
+  if avg_amount is large then customer is good;
+
+  sales_price = 2 * cost_price;
+
+  if qty is small then discount is none;
+  if qty in (normal, large) and customer is bad then discount is 
+small;
+  if qty is normal and customer in (normal, good) then discount 
+is medium;
+  if qty is large and customer is normal then discount is 
+medium;
+  if qty is large and customer is good then discount is large;
+  if customer_age = 0 then discount = 10; 
+    /* special discount to new customers.*/
+
+  sales_price = sales_price - discount / 100.0 * sales_price;
+ 

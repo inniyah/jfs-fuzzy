@@ -1,0 +1,29 @@
+
+title "Sinus med linear functions";
+/* Sample program to JFI. Improve a poor sinus-function from the data-file 
+   'sin.dat'. Improve numbers in expressions, center-values.*/
+
+domains
+    x_dom 0 6.3;
+    y_dom -1 1;
+
+input
+    x "X" x_dom;
+
+output
+    y "Y" y_dom d_comp avg;
+
+adjectives
+    x s %0;
+    x sm %1.575;
+    x m %3.15;
+    x ml %4.725;
+    x l %6.3;
+
+program
+    ifw %0.5 x s then y = %1 * x + %0.5;
+    ifw %0.5 x sm then y = %1 * x + %0.5;
+    ifw %0.5 x m then y  = %1 * x + %0.5;
+    ifw %0.5 x ml then y = %1 * x + %0.5;
+    ifw %0.5 x l then y = %1 * x + %0.5;
+

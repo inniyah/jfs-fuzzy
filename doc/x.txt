@@ -1,0 +1,136 @@
+File jfc.jhd:
+!ref jfc_changes "Changes in JFC"
+File jfea.jhd:
+!ref learn_ex
+!ref ap_examples
+!ref jfea_bugs
+!ref jfea_v2 "Changes in JFEA"
+File jffam.jhd:
+!ref learn_meth_WM
+!ref learn_ex
+!ref ap_examples
+!ref jfrd_v2 "Changes in JFFAM"
+File jfg_lib.jhd:
+!ref source_jfg_changes "Changes in JFG_LIB"
+File jfldecl.jhd:
+!ref jfl_decl_fzvars
+!ref jfl_decl_domain
+!ref jfl_prog_thenfz
+!ref jfl_prog_thenva
+!ref jfl_decl_defuz
+!ref jfl_decl_defuz
+!ref jfl_decl_fuzz
+!ref jfl_decl_domain
+!ref jfl_decl_domvar
+!ref jfl_decl_fzvars jfl_fzv_calc below
+!ref jfl_decl_fzvars jfl_fzv_calc below
+!ref jfl_decl_fzvars jfl_fzv_calc  below
+!ref jfl_decl_fzvars jfl_fzv_calc below
+!ref jfl_decl_fuzz
+!ref jfl_decl_fzvars
+!ref jfl_decl_domvar
+!ref jfl_decl_fzvars
+File jfp_lib.jhd:
+!ref source_jfp_changes "Changes in JFP_LIB"
+File jfrd.jhd:
+!ref learn_meth_WM
+!ref learn_ex
+!ref ap_examples
+!ref jfrd_v2 "Changes in JFRD"
+File jfs.jhd:
+!ref started_first
+!ref started_plan
+File jfsw.jhd:
+!ref jfsw_code
+!ref jfsw_menus jfsw_ignuplt
+!ref jfsw_options
+!ref jfsw_errors
+!ref jfsw_ignult
+!ref jfsw_runplot
+!ref jfsw_fedit
+!ref jfl_syntax_syn
+!ref jfl_decl_hedges
+!ref jfl_decl_hedges htypes
+!ref jfsw_plf
+!ref jfl_decl_ops
+!ref jfl_decl_ops otypes
+!ref jfl_decl_rels
+!ref jfsw_plf
+!ref jfl_decl_domains
+!ref jfl_decl_fzvars
+!ref jfl_decl_fuzz
+!ref jfl_decl_defuz
+!ref jfl_decl_defuz
+!ref jfsw_ins_adj
+!ref jfl_decl_domvars
+!ref jfl_prog_thenfzvar
+!ref jfl_prog_thenvar
+!ref jfl_decl_defuz
+!ref jfl_decl_defuz
+!ref jfl_prog_thenclear
+!ref jfl_decl_fuzz
+!ref jfl_decl_array
+!ref learn
+!ref jfgp
+!ref learn
+!ref ad_registry
+File learna.jhd:
+!ref jfs uci
+!ref jfs cox2
+!ref jfid3
+!ref jfs mich
+File intro.jhd:
+!ref jhlp
+!ref jhlp
+File jfgp.jhd:
+!ref learn_ex
+!ref ap_examples
+!ref jfgp_v2 "Changes in JFGP"
+File jfi.jhd:
+!ref jfs mich
+!ref learn_ex
+!ref ap_examples
+!ref jfi_changes "Changes in JFI"
+File jfid3.jhd:
+!ref learn_meth_WM
+!ref learn_ex
+!ref ap_examples
+!ref jfid3_v2 "Changes in JFID3"
+File jflprog.jhd:
+!ref jfl_decl_fuzz
+!ref jfl_prog_thenvar varround
+!ref jfr
+!ref jfl_prog_proced.
+!ref jfl_changes "Changes in Jfl"
+File jfr.jhd:
+!ref jfr_changes "Changes in JFR"
+File jfr_lib.jhd:
+!ref source_jfr_changes "Changes in JFR_LIB"
+File jfr2htm.jhd:
+!ref jfr2s
+!ref jfr2htm_changes "Changes in JFR2HTM"
+File jfr2s.jhd:
+!ref jfr2s_changes "Changes in JFR2S"
+File jhlp.jhd:
+!ref jhlp_options
+!ref jhlp_jfs_opts
+File source1.jhd:
+!ref source_jfg
+!ref source_jfp
+!ref source_jfr
+File started.jhd:
+!ref jfl_decl_fuzz
+!ref jfl_decl_defuz
+!ref jfl_prog_expr
+!ref jfl_decl_ops
+!ref jfl_decl_rels
+!ref jfl_prog_expr
+!ref jfl_prog_expr
+!ref jfl_prog_thenva
+!ref jfl_prog_thenin
+!ref jfl_decl_array
+!ref jfl_prog_proced
+!ref jfl_prog_while
+!ref jfl_prog_thenex
+!ref jfl_syntax_syn
+!ref jfr

@@ -1,0 +1,20 @@
+
+   Copyright (c) 1999-2000   Jan E. Mortensen                    
+  
+   Permission to use, copy, and distribute this software and its
+   documentation for any purpose with or without fee is hereby granted,
+   provided that the above copyright notice appear in all copies.
+
+   Permission to distribute binaries including jfs-files for any purpose
+   is hereby granted.
+ 
+   This software is provided "as is" without express or implied warranty.
+  
+  
+   AUTHOR
+ 
+     Jan E. Mortensen           email:  jemor@inet.uni2.dk
+     Lollandsvej 35 3.tv
+     DK-2000 Frederiksberg
+     Denmark
+

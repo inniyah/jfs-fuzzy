@@ -1,0 +1,1102 @@
+!head jfr2htm prog_run jfr2htm "JFR2HTM: JavaScript converter"
+
+!ind JFR2HTM
+!ind "JavaScript, converting to"
+!ind "HTML, converting to"
+JFR2HTM converts a compiled jfs-program to a Web page (a HTML file), with
+the program converted to JavaScript (optionally placed in a
+different file). The newly created HTML file subsequently can be housed on
+a server, then accessed and run by a user who possesses a suitable web
+browser (e.g. Microsoft Internet Explorer, Netscape Navigator, etc.). The
+HTML file contains a
+<STRONG>form</STRONG>
+ with the various input and output variables included
+as  fields. The form also contains two buttons named
+<STRONG>Calculate</STRONG> and <STRONG>Reset</STRONG>.
+Use is straightforward: When one enters input field data and clicks the
+ 'Calculate' button, output values are calculated and displayed.
+Example:
+<A HREF="%%idweight.htm">Ideal weight</A>.
+<P>
+JFR2HTM can run in two modes:
+<STRONG>overwrite</STRONG> and <STRONG>update</STRONG>.
+<BR>&bull;
+When run in overwrite mode, it creates a new HTML file <htmf> from the
+compiled jfs-program. If a HTML file with the same filename exists, it is
+replaced (overwritten).
+<BR>&bull;
+When run in update mode, JFR2HTM (a) updates the specified HTML file by
+replacing all lines between <!-- JFS BEGIN --> and <!-- JFS END --> in the
+<STRONG>header</STRONG>
+section of the html-file, with the jfs-program
+converted to JavaScript. (b) It replaces all lines between <!-- JFS BEGIN -->
+and <!-- JFS END --> in the
+<STRONG>body</STRONG>
+section of the HTML file with a form containing the
+input variables, the output variables, and the two buttons
+(update of the body section can be suppressed by an option). See
+!ref jfr2htm_htmlfil
+ for details of the HTML file format.
+<BR>&bull;
+When run without option JFR2HTM first checks if the output file <htmf> exists.
+If so JFR2HTM runs in update mode; else it runs in overwrite mode.
+<P>
+An alternative to using the update mode is to write the
+HTML form and the JavaScript program to different files (this is controlled by
+an option). A JavaScript file is always overwritten.
+<P>
+Of course, the "finished" HTML file can be accessed and tweaked with an ordinary
+text editor or some other suitable tool. For example, a web page developer might
+desire to make various changes for aesthetic reasons.
+<P>
+Using combinations of options, domain variable argument values, and
+ 'extern' statements  JFR2HTM can:
+<UL>
+<LI>Control the contens and placement of field-labels and the field types.
+<LI>Create and write output to HTML text areas.
+<LI>Use a cascading style sheet to format the generated HTML file.
+</UL>
+<P>
+An example which shows some of the possibilities:
+<A HREF="%%jfr2hdem.htm">jfr2hdem.htm</A>.
+The details are described in the following chapters.
+
+!li samp_progs control
+<B>JFR2HDEM.JFS</B>
+A program showing the use of variable arguments, style sheets, and 'extern'
+statements in JFR2HTM (to see the style sheets use one of the style sheets 'jfr2hdem.css'
+or 'jfr2hcss.css' also found in the samples directory).
+!eli
+
+!head jfr2htm_extern jfr2htm extern_statement "Extern statements"
+
+!ind "Extern statements, JFR2HTM"
+!ind "JFR2HTM, Extern statements"
+!ind "Text areas, writing to"
+JFR2HTM recognizes the following 'extern' statements in the jfs-program:
+<PRE>
+extern textarea [<name>] <label> <columns> <rows>;
+extern printf "<format_string>" {, <dvar_name>};
+extern fprintf <name>, "<format_string>" {, <dvar_name>};
+extern alert "<format_string>" {, <dvar_name>};
+extern javascript "<jstats>
+</PRE>
+
+<H4>The 'extern textarea' statement</H4>
+!ind "Extern textarea"
+<P>
+Before JFR2HTM converts the program code in a jfs-program, it searches through
+the jfs-program, and finds the statements of the type 'extern textarea'.
+For each such statement a HTML text area is created in the HTML file. The text areas
+are placed in the HTML form after the output variables. The texts areas are
+ordered as they are found in the jfs-program. The syntax of the 'extern textarea'
+statement is:
+<PRE>
+     extern textarea [<name>] <label> <columns> <rows>;
+</PRE>
+The <label> is placed above the text area in the HTML file. The number <columns>
+and <rows> specifies the size of the text area. <columns> is the width
+(measured in charecters) of the text area and <row> are the height (also
+measured in characters) of the text area (of course the sizes don't limit
+the amount of data, which can be written to the text area). The <name> is used
+by the 'extern fprintf' statement to identify the text area (se below). A jfs-program
+can only have one 'extern textarea' statement without a name (this is text area
+which the 'extern printf' writes to).
+<BR>Examples of 'extern textarea' statements:
+<PRE>
+     extern textarea "Result" 70 20;
+     extern textarea errors "Errors in data" 70 5;
+</PRE>
+The first statement creates an unnamed text area 20 rows high and 70 charecters wide.
+It is labeled "Result".
+The second statement creates a text area labeled "Errors in data" with the name
+'errors'. The text area is 70 characters wide and 5 characters high.
+<P>
+
+<H4>The 'extern printf' and 'extern fprintf' statements</H4>
+<P>
+!ind "Extern printf, fprintf (JFR2HTM)"
+The 'extern printf' and 'extern fprintf' statements are used to
+write text to the text areas created with 'extern textarea' statements.
+The 'extern printf' writes to the unnamed text area and the
+'extern fprintf' writes to a named text area. The syntax of the
+statements:
+<PRE>
+     extern printf "<format_string>" {, <dvar_name>};
+     extern fprintf <name>, "<format_string>" {, <dvar_name>};
+</PRE>
+The statements writes the <format_string> to a text area. In the <format_string>
+The character sequence '\n' in the format string is replaced by a new line and
+the  character '%' followed by none of the characters 'f', 'c' or 'a' is
+replaced with a value from the {<dvar_name>} list of domain variable names. The
+first '%' in is replaced with a value from the first <dvar_name>, the second
+ '%' is replaced with a value from the second <dvar_name> and so on. The
+meaning of the characters after the '%' is:
+<UL>
+<LI><STRONG>f: </STRONG>
+The numeric value of the domain variable is written.
+<LI><STRONG>c: </STRONG>
+The confidence value of the domain variable is written.
+<LI><STRONG>a: </STRONG>
+The adjective name of the domain variable's fuzzy variables with
+the highest value is written.
+</UL>
+The <name> argument to the 'extern fprintf' statement has to be
+the name of a text area defined with 'extern textarea' command.
+The text is written to the this text area.
+<P>
+<STRONG>Example:</STRONG>
+If the text areas from the example above are used, then the
+statements:
+<PRE>
+  extern printf "The values of 'speed' is:\n";
+  extern printf "Value: %f,\nConfidence: %c,\nAdejective: %a.\n", speed, speed, speed;
+  if day < 1 or day > days_in_month(year, month) then
+    extern fprintf errors, "Illegal date: %f-%a-%f\n", day, month, year);
+</PRE>
+could write something like:
+<PRE>
+The values of 'speed' is:
+Value: 117.26,
+Confidence: 0.4,
+Adjective: high.
+</PRE>
+to the unnamed text area and maybe something like:
+<PRE>
+Illegal date: 32-NOV-2000
+</PRE>
+to the text area named 'errors'.
+<P>
+<H4>The 'extern alert' statement</H4>
+<P>
+The alert statement is used to write a text to an alert box. The syntax
+nearly the same as that of the 'extern printf' statement:
+<PRE>
+    extern alert "<format_string>" {, <dvar_name>};
+</PRE>
+The <format_string> and <dvar_name> list are used just like in the
+'extern printf' statement. The message is shown in an alert box
+when the statement is executed. Example:
+<PRE>
+    if from_val > to_val then extern alert "Error in data. %f > %f", from_val, to_val;
+</PRE>
+<P>
+<H4>The 'extern javascript' statement </H4>
+<P>
+The syntax of the 'extern javascript' statement is:
+<PRE>
+     extern javascript "<jstats>";
+</PRE>
+where <jstats> is Javascript statements. For example:
+<PRE>
+     extern javascript "if (v7 > 100.0) window.alert('Speed to large')";
+</PRE>
+JFR2HTM has no interface functions to access or change the jfs-variables
+from the <jstats>-statements, but the values of domain variables are
+available in JavaScript variables of the type 'd%', where '%' is the number
+of the jfs-variable, (the Javascript variable 'd2' contains the value of
+jfs-variable number 2). The confidence of jfs domain variables are in
+Javascript variables of the type 'c%', where '%' is the number of the
+jfs-variable. The value of jfs fuzzy variables are in Javascript variables of
+the type 'f%', where '%' is the number of the jfs fuzzy variable. One way to
+find the number of domain and fuzzy variables is to use the program JFR2S with
+the 'write var-nos'-option (see:
+!ref jfr2s
+ for details). Changing the value of a domain
+variable in <jstats> only works if the change is surrounded by the statements:
+     h=v%;<change value of v%>;fu%()
+for example an extern statement setting variable number 2 to 17.0:
+<PRE>
+    extern javascript "h=v2;v2=17.0;fu2()";
+</PRE>
+A statement changing a fuzzy variable has to be written as:
+<PRE>
+    h=f%;<change value of f%>;df$(f%)
+</PRE>
+where '$' is the number of the domain variable f% is bound to. For example to
+change the value of fuzzy variable number 7 bound to domain variable number 3
+to 0.4:
+<PRE>
+    extern javascript "h=f7;f7=0.4;df3(f7)";
+</PRE>
+
+!head jfr2htm_htmlfil jfr2htm htmlformat "Format of HTML file"
+!ind "HTML, file format"
+This chapters describes the details of the HTML file generated by JFR2HTM.
+It describes the HTML tags and the style sheet classes used in the
+generated file. In the description text written in uppercase are
+generated just like written while text written in  lower cases are replaced
+with data from the program (NOTE fixed class-names which are in lower-case
+in the generated program are written in upper case in the format description).
+Square brackets are placed around text, whose generation depends on
+the jfs-program or the options to JFR2HTM. Blank lines and tabulation not part
+of generated HTML files are added to the descriptions to make them more
+readable.
+<P>
+!ind "JFR2HTM, overwrite/update"
+When JFR2HTM is run in overwrite mode (or in update mode and the destination
+file doesn't exist) JFR2HTM creates a HTML file of the form:
+<PRE>
+  <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN">
+  <HTML>
+    <HEAD><TITLE>title of jfs-program here</TITLE>
+          [ <LINK REL=STYLESHEET TYPE=TEXT/CSS HREF="name of stylesheet here"> ]
+
+       <!-- JFS BEGIN -->
+          jfs-program converted to JavaScript here
+       <!-- JFS END -->
+
+    </HEAD>
+
+    <BODY>
+      <H1>title of jfs-program here</H1>
+      [ <SPAN CLASS="JFR2HTM_COMMENT"> comment to title here</SPAN> ]
+
+      <!-- JFS BEGIN -->
+          form generated from input and output variables here
+      <!-- JFS END -->
+
+    </BODY>
+  </HTML>
+</PRE>
+When JFR2HTM is run in update mode (and the destination HTML file already exists)
+only the JavaScript code and the input/output-form placed between
+the tags <!-- JFS BEGIN --> and <!-- JFS END --> are changed. The rest of
+the HTML file isn't changed. The change of the input/output-form can be
+suppressed by an option. Note that changes in jfs-program's title or title-comment
+or a different style sheet won't change the HTML file.
+<P>
+The format of the input/output-form is:
+<PRE>
+  <DIV CLASS="JFR2HTM_FORM">
+    <FORM NAME="JFS">
+      [ <PRE> ]
+
+      <DIV CLASS="IP_BLOCK">
+         fields generated from input variables here
+      </DIV>
+
+      <DIV CLASS="BUTTON_BLOCK">
+         calculate and reset buttons here
+      </DIV>
+
+      <DIV CLASS="OP_BLOCK">
+         fields generated from output variables here
+         output text areas  here
+      </DIV>
+
+      [ </PRE> ]
+    </FORM>
+  </DIV>
+</PRE>
+The optional <PRE>, </PRE> is only included in the HTML file if JFR2HTM
+is called with label placement 'left' and fieldsets are not used.
+<P>
+If the argument of a variable sets the variable type 'fieldset', then the
+variable and the variables following it until the next fieldset-variable
+are placed in the tags:
+<PRE>
+  <DIV CLASS="O_FIELDSET">
+     <FIELDSET>
+       [ <SPAN CLASS="lABEL_LEGEND">
+           <LEGEND>text to hidden variable here</LEGEND>
+         </SPAN>
+       ]
+       <DIV CLASS="I_FIELDSET">
+          <DIV CLASS="FS_fsetno">
+            [ <SPAN CLASS="LABEL_FIELDSET">comment to hidden variable here</SPAN> ]
+            [<PRE>]
+              variables in field set here
+            [</PRE>]
+          </DIV>
+       </DIV>
+     </FIELDSET>
+   </DIV>
+</PRE>
+The optional LEGEND-section is taken from the fieldset-variable's text.
+The optional comment is taken from the fieldset-variable's comment.
+<BR>
+The class 'fsetno' part of the <DIV CLASS="FS_fsetno"> is replaced with the
+number of the fieldset. The first fieldset is number 0 (zero), the next number
+one and so on, i.e. the first fieldset includes a <DIV CLASS="fs_0"> tag and
+so on.
+<P>
+If JFR2HTM is run with label-mode set to 'table' or 'multicolumn-table' the
+input/output-fields and the buttons are placed in HTML tables. By default
+all fields and buttons are written to a single table. If field sets are used, then
+a table is created for each field set. The format of standard tables are:
+<PRE>
+  <DIV CLASS="table_class">
+    <TABLE>
+       <TBODY>
+          input fields here
+       </TBODY>
+    </TABLE>
+  </DIV>
+</PRE>
+where <table_class> is 'table_2cl' if the HTML file is generated with
+label mode 'table' and <table_class> is 'table_mcl' if the file is generated
+with the 'multi column' label mode. If (a) multi column label mode is used, (b)
+all variables in a field set is from the same domain (c) none of the variables
+have adjectives defined directly for the variable, and (d) all variables uses
+the field type 'radiobutton', then a somewhat different table is created with
+the adjective labels placed in a header row:
+<PRE>
+  <DIV CLASS="TABLE_MCLHEAD">
+    <TABLE>
+       <thead>
+          <TR><TH></TH>
+            adjective labels here
+          </TR>
+       </THEAD>
+       <TBODY>
+          input fields here
+       </TBODY>
+    </TABLE>
+  </DIV>
+</PRE>
+If The HTML file is generated without a 'table' label-mode, then an input/output field
+is of the form:
+<PRE>
+  <SPAN CLASS="label_mode">label text here</SPAN>
+  [ <BR> ]
+  <INPUT field-type, size, validation-call etc here >
+  [ confidence field here ] [ help button here ]
+  [ <BR> ]
+  [ <BR> ]
+</PRE>
+Where <label_mode> is either 'label_left' or 'label_above'. 'label_left' if label-mode
+is 'left' and 'label_above' if label-mode is 'above' or 'above blank'. The first <BR>
+is included if label-mode is 'above' or 'above blank'. The second <BR> is included
+if the 'no_newline' flags is not set for the variable. The last <BR> is only included if
+the label-mode is 'above blank'.
+
+!head jfr2htm_stylesheet jfr2htm stylesheet "Stylesheet classes in HTML file"
+
+!ind "Style sheet codes, JFR2HTM"
+HTML files generated by JFR2HTM contains references to several special stylesheet
+selector classes, i.e. the HTML files include tag-blocks of the type
+ <DIV CLASS="xxx"> ... </DIV>, where 'xxx' is the name of the selector class. By
+writting stylishness with format commands for the different selector classes
+it is to some degree possible to control the way the generated HTML form is
+presented by the browser. JFR2HTM uses the classes:
+<P>
+<TABLE BORDER><CAPTION><STRONG>stylesheet classes</STRONG></CAPTION>
+<THEAD><TR><TD><STRONG>Class</STRONG></TD><TD><STRONG>Use</STRONG></TD></TR></THEAD>
+<TBODY>
+<TR>
+<TD>
+button_block
+</TD><TD>
+Placed around the buttons labeled 'Calculate' and 'Reset'.
+</TD></TR><TR>
+<TD>
+fs_%
+</TD><TD>
+Is placed just inside every fieldset. The '%' is replaced by the number of the
+fieldset. The first fieldset uses the class 'fs_0', the next 'fs_1' and so
+on. The numbering continues through the input, button, and output block. The
+first fieldset in the output block can for example be 'fs_3'.
+</TD></TR><TR>
+<TD>
+i_fieldset
+</TD><TD>
+Placed inside every fieldset. immediately after the <FIELDSET>. The block ends
+immediately before the </FIELDSET> tag.
+</TD></TR><TR>
+<TD>
+ip_block
+</TD><TD>
+Placed around all fields (and fieldsets) created from input variables (from the start
+of the form to the buttons 'run' and 'reset').
+</TD></TR><TR>
+<TD>
+jfr2htm_comment
+</TD><TD>
+Placed around the title-comment (if it is included in the generated HTML file).
+</TD></TR><TR>
+<TD>
+jfr2htm_form
+</TD><TD>
+The generated HTML form is placed inside this class.
+</TD></TR><TR>
+<TD>
+label_above
+</TD><TD>
+All field-labels placed above its field is placed inside this class.
+</TD></TR><TR>
+<TD>
+label_fieldset
+</TD><TD>
+If the comment to a hidden variable is written to a field-set, it is
+placed inside this class.
+</TD></TR><TR>
+<TD>
+label_left
+</TD><TD>
+All field-labels placed to the left of its field is placed inside this
+class.
+</TD></TR><TR>
+<TD>
+label_legend
+</TD><TD>
+If the text of a variable of the type 'fieldset' is written to the fieldset's
+legend, the legend is placed inside this class.
+</TD></TR><TR>
+<TD>
+label_radio
+</TD><TD>
+All labels to radio buttons are placed inside this class.
+<TD></TR><TR><TD>
+label_table
+</TD><TD>
+All field-labels to fields placed in a table is placed inside this class.
+</TD></TR><TR>
+<TD>
+o_fieldset
+</TD><TD>
+Every field set is placed inside this class.
+</TD></TR><TR>
+<TD>
+op_block
+</TD><TD>
+This class surrounds all the fields generated from output variables.
+</TD></TR><TR>
+<TD>
+table_2cl
+</TD><TD>
+Tables generated by the label mode 'table' is placed inside
+this class.
+</TD></TR><TR>
+<TD>
+table_mcl
+</TD><TD>
+Tables generated with the label mode 'multi-table' is placed
+inside this class.
+</TD></TR><TR>
+<TD>
+table_mclhead
+</TD><TD>
+Tables generated with the label mode 'multi-table' where all fields in
+the table is radio buttons and all variables are from the same domain
+is placed inside this class.
+</TD></TR>
+</TBODY></TABLE>
+<P>
+Two sample style sheets using this classes is provided in the
+directory <jfs2>\samples. The style sheets are named 'jfr2hdem.css'
+and 'jfr2hcss.css'.
+
+!head jfr2htm_v_args jfr2htm var_arguments "Variable arguments"
+
+!ind "Variable argument values, JFR2hTM"
+!ind "Variable types (argument-types)"
+The argument to an input or output variable's 'argument <number>' can be used
+to overwrite JFR2HTM's standard way of placing input/output-fields on the
+HTML page. With the argument it is possible to specify the field type used to
+enter the variable value, and to include a help button, use comments as labels,
+enter confidence, etc.
+<P>
+The argument is used in a binary form, where the rightmost 2 bits is the variables
+type. The meaning of the other bits in the number depends on the variable type.
+The current version of JFR2HTM support only two variable types:
+<P>
+<TABLE BORDER><CAPTION><STRONG>Variable types</STRONG></CAPTION>
+<THEAD><TR><TD><STRONG>Variable type</STRONG></TD>
+<TD><STRONG>Numeric value</STRONG></TD>
+<TD><STRONG>Comment<STRONG></TD></TR></THEAD>
+<TBODY>
+<TR><TD>Standard</TD><TD>0</TD><TD>
+A standard input/output variable. Most variables will be of this type.
+</TD></TR>
+<TR><TD>Fieldset</TD><TD>1</TD><TD>
+The value of a fieldset variable is not entered in the HTML form. It always
+gets default value. The variable is used to split the HTML form into
+smaller blocks using HTML fieldsets. A fieldset variable starts a new HTML
+fieldset. The fieldset's ledger and starting text is created from the
+variables text and comment.
+</TD></TR>
+</TBODY></TABLE>
+<P>
+The meaning of the other bits in the argument depends on the variable type:
+<P>
+<H4>Variable type 'Standard'</H4>
+<P>
+If the variable type is 'Standard' then bit 2-5 of the argument is the
+field type and the other bits are individual flag. The field type
+tells JFR2HTM what type of HTML input is used for the variable. The
+possible values are:
+<P>
+<TABLE BORDER><CAPTION><STRONG>Field types</STRONG></CAPTION>
+<THEAD><TR><TD><STRONG>Field type</STRONG></TD>
+<TD><STRONG>Numeric value</STRONG></TD>
+<TD><STRONG>Comment<STRONG></TD></TR></THEAD>
+<TBODY>
+<TR><TD>Default</TD><TD>0</TD><TD>
+The default is to use numeric text fields for variables from float and
+integer domains, and pull down lists for variables from categorical
+domains.
+</TD></TR>
+<TR><TD>Numeric</TD><TD>4</TD><TD>
+The variables value is entered/displayed as a number.
+</TD></TR>
+<TR><TD>Text</TD><TD>8</TD><TD>
+Can only be used for output variables. The name of the adjective whose
+center value is closest to the variables values is displayed.
+</TD></TR>
+<TR><TD>Pull down list</TD><TD>12</TD><TD>
+The value is entered by selecting from a list of names of the
+adjectives bound to the variable. The numeric value is the
+selected adjective's center-value.
+</TD></TR>
+<TR><TD>Radio buttons</TD><TD>16</TD><TD>
+Same as 'pull down', but the adjective names are shown as radio buttons
+placed on a single line.
+</TD></TR>
+<TR><TD>Multiline radio buttons</TD><TD>20</TD><TD>
+Same as 'Radio buttons', but each button are placed on a new line.
+</TD></TR>
+<TR><TD>Checkbox</TD><TD>24</TD><TD>
+The value is entered by selecting/unselecting a checkbox. Can only
+be used by input variables with exactly two bound adjectives. Selecting
+the checkbox gives the variable the center value of the second
+adjective. Unselecting the checkbox gives the variable the center value
+of the first adjective.
+</TD></TR>
+</TBODY>
+</TABLE>
+<P>
+
+The flags for variables of the type 'Standard' are :
+<TABLE BORDER><CAPTION><STRONG>Argument flags</STRONG></CAPTION>
+<THEAD><TR><TD><STRONG>Flag</STRONG></TD>
+<TD><STRONG>Bit number</STRONG></TD>
+<TD><STRONG>Numeric value</STRONG></TD>
+<TD><STRONG>Comment</STRONG></TD></TR></THEAD>
+<TBODY>
+<TR><TD>Comment label</TD><TD>6</TD><TD>64</TD><TD>
+Use the variable's comment as label instead of its name. The label
+is placed above the field even if the label mode is 'left'.
+</TD></TR>
+<TR><TD>Help button</TD><TD>7</TD><TD>128</TD><TD>
+Place a help button after the field. Pressing the button shows the
+variable's comment in an alert box.
+</TD></TR>
+<TR><TD>Confidence value</TD><TD>8</TD><TD>256</TD><TD>
+Place a confidence field after the variable's input field. The label to the
+field and its scaling are controlled by JFR2HTM options.
+</TD></TR>
+<TR><TD>Suppress newline</TD><TD>9</TD><TD>512</TD><TD>
+If this flag is set, the next field is displayed on the same line as
+the actual field.
+</TD></TR>
+</TBODY>
+</TABLE>
+<P>
+!lab vt_fset
+<H4>Variable type 'Fieldset'</H4>
+<P>
+If the variable type is 'fieldset', then bit 2-5 of the argument describes a
+label type. The other bits are used as flags. The label types tells JFR2hTM how the input/output-fields
+labels are placed. The label type is used on all field within the fieldset.
+The possible values are:
+<P>
+<TABLE BORDER><CAPTION><STRONG>Label types</STRONG></CAPTION>
+<THEAD><TR><TD><STRONG>Label type</STRONG></TD>
+<TD><STRONG>Numeric value</STRONG></TD>
+<TD><STRONG>Comment<STRONG></TD></TR></THEAD>
+<TBODY>
+<TR><TD>Default</TD><TD>0</TD><TD>
+The global label type specified as an option in the call of JFR2HTM is
+used for this fieldset.
+</TD></TR><TR><TD>Left</TD><TD>4</TD><TD>
+The labels are placed to the left of the fields. The fields are placed in <PRE>
+tags to align the fields.
+</TD></TR>
+<TR><TD>Above</TD><TD>8</TD><TD>
+The labels are placed above the fields.
+</TD></TR>
+<TR><TD>Above blank</TD><TD>12</TD><TD>
+The labels are placed above the fields. An extra blank line is
+inserted after the fields.
+</TD></TR>
+<TR><TD>Table</TD><TD>16</TD><TD>
+All labels and fields in the field set are placed in a two-column table.
+The labels are placed in the first column. The fields (and confidence fields,
+help buttons etc) are placed in the second column.
+</TD></TR>
+<TR><TD>Multi-table</TD><TD>20</TD><TD>
+All labels and fields in the field set are placed in a table.
+The labels are placed in the first column. The fields are placed in the second column.
+If the field type of a variable is 'Radio' then each radio button is placed
+in a separate column. Confidence fields and help buttons are placed in separate
+rows.
+</TD></TR>
+</TBODY></TABLE>
+<P>
+The flags for variables of the type 'Fieldset' are :
+<TABLE BORDER><CAPTION><STRONG>Argument flags</STRONG></CAPTION>
+<THEAD><TR><TD><STRONG>Flag</STRONG></TD>
+<TD><STRONG>Bit number</STRONG></TD>
+<TD><STRONG>Numeric value</STRONG></TD>
+<TD><STRONG>Comment</STRONG></TD></TR></THEAD>
+<TBODY>
+<TR><TD>Comment label</TD><TD>6</TD><TD>64</TD><TD>
+Write the variable's comment as the first line(s) in the fieldset.
+</TD></TR>
+<TR><TD>No ledger</TD><TD>7</TD><TD>128</TD><TD>
+Normally the variable's text is written as a HTML field set ledger. If
+the flag 'No ledger' is used, no ledger is written.
+</TD></TR>
+<TR><TD>No fieldset</TD><TD>8</TD><TD>256</TD><TD>
+Don't place the block in a HTML fieldset. Only define the block
+with the stylesheet classes ("o_fieldset", "i_fieldset", "fs_%").
+</TD></TR>
+</TBODY></TABLE>
+<P>
+
+To give a variable a set of properties, add the numeric value of the
+variable type with the field type and the numeric values of the desired flags.
+<P><STRONG>Examples:</STRONG><P>
+To enter the value of the variable 'speed' in a pull down list with a
+help button besides the list, the argument value is calculated by adding
+the numeric value of the variable type 'standard' (0) with the value of the field
+type 'pull down' (12) and the value of the flag 'help button' (128) giving the
+argument value 140. The variable definition could be:
+<PRE>
+   speed "Speed in kilometers pr hour" domain speeddom  default high  argument 140;
+</PRE>
+To enter a variable's value by selecting a radio button with a confidence value
+and using the variable's comment as label, set the argument to
+<PRE>
+   148 = 0 (standard) + 16 (radio button) + 256 (confidence) + 64 (label-comment)
+</PRE>
+The sample program:
+<A HREF="%%jfr2hdem.htm">jfr2hdem.htm</A>
+ shows the use of most of the variable types, field types and flags.
+
+
+!head jfr2htm_options jfr2htm options "Running JFR2HTM from the command line"
+
+To invoke JFR2HTM from the command line type 'jfr2htm' at the prompt and
+follow it with a set of command line arguments. The command line
+format is:
+<PRE>
+       jfr2htm {<option>} <rf>
+</PRE>
+where <rf> is the filename of a compiled jfs-program. If JFR2HTM is run without
+options, the HTML file is written to <rf>.htm.
+<P>
+JFR2HTM recognizes the following options:
+<P>
+!dtab jfr2htm_options "JFR2HTM options"
+!tab jfr2htm_options -o
+-o <of>
+!etc
+Write the HTML file to <of>.
+!etab
+!tab jfr2htm_options -r
+-r
+!etc
+Convert only the program part (not the input/output-form).
+!etab
+!tab jfr2htm_options -ow
+-ow
+!etc
+Run in overwrite-mode even if the HTML file already exists.
+!etab
+!tab jfr2htm_options -Sh
+-Sh <ssheet>
+!etc
+Include a reference to a the stylesheet in the header of the generated
+HTML file. Note the option simply inserts a link with HREF="<ssheet>" in
+the HTML file. It does not check if the stylesheet exists or makes any
+calculation of path names.
+!etab
+!tab jfr2htm_options -Na
+-Na
+!etc
+Ignore the domain variables argument-value when
+generating the HTML file (same result as changing all the variables argument
+values to 0 (zero)).
+!etab
+!tab jfr2htm_options -l
+-l <lp>
+!etc
+ <lp> defines how labels are placed in relation to there input/output-fields.
+Note this option can be overwritten for individual fieldset's by the fieldset
+variables label-mode (part of the variables argument see:.
+!ref jfr2htm_v_args
+).
+The possible values of <lp> are:
+<UL>
+<LI><STRONG>a: </STRONG>
+above. The label is placed above the field.
+<LI><STRONG>ab: </STRONG>
+above with blank line. The label is placed above the field. An
+extra blank line is placed after the field.
+<LI><STRONG>l: </STRONG>
+left. The label is placed to the left of the field. The fields
+are left aligned (with spaces in the <PRE>-font). Note that
+labels read from variable comment are always placed above the
+field.
+<LI><STRONG>t: </STRONG>
+table. The input/output fields and there labels are placed in a HTML table.
+The label is placed in the first column. The field (and the optional confidence
+value and help button are placed in the second column).
+<LI><STRONG>mt: </STRONG>
+table with several rows. The fields and there labels are placed in a HTML table.
+The label is placed in the first column. The Field is placed in the second
+column. If the field is of the type 'radio buttons', then each button is
+placed in its own column. The optional confidence input and help
+button are placed in separate columns.
+</UL>
+!etab
+!tab jfr2htm_options -g
+-g <digits>
+!etc
+ <digits> is the maximal number of digits after the decimal
+	     point in constants (<digits> has to be in [1,9]). Default 4.
+!etab
+!tab jfr2htm_options -c
+-c
+!etc
+ Write the jfs-program's title comment to the HTML file.
+!etab
+!tab jfr2htm_options -Ct
+-Ct <txt>
+!etc
+ <txt> is used as label to the optional confidence fields (default is
+ 'Conf.:').
+!etab
+!tab jfr2htm_options -Cm
+-Cm <mcval>
+!etc
+ <mcval> is a positive float number. Input values to confidence fields
+in the interval [0,<mcval>]. When used in the program the values are
+scaled to the interval  [0.0, 1.0].
+!etab
+!tab jfr2htm_options -Nc
+-Nc
+!etc
+Suppress the testing of numeric input with the JavaScript function isNaN().
+Some older browsers (for example Netscape Navigator version 2) don't
+support the isNaN() functions. Without this test some illegal numeric
+input like '30 0' is accepted (it is wrongly read as 30).
+!etab
+!tab jfr2htm_options -Sa
+-Sa <size>
+!etc
+Maximum number of characters in a statement (default 512).
+!etab
+!tab jfr2htm_options -St
+-St <size>
+!etc
+Maximum  number of nodes in conversion tree (default 128).
+!etab
+!tab jfr2htm_options -Ss
+-Ss <size>
+!etc
+Maximum  stack size conversion stack (default 64).
+!etab
+!tab jfr2htm_options -s
+-s
+!etc
+Silent; don't write messages to standard output.
+!etab
+!tab jfr2htm_options -j
+-j
+!etc
+Write the JavaScript part of the program to the file <of>.js (<of>
+is specified in the '-o' option).
+!etab
+!tab jfr2htm_options -p
+-p <prefix>
+!etc
+Place the text <prefix> in front of all global variable names and
+function names in the generated JavaScript (to avoid conflicts with
+other JavaScript programs in the same HTML file). If for example,
+ <prefix> is set to 'JFS' then the name of the variable Normally
+named 'v1' is changed to 'JFSv1'.
+!etab
+!tab jfr2htm_options -so
+-so <s>
+!etc
+Redirect standard output to the file <s>.
+!etab
+!tab jfr2htm_options -a
+-a
+!etc
+Append to the standard output file (instead of overwriting it).
+!etab
+!tab jfr2htm_options -w
+-w
+!etc
+Wait for the user to press the return key before exiting the program.
+!etab
+<P>
+Examples of jfr2htm-calls:
+<P>
+Convert the compiled jfs-program 'truck.jfr' to the HTML file 'nt.htm'
+(update the file 'nt.htm' if it already exists):
+<PRE>
+       jfr2htm -o nt truck
+</PRE>
+Convert the jfs-program 'truck.jfr' to a HTML file. Write the file to
+ 'truck.htm' overwriting an existing file with up to 6 digits precision:
+<PRE>
+   jfr2htm -ow -g 6 truck
+</PRE>
+Convert the jfs-program truck.jfr to a HTML file (truck.htm)
+and a JavaScript file (truck.js):
+<PRE>
+   jfr2htm -j truck
+</PRE>
+
+
+!head jfr2htm_jfs_run jfr2htm options "Running JFR2HTM from JFS"
+!if !UNIX
+JFR2HTM can be accessed and run via JFS in either of two ways, (a) select it via
+the 'Tools' that are found in the drop-down menu, or (b) after clicking the 'Option'
+button, one can (i) select JFR2HTM, (ii) edit its options, and (iii) click
+the 'RunTool' button. The following options can be set via the later route:
+<P>
+!dtab jfr2htm_opt_jfs "JFR2HTM options"
+!tab jfr2htm_opt_jfs -o
+Output file
+!etc
+Specify the filename for the HTML output file that will be created
+when the tool is run.
+!etab
+!tab jfr2htm_opt_jfs -r
+Convert only program
+!etc
+<strong>yes:</STRONG>
+Just write the JavaScript block to the HTML file.
+<BR><STRONG>no:</STRONG>
+Write both the HTML form (that contains the input fields, output fields and buttons)
+and the JavaScript block to the output HTML file.
+!etab
+!tab jfr2htm_opt_jfs -ow
+Overwrite
+!etc
+<STRONG>yes:</STRONG>
+Overwrite the HTML file.
+<BR>no:</STRONG>
+If the HTML file already exist, then update it; else create a HTML file.
+<BR>
+!etab
+!tab jfr2htm_opt_jfs -p
+Object prefix
+!etc
+Place the specified text in front of all global variable names and
+function names in the generated JavaScript (to avoid conflicts with
+other JavaScript programs in the same HTML file). If for example the
+prefix is set to 'JFS' then the name of the variable Normally named 'v1'
+is changed to 'JFSv1'.
+!etab
+!tab jfr2htm_opt_jfs -g
+Precision
+!etc
+Specify the maximal number of digits (range from 1 to 9) after the decimal
+point in constants.
+!etab
+!tab jfr2htm_opt_jfs -Na
+Ignore var-arguments
+!etc
+<STRONG>yes: </STRONG>
+Ignore the domain variables argument values when
+generating the HTML file (same result as changing all the variables argument
+values to 0 (zero)).
+<BR><STRONG>no: </STRONG>
+Use the domain variables argument values to select field type etc.
+!etab
+!tab jfr2htm_opt_jfs -Sh
+Reference to stylesheet
+!etc
+Include a reference to a stylesheet in the header of the generated
+HTML file. Note the option simply inserts a link with HREF="<ssheet>" in
+the HTML file (where <ssheet> is the name of the specified stylesheet). It does
+not check if the stylesheet exists or makes any calculation of path names.
+!etab
+!tab jfr2htm_opt_jfs -Nc
+Don't check numbers
+!etc
+<STRONG>no:</STRONG>
+Check numeric input with the JavaScript function isNaN().
+Some older browsers (for example Netscape Navigator version 2) don't
+support the isNaN() functions.
+<BR><STRONG>yes:</STRONG>
+Don't check numbers. Some illegal numeric
+input like '30 0' is accepted (it is wrongly read as 30).
+!etab
+!tab jfr2htm_opt_jfs -c
+Use title comment
+!etc
+ Write the jfs-program's title comment to the HTML file.
+!etab
+!tab jfr2htm_opt_jfs -l
+Label placement
+!etc
+Defines how labels are placed in relation to there input/output-fields. Note
+this option can be overwritten for individual fieldset's by the fieldset
+variables label-mode (part of the variables argument see:.
+!ref jfr2htm_v_args
+).
+<BR>
+The possible values are:
+<UL>
+<LI><STRONG>above: </STRONG>
+The label is placed above the field.
+<LI><STRONG>above_blank: </STRONG>
+The label is placed above the field. An extra blank line is placed after the field.
+<LI><STRONG>left: </STRONG>
+The label is placed to the left of the field. The fields
+are left aligned (with spaces in the <PRE>-font). Note that
+labels read from variable comment are always placed above the
+field.
+<LI><STRONG>table: </STRONG>
+The input/output fields and there labels are placed in a HTML table.
+The label is placed in the first column. The field (and the optional confidence
+value and help button are placed in the second column).
+<LI><STRONG>multi_table: </STRONG>
+table with several rows. The fields and there labels are placed in a HTML table.
+The label is placed in the first column. The Field is placed in the second
+column. If the field is of the type 'radio buttons', then each button is
+placed in its own column. The optional confidence input and help
+button are placed in sparate columns.
+</UL>
+!etab
+!tab jfr2htm_opt_jfs -Cm
+Max confidence
+!etc
+The value has to be a positive float number. Input values in confidence fields in
+from the interval [0,<mcval>]. When used in the program values are scaled to
+ [0.0, 1.0].
+!etab
+!tab jfr2htm_opt_jfs -Ct
+Confidence text
+!etc
+The specified text is used as label to the optional confidence fields (default is
+ 'Conf.:').
+!etab
+!tab jfr2htm_opt_jfs -Sa
+Max sentence-length
+!etc
+Specify the maximum number of characters in a statement (increase this number
+if JFR2HTML fails with an error number 301).
+!etab
+!tab jfr2htm_opt_jfs -St
+Nodes conv-tree
+!etc
+Specify number of nodes in conversion tree (increase this number if JFR2HTM
+fails with an error number 302).
+!etab
+!tab jfr2htm_opt_jfs -Ss
+Stacksize
+!etc
+Specify the size of the conversion stack (increase this number if JFR2HTM
+fails with an error number 303).
+!etab
+!tab jfr2htm_opt_jfs -s
+silent
+!etc
+Don't write messages to standard output.
+!etab
+!tab jfr2htm_opt_jfs -j
+Write JavaScript to file
+!etc
+<STRONG>yes:</STRONG>
+Write the JavaSscript part of the program to the file <of>.js, where <of>
+is whatever is specified in the 'Output file' field as <of>.htm.
+<BR><STRONG>no:</STRONG>
+Incorporate the JavaScript block within the HTML file.
+!etab
+!tab jfr2htm_opt_jfs -so
+Redirect stdout to
+!etc
+Write messages to the file specified here instead of writing them
+to standard output.
+!etab
+!tab jfr2htm_opt_jfs -a
+Append to stdoutfile
+!etc
+<STRONG>yes:</STRONG>
+Append to the standard output file.
+<BR><STRONG>no:</STRONG>
+ Overwriting the standard output file.
+!etab
+!tab jfr2htm_opt_jfs -w
+Wait for return
+!etc
+<STRONG>yes:</STRONG>
+Wait for the user to press the return key before exiting the program.
+<BR><STRONG>no:</STRONG>
+Don't wait.
+!etab
+<P>
+!endif
+
+!head jfr2htm_changes jfr2htm changes "Changes in JFR2HTM version 2"
+<P>
+<H4>Changes in JFR2HTM version 2.04</H4>
+<UL>
+<LI>A bug in the handling of return values from function calls in JFS is
+fixed.
+<LI>The generated JavaScript programs now check if entered numbers are
+legal (can be suppressed by an option).
+<LI>It is now possible to specify a prefix-text, which is placed in
+front of all global variables and functions in the JavaScript program.
+Can be used to prevent name conflicts with other JavaScript programs
+in the same HTML file.
+<LI>New 'extern' statements 'textare', 'printf' and 'fprintf'. They are
+used to create HTML text areas in the generated form and to write
+text and variable values to the text areas.
+<LI>JFR2HTM can now insert a reference to a stylesheet in the generated
+HTML files and some class-commands in the HTML form.
+<LI>It is now possible to include variable comments in the generated HTML
+file. Either as field label or as pop-up help.
+<LI>It is now possible to control the placement of field lables in the
+generated HTML form (left, above, table).
+<LI>Input values can now be entered in text fields, pull down lists,
+radio buttons, and check boxes.
+<LI>It is now possible to read and write confidence values in the HTML form.
+</UL>
+<H4>Changes in JFR2HTM version 2.03</H4>
+<UL>
+<LI>A bug, which prevented more than 100 domain variables, is fixed.
+</UL>
+<P>
+<H4>Changes in JFR2HTM version 2.01</H4>
+<P>
+The difference between JFR2HTM version 2.01 and version 2.00 is that
+some bugs has been fixed. The fixed bugs are:
+<UL>
+<LI>
+An error, in calculation of plf-values in plf's with exclusive-definitions,
+has been fixed (version 2.00 could give 'division-by-zero error').
+<LI>
+An error, with missing variable-to-domain-limits rounding for domains with
+a max-value but no min-value, has been fixed.
+<LI>
+An error, with a missing end-bracket in while-statements, is fixed.
+<LI>
+An error, in fuzzification using 2 hedges or normal=conf, is fixed.
+<LI>
+An error, with missing rounding in west-statements and iif-expressions,
+ is fixed.
+</UL>
+<P>
+<H4>Changes in JFR2HTM version 2.00</H4>
+<P>
+!li intro_changes jfr2htm
+!ref jfr2htm_changes "Changes in JFR2HTM"
+!eli
+<UL>
+<LI>
+The option to overwrite destination-file is changed to '-ow' (it was
+ '-o' in version 1).
+<LI>
+It is now possible to write the html-page to one file and the Javascript
+program to another (using the option '-j').
+</UL>

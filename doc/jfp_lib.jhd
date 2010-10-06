@@ -1,0 +1,186 @@
+!head source_jfp source jfp_lib "JFP_LIB: C-library to change jfs-programs"
+
+!ind Jfp_lib
+!ind "C, changing jfs-programs from"
+JFP_LIB is a source code library used to change a compiled jfs-program.
+Variables, hedges, etc can be changed using jfp_lib functions,
+and statements can be inserted and deleted. Jfp_lib uses the
+data structures defined in jfg_lib (jfg_lib.h). The functions in jfp_lib are
+described in the file 'jfp_lib.h'. To use jfp_lib from a C-program do
+the following:
+
+!dlist source_jfp_use
+!li source_jfp_use 1
+Compile 'jfp_lib.cpp' (and jfg_lib.cpp, jfr_lib.cpp, jfs_text.cpp)
+producing an '.obj'-file.
+!eli
+!li source_jfp_use 2
+Include the header-files 'jfp_lib.h', 'jfg_lib.h' and 'jfr_lib.h' in
+your C-program.
+!eli
+!li source_jfp_use 3
+Call the functions jfr_init(), jfr_load(), jfg_init(), jfp_init(),
+   jfp_lib-functions and finally jfp_save(), jfr_close(), jfp_free(),
+jfg_free() and jfr_free() from the C-program (see example below).
+!eli
+!li source_jfp_use 4
+Compile the C-program and link it with 'jfr_lib.obj', 'jfg_lib.obj',
+'jfs_text.obj' and 'jfp_lib.obj'.
+!eli
+
+The following code fragment uses jfp_lib to change the 'and' operator in the
+jfs-program 'truck.jfr'. The complete code is in the file 'jfp_ex01.cpp'.
+<PRE>
+
+{
+  char fname[] = "truck.jfr";  /* filename                 */
+  char nname[] = "ntruck.jfr"; /* filename changed program */
+  struct jfg_operator_desc odesc;
+  void *head;
+  int res;
+
+  res = jfr_init(0);
+  if (res != 0)
+  { printf("Error in jfr_init. errcode %d\n", res);
+    return 1;
+  res = jfg_init(JFG_PM_NORMAL, 0, 0);
+  if (res != 0)
+  { printf("Error in jfg_init. errcode %d\n", res);
+    jfr_free();
+    return 1;
+  }
+  res = jfp_init(0);
+  if (res != 0)
+  { printf("Error in jfp_init(). Errcode %d\n", res);
+    jfg_free();
+    jfr_free();
+    return 1;
+  }
+  res = jfr_load(&head, fname);
+  if (res == 0)
+  {
+    jfg_operator(&odesc, head, JFS_ONO_AND); /* get operator and */
+
+    odesc.op_1 = JFS_FOP_YAGERAND;
+    odesc.op_2 = JFS_FOP_NONE;
+    odesc.op_arg = 2.5;
+    odesc.flags |= JFS_OF_IARG;   /* '%' in front of argument */
+
+    jfp_operator(head, JFS_ONO_AND, &odesc);
+
+    res = jfp_save(nname, head);
+    if (res != 0)
+      printf("Error writing to the file %s. Errcode: %d\n", nname, res);
+
+    jfr_close(head);
+    jfp_free();
+    jfg_free();
+    jfr_free();
+  }
+  else
+  { printf("Error loading program. Error code %d\n", res);
+    jfg_free();
+    jfp_free();
+    jfr_free();
+  }
+}
+</PRE>
+With jfp_lib it is possible to change most attributes of defined objects
+(variables, hedges, adjectives etc.). Some attributes cannot be changed,
+for example the name of a variable (see the description of the changing-
+functions in jfp_lib.h for details). It is not possible to insert or delete
+defined objects. When an attribute of an adjective is changed, the calculated
+attributes (center, base, Fuzzification function) of adjectives, bound to
+the same variable, are automatically recalculated. The example file
+'jfp_ex02.cpp' changes the plf-functions used to fuzzificate.
+<P>
+In statements it is possible to (a) change the weight-values of
+'ifw'-statements, (b) constants in expressions can be
+changed (by the low-level-function jfp_u_oc()), (c)
+Statements can be deleted, and (d) new statements can be inserted.
+<P>
+It is only possible to insert statements, if extra
+memory was reserved when the jfs-program was loaded (use 'jfr_aload' with
+'esize' != 0). When a statement is deleted or inserted, the program-
+addresses of all the following statements are changed. If a
+statement in a user-defined function/procedure is inserted or deleted, the
+start program-address for other user-defined functions is changed.
+<P>
+The following code fragment deletes all 'extern' statements from the main-block
+in the program 'head':
+<PRE>
+{
+  struct jfg_statement_desc sdesc;
+  struct jfg_sprog_desc pdesc;
+  unsigned char *pc;
+
+  jfg_sprg(&pdesc, head);
+  pc = pdesc.pc_start;
+  jfg_statement(&sdesc, head, pc);
+  while (sdesc.type != JFG_ST_EOP)
+  { if (sdesc.type == JFG_ST_IF && sdesc.sec_type == JFG_ST_EXTERN)
+      jfp_d_statement(head, pc);
+    else
+      pc = sdesc.n_pc;
+    jfg_statement(&sdesc, head, pc);
+  }
+}
+</PRE>
+Statements are inserted by the function jfp_i_tree(). The
+following code-fragment insert 3 statements at the beginning of the program
+'head'. First it inserts a 'switch' statement. Second, it insert the statement
+'x = 0.7;', and third, it inserts an 'end;' statement:
+<PRE>
+{
+  struct statement_desc sdesc;
+  struct jfg_tree_desc tree[17];
+  int res;
+  struct jfg_sprog_desc pdesc;
+  unsigned char *pc;
+  char *dummy[1];
+
+  vno = find_var("x");    /* see the documentation for 'find_var()' */
+  jfg_sprg(&pdesc, head);
+  pc = pdesc.pc_start;
+  sdesc.type = JFG_ST_SWITCH;
+  res = jfp_i_tree(head, &pc, &sdesc, tree, 0, 0, 0, dummy, 0);
+  if (res != 0)
+    printf("error in jfp_i_tree. Errcode %d\n", res);
+
+  sdesc.type = JFG_ST_IF;           /* the assign-statement is inserted as */
+  sdesc.sec_type = JFG_SST_VAR;     /* 'if true then weight = 0.7;'        */
+  sdesc.sarg_1 = vno;               /* var_no weight.                */
+  sdesc.flags = 0;
+  tree[0].type = JFG_TT_TRUE;
+  tree[1].type = JFG_TT_CONST;
+  tree[1].op   = 0;
+  tree[1].farg = 0.7;
+  res = jfp_i_tree(head, &pc, &sdesc, tree, 0, 1, 0, dummy, 0);
+  if (res != 0)
+    printf("error in jfp_i_tree. Errcode %d\n", res);
+
+  sdesc.type = JFG_ST_STEND;
+  sdesc.sec_type = 0; /* end-switch */
+  res = jfp_i_tree(head, &pc, &sdesc, tree, 0, 0, 1, dummy, 0);
+  if (res != 0)
+    printf("error in jfp_i_tree. Errcode %d\n", res);
+}
+</PRE>
+Another example using the jfp_i_tree functions is found in the file
+'jfp_ex04.cpp'.
+
+!head source_jfp_changes source_jfp changes "Changes in JFP_LIB version 2"
+!li intro_changes jfp
+!ref source_jfp_changes "Changes in JFP_LIB"
+!eli
+The program-address 'pc' is now a pointer to char instead of an integer
+(jfp_statement, jfp_d_statement, jfp_i_tree).
+<P>
+The function jfp_i_tree() is changed. Arguments are added. It now replaces
+ jfp_i_tree() and jfp_i_call() from version 1.
+<P>
+A new function jfp_u_oc() to change low-level commands are included.
+<P>
+Changed data-formats from jfg_lib is used in jfp_lib.
+
+

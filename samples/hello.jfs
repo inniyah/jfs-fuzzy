@@ -1,0 +1,10 @@
+
+title "hello world";
+/*This program writes the text 'Hello world' on the screen.*/
+
+local
+    Dummy "Type '!' to exit" float defuz avg;
+
+program
+extern printf "\nHello world!\n\n";
+extern read Dummy;

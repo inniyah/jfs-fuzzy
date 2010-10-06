@@ -1,0 +1,224 @@
+!head jfr2s prog_bas jfr2s "JFR2S: the inverse compiler"
+
+!ind JFR2S
+!ind "Inverse compiler"
+!ind "Source-code, extracting"
+JFR2S is the Jfs system's inverse compiler. It is a two-step converter:
+<UL>
+<LI>First it converts a run-code program (a jfr-file) to a windows-code
+program (a jfw-file).
+<LI>Then it converts the windows-code program to source-code (a jfs-file).
+</UL>
+Both steps are optional.
+!if !UNIX
+JFR2S is run either from the program JFS, or from the command line.
+
+!head jfr2s_comline jfr2s command-line "Running JFR2S from the command line"
+!else
+<P>
+!endif
+
+To invoke JFR2S from the command line, type 'jfr2s' at the prompt and
+follow it with a set of command line arguments. The command line format is:
+<PRE>
+       jfr2s {<options>} <rf>
+</PRE>
+If JFR2S is run without options it converts the run code file <rf> to
+the source code file <rf>.jfs.
+JFR2S recognizes the following options:
+!dtab jfr2s_options "JFR2S options"
+!tab jfr2s_options -m
+-m <cm>
+!etc
+Conversion-mode. <cm> is one of {'rs', 'rw', 'ws', 'rws'}
+<UL>
+<LI>
+ <cm>='rs': conversion from run code (jfr-file) to source code (jfs-file)
+<LI>
+ <cm>='rw': conversion from run code (jfr-file) to windows code (jfw-file)
+<LI>
+ <cm>='ws': conversion from windows code (jfw-file) to source code (jfs-file)
+<LI>
+ <cm>='rws' conversion from run-code (jfr-file) to windows-code (jfw-file),
+followed by conversion from windows-code (jfw-file) to source-code (jfs-file)
+</UL>
+ Default is 'rs'.
+!etab
+!tab jfr2s_options -o
+-o <of>
+!etc
+Write the converted program to <of> (if <of> has no extension '.jfw'
+or '.jfs' is added).
+!etab
+!tab jfr2s_options -g
+-g <digits>
+!etc
+ <digits> is the maximal number of digits after the decimal
+point in constants (<digits> has to be in [1,9]). Default 4.
+!etab
+!tab jfr2s_options -n
+-n
+!etc
+Write statement-numbers in a comment lines before each statement.
+!etab
+!tab jfr2s_options -v
+-v
+!etc
+Write variable numbers in comment lines before each variable (both
+domain variables and fuzzy variables).
+!etab
+!tab jfr2s_options -t
+-t
+!etc
+Write '|'-comments in switch-blocks. (This makes programs with
+ many levels of switch blocks more readable.)
+!etab
+!tab jfr2s_options -pm
+-pm <mode>
+!etc
+Parentheses mode. <mode>='s' (default) or <mode>='e'
+<UL>
+<LI>
+ <mode>='s': standard parentheses (i.e. only parentheses around
+	     expressions when needed)
+<LI>
+ <mode>='e': parentheses around all expression.
+</UL>
+For example: with '-m e' the expression:
+<CODE>     speed low and y high or z medium</CODE><BR>
+is written:
+<CODE>(speed low and y high) or z medium</CODE>
+!etab
+!tab jfr2s_options -k
+-k
+!etc
+Write source code without abbreviations (with all keywords).
+!etab
+!tab jfr2s_options -Sa
+-Sa <size>
+!etc
+Maximum number of characters in a statement (default 1024).
+!etab
+!tab jfr2s_options -St
+-St <size>
+!etc
+Maximum  number of nodes in conversion tree (default 256).
+!etab
+!tab jfr2s_options -Ss
+-Ss <size>
+!etc
+Maximum  stack size conversion-stack (default 64).
+!etab
+!tab jfr2s_options -so
+-so <sof>
+!etc
+Write messages to the file <sof> instead of standard output.
+!etab
+!tab jfr2s_options -a
+-a
+!etc
+Append messages to output-file (instead of overwriting the file).
+!etab
+!tab jfr2s_options -w
+-w
+!etc
+Wait for the user to press the return-key before exiting the program.
+!etab
+<P>
+<STRONG>Examples:</STRONG><P>
+Extract source code from the compiled jfs-program 'truck.jfr' and write
+the source code to the file 'nt.jfs':
+<PRE>
+       jfr2s -o nt truck
+</PRE>
+Extract windows code from the jfs-program 'truck.jfr'. Write the code
+to 'truck.jfw' with statement numbers and up to 6 digits precision.
+<PRE>
+   jfr2s -m rw -n -g 6 truck
+</PRE>
+
+!head jfr2s_jfs jfr2s options "Running JFR2S from JFS"
+!if !UNIX
+<P>
+JFR2S is automatically run from JFS when a program is saved as a source code
+file and when a jfr-file is loaded. JFR2S can also be run from the tools menu.
+<P>
+!dtab jfr2s_jfs_options "JFR2S options"
+!tab jfr2s_jfs_options -Sa
+Max chars
+!etc
+Maximum number of characters in a statement (default 1024).
+!etab
+!tab jfr2s_jfs_options -St
+Max nodes
+!etc
+Maximum number of nodes in conversion tree (default 256).
+!etab
+!tab jfr2s_jfs_options -g
+Max digits
+!etc
+The maximum number of digits after the decimal
+point in constants (has to be in [1,9]). Default is 4.
+!etab
+!tab jfr2s_jfs_options -Ss
+Stacksize
+!etc
+stack-size conversion stack (default 64).
+!etab
+!tab jfr2s_jfs_options -pm
+Parentheses
+!etc
+parentheses mode.
+<UL>
+<LI><STRONG>standard</STRONG>: only parentheses around expressions when needed
+<LI><STRONG>extended</STRONG>: parentheses around all expression.
+</UL>
+Example: with parenthes mode set to 'extended' the expression:
+<PRE>s low and y high or z medium
+</PRE>is written:
+<PRE>(s low and y high) or z medium
+</PRE>
+!etab
+!tab jfr2s_jfs_options -k
+Keywords
+!etc
+<STRONG>yes</STRONG>: write source code with all keywords<BR>
+<STRONG>no</STRONG>: remove optional keywords
+!etab
+!tab jfr2s_jfs_options -t
+Switch-comments
+!etc
+<STRONG>yes</STRONG>:
+write '|' comments in switch blocks (to make programs with
+many levels of switch blocks more readable).
+!etab
+!tab jfr2s_jfs_options -v
+Variable-no comments
+!etc
+<STRONG>yes</STRONG>: write variable numbers in comment lines before each
+variable (domain variables and fuzzy variables).
+!etab
+!tab jfr2s_jfs_options -n
+Line-number comments
+!etc
+<STRONG>yes</STRONG>: write statement numbers in a comment lines
+ before each statement.
+!etab
+
+!endif
+!head jfr2s_changes jfr2s changes "Changes in JFR2S version 2"
+
+!li intro_changes jfr2s
+!ref jfr2s_changes "Changes in JFR2S"
+!eli
+<UL>
+<LI>
+The most important change is  that JFR2S now uses a two-step method to
+inverse compile. First run code (jfr-file) is converted to windows code
+(jfw-file), and then windows code is converted to source code (jfs-file).
+<LI>
+JFR2S no longer support inverse compiling of only the program block (the
+ '-r' option in version 1).
+<LI>
+The parentheses mode option is now '-pm' (instead of '-m' in version 1).
+</UL>

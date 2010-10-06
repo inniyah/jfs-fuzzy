@@ -1,0 +1,289 @@
+cd source
+echo "Installing JFS" >../install.log
+rm *.o 
+glerr=0
+
+#------------------------------------------------------------------
+echo -n "Compiling libs..."
+echo "Compiling libs..." >> ../install.log
+
+gcc -c -o jft_lib.o jft_lib.cpp >> ../install.log 2>&1
+if [ $? -ne 0 ]; then
+  glerr=1
+  echo "ERRORS in jft_lib.cpp" >> ../install.log
+fi
+
+gcc -c -o jfm_lib.o jfm_lib.cpp >> ../install.log 2>&1
+if [ $? -ne 0 ]; then
+  glerr=1
+  echo "ERRORS in jfm_lib.cpp" >> ../install.log
+fi
+
+gcc -c -o jopt_lib.o jopt_lib.cpp >> ../install.log 2>&1
+if [ $? -ne 0 ]; then
+  glerr=1
+  echo "ERRORS in jopt_lib.cpp" >> ../install.log
+fi
+
+gcc -c -o jfr_lib.o jfr_lib.cpp >> ../install.log 2>&1
+if [ $? -ne 0 ]; then
+  glerr=1
+  echo "ERRORS in jfr_lib.cpp" >> ../install.log
+fi
+
+gcc -c -o jfg_lib.o jfg_lib.cpp >> ../install.log 2>&1
+if [ $? -ne 0 ]; then
+  glerr=1
+  echo "ERRORS in jfg_lib.cpp" >> ../install.log
+fi
+
+gcc -c -o jfp_lib.o jfp_lib.cpp >> ../install.log 2>&1
+if [ $? -ne 0 ]; then
+  glerr=1
+  echo "ERRORS in jfp_lib.cpp" >> ../install.log
+fi
+
+gcc -c -o jfs_text.o jfs_text.cpp >> ../install.log 2>&1
+if [ $? -ne 0 ]; then
+  glerr=1
+  echo "ERRORS in jfs_text.cpp" >> ../install.log
+fi
+
+if [ $glerr -eq 0 ]; then
+  echo " OK"
+else
+  echo " FAILURE, see install.log for details" 
+fi
+
+#--------------------------------------------------------------
+
+echo -n "compiling jfc... "
+echo "compiling jfc..." >> ../install.log
+gcc -o ../bin/jfc jfc.cpp jfs2wlib.cpp jfw2rlib.cpp jfs_text.o -lm >> ../install.log 2>&1
+if [ $? -eq 0 ]; then
+  echo " OK"
+else
+  glerr=1
+  echo " FAILURE, see install.log for details"
+  echo "ERRORS when compiling jfc" >> ../install.log
+fi
+
+echo -n "compiling jfr... "
+echo "compiling jfr... " >> ../install.log
+gcc -o ../bin/jfr jfr.cpp jfr_lib.o jfg_lib.o jft_lib.o jfs_text.o -lm >> ../install.log 2>&1
+if [ $? -eq 0 ]; then
+  echo " OK"
+else
+  glerr=1
+  echo " FAILURE, see install.log for details"
+  echo "ERRORS when compiling jfr" >> ../install.log
+fi
+
+echo -n "compiling jfr2s... "
+echo "compiling jfr2s... " >> ../install.log
+gcc -o ../bin/jfr2s jfr2s.cpp jfr2wlib.cpp jfw2slib.cpp jfr_lib.o jfg_lib.o jfs_text.cpp -lm >> ../install.log 2>&1
+if [ $? -eq 0 ]; then
+  echo " OK"
+else
+  glerr=1
+  echo " FAILURE, see install.log for details"
+  echo "ERRORS when compiling jfr2s" >> ../install.log
+fi
+
+echo -n "compiling jhlp... "
+echo "compiling jhlp... " >> ../install.log
+gcc -DOS_UNIX -o ../bin/jhlp jhlp.cpp jhlp_lib.cpp jfm_lib.o >> ../install.log 2>&1
+if [ $? -eq 0 ]; then
+  echo " OK"
+else
+  glerr=1
+  echo " FAILURE, see install.log for details"
+  echo "ERRORS when compiling jhlp" >> ../install.log
+fi
+
+#--------------------------------------------------------------------------
+echo -n "compiling jfplot... "
+echo "compiling jfplot... " >> ../install.log
+gcc -o ../bin/jfplot jfplot.cpp jfpltlib.cpp jopt_lib.o jfr_lib.o jfg_lib.o jfs_text.cpp -lm >> ../install.log 2>&1
+if [ $? -eq 0 ]; then
+  echo " OK"
+else
+  glerr=1
+  echo " FAILURE, see install.log for details"
+  echo "ERRORS when compiling jfplot" >> ../install.log
+fi
+
+echo -n "compiling jfrplt... "
+echo "compiling jfrplt... " >> ../install.log
+gcc -o ../bin/jfrplt jfrplt.cpp jopt_lib.o jfr_lib.o jfg_lib.o jfs_text.cpp jft_lib.o -lm >> ../install.log 2>&1
+if [ $? -eq 0 ]; then
+  echo " OK"
+else
+  glerr=1
+  echo " FAILURE, see install.log for details"
+  echo "ERRORS when compiling jfrplt" >> ../install.log
+fi
+
+echo -n "compiling jfr2c... "
+echo "compiling jfr2c... " >> ../install.log
+gcc -o ../bin/jfr2c jfr2c.cpp jfr2clib.cpp jfr_lib.o jfg_lib.o jfs_text.cpp -lm >> ../install.log 2>&1
+if [ $? -eq 0 ]; then
+  echo " OK"
+else
+  glerr=1
+  echo " FAILURE, see install.log for details"
+  echo "ERRORS when compiling jfr2c" >> ../install.log
+fi
+
+echo -n "compiling jfr2htm... "
+echo "compiling jfr2htm... " >> ../install.log
+gcc -o ../bin/jfr2htm jfr2htm.cpp jfr2hlib.cpp jfr_lib.o jfg_lib.o jfs_text.cpp -lm >> ../install.log 2>&1
+if [ $? -eq 0 ]; then
+  echo " OK"
+else
+  glerr=1
+  echo " FAILURE, see install.log for details"
+  echo "ERRORS when compiling jfr2htm" >> ../install.log
+fi
+
+#--------------------------------------------------------------------------
+
+echo -n "compiling jfea... "
+echo "compiling jfea... " >> ../install.log
+gcc -o ../bin/jfea jfea.cpp jfea_lib.cpp jfg_lib.o jfp_lib.o jfr_lib.o jft_lib.o jfs_text.o -lm >> ../install.log 2>&1
+if [ $? -eq 0 ]; then
+  echo " OK"
+else
+  glerr=1
+  echo " FAILURE, see install.log for details"
+  echo "ERRORS when compiling jfea" >> ../install.log
+fi
+
+echo -n "compiling jfid3... " 
+echo "compiling jfid3... " >> ../install.log
+gcc -o ../bin/jfid3 jfid3.cpp jfid3lib.cpp jfg_lib.o jfp_lib.o jfr_lib.o jft_lib.o jfs_text.o -lm >> ../install.log 2>&1
+if [ $? -eq 0 ]; then
+  echo " OK"
+else
+  glerr=1
+  echo " FAILURE, see install.log for details"
+  echo "ERRORS when compiling jfid3" >> ../install.log
+fi
+
+echo -n "compiling jfrd... "
+echo "compiling jfrd... " >> ../install.log
+gcc -o ../bin/jfrd jfrd.cpp jfrd_lib.cpp jfg_lib.o jfp_lib.o jfr_lib.o jft_lib.o jfs_text.o -lm >> ../install.log 2>&1
+if [ $? -eq 0 ]; then
+  echo " OK"
+else
+  glerr=1
+  echo " FAILURE, see install.log for details"
+  echo "ERRORS when compiling jfrd" >> ../install.log
+fi
+
+echo -n "compiling jffam... "
+echo "compiling jffam... " >> ../install.log
+gcc -o ../bin/jffam jffam.cpp jffamlib.cpp jfg_lib.o jfp_lib.o jfr_lib.o jft_lib.o jfs_text.o -lm >> ../install.log 2>&1
+if [ $? -eq 0 ]; then
+  echo " OK"
+else
+  glerr=1
+  echo " FAILURE, see install.log for details"
+  echo "ERRORS when compiling jffam" >> ../install.log
+fi
+
+echo -n "compiling jfgp... "
+echo "compiling jfgp... " >> ../install.log
+gcc -o ../bin/jfgp jfgp.cpp jfgp_lib.cpp jfg_lib.o jfp_lib.o jfr_lib.o jft_lib.o jfs_text.o  -lm >> ../install.log 2>&1
+if [ $? -eq 0 ]; then
+  echo " OK"
+else
+  glerr=1
+  echo " FAILURE, see install.log for details"
+  echo "ERRORS when compiling jfgp" >> ../install.log
+fi
+
+echo -n "compiling jfi... "
+echo "compiling jfi... " >> ../install.log
+gcc -o ../bin/jfi jfi.cpp jfi_lib.cpp jfg_lib.o jfp_lib.o jfr_lib.o jft_lib.o  jfs_text.o -lm >> ../install.log 2>&1
+if [ $? -eq 0 ]; then
+  echo " OK"
+else
+  glerr=1
+  echo " FAILURE, see install.log for details"
+  echo "ERRORS when compiling jfi" >> ../install.log
+fi
+
+chmod 666 *.o
+
+#------------------------------------------------------------------------
+cd ../doc
+
+echo -n "creating documentation for basic system... "
+echo "creating documentation for basic system... " >> ../install.log
+../bin/jhlp -hi jfs -e ../install.log -a  -si html/jfs >> ../install.log
+if [ $? -eq 0 ]; then
+  echo " OK"
+else
+  glerr=1
+  echo " FAILURE, see install.log for details"
+  echo "ERRORS in documentation-creation for jfs" >> ../install.log
+fi
+
+echo -n "creating documentation for conversition tools ... "
+echo "creating documentation for conversion tools... " >> ../install.log
+../bin/jhlp -hi runa -e ../install.log -a -si html/jfs >> ../install.log
+if [ $? -eq 0 ]; then
+  echo " OK"
+else
+  glerr=1
+  echo " FAILURE, see install.log for details"
+  echo "ERRORS in documentation-creation for runa" >> ../install.log
+fi
+
+echo -n "creating documentation for learning tools ... "
+echo "creating documentation for learning tools... " >> ../install.log
+../bin/jhlp -hi learna -e ../install.log -a -si html/jfs >> ../install.log
+if [ $? -eq 0 ]; then
+  echo " OK"
+else
+  glerr=1
+  echo " FAILURE, see install.log for details"
+  echo "ERRORS in documentation-creation for runa" >> ../install.log
+fi
+
+echo -n "creating documentation for documentation tools ... "
+echo "creating documentation for documentation tools... " >> ../install.log
+../bin/jhlp -hi jdoc -e ../install.log -a -si html/jfs >> ../install.log
+if [ $? -eq 0 ]; then
+  echo " OK"
+else
+  glerr=1
+  echo " FAILURE, see install.log for details"
+  echo "ERRORS in documentation-creatin for jdoc" >> ../install.log
+fi
+
+echo -n "creating documentation for source code ... "
+echo "creating documentation for source code... " >> ../install.log
+../bin/jhlp -hi source1 -e ../install.log -a -si html/jfs >> ../install.log
+if [ $? -eq 0 ]; then
+  echo " OK"
+else
+  glerr=1
+  echo " FAILURE, see install.log for details"
+  echo "ERRORS in documentation-creatin for source1" >> ../install.log
+fi
+
+#----------------------------------------------------------------------------
+cd ..
+if [ $glerr -eq 0 ]; then
+  echo "Installation completed without errors"
+  echo "Installation completed without errors" >>install.log
+else
+  echo "Errors in installation; see install.log for details"
+  echo "Errors in installation." >>install.log
+fi
+
+
+  
+
