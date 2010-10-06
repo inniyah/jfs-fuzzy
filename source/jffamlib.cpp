@@ -176,12 +176,12 @@ static char jffam_da_fname[256];
 /* Error handling                                                         */
 /**************************************************************************/
 
-struct jfr_err_desc {
+struct jffam_err_desc {
 	int eno;
 	const char *text;
 };
 
-struct jfr_err_desc jfr_err_texts[] =
+struct jffam_err_desc jffam_err_texts[] =
 {{  0, " "},
 	{  1, "Cannot open file:"},
 	{  2, "Error reading from file:"},
@@ -272,17 +272,17 @@ static int jf_error(int eno, const char *name, int mode)
 
   e = 0;
   for (v = 0; e == 0; v++)
-  { if (jfr_err_texts[v].eno == eno
-       	|| jfr_err_texts[v].eno == 9999)
+  { if (jffam_err_texts[v].eno == eno
+       	|| jffam_err_texts[v].eno == 9999)
       e = v;
   }
   if (mode == JFE_WARNING)
-  { fprintf(sout, "WARNING %d: %s %s\n", eno, jfr_err_texts[e].text, name);
+  { fprintf(sout, "WARNING %d: %s %s\n", eno, jffam_err_texts[e].text, name);
     m = 0;
   }
   else
   { if (eno != 0)
-      fprintf(sout, "*** error %d: %s %s\n", eno, jfr_err_texts[e].text, name);
+      fprintf(sout, "*** error %d: %s %s\n", eno, jffam_err_texts[e].text, name);
     if (mode == JFE_FATAL)
     { if (eno != 0)
 	       fprintf(sout, "\n*** PROGRAM ABORTED! ***\n");
