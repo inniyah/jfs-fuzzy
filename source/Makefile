@@ -85,7 +85,7 @@ $(LIB_DIR)/$(LIBRARY).so.$(MAJOR).$(MINOR): $(LIBRARY_SHARED_OBJS)
 	mkdir -p $(LIB_DIR)
 	$(CC) $(LDFLAGS) -shared \
 		-Wl,-soname,$(LIBRARY).so.$(MAJOR) \
-		$(LIBRARY_SHARED_OBJS) -o $@ 
+		$(LIBRARY_SHARED_OBJS) -o $@ -lm
 
 $(LIB_DIR)/$(LIBRARY).so: $(LIB_DIR)/$(LIBRARY).so.$(MAJOR).$(MINOR)
 	mkdir -p $(LIB_DIR)
@@ -102,7 +102,7 @@ $(LIB_DIR)/$(LIBXTRA).so.$(MAJOR).$(MINOR): $(LIBXTRA_SHARED_OBJS) $(LIB_DIR)/$(
 	mkdir -p $(LIB_DIR)
 	$(CC) $(LDFLAGS) -shared \
 		-Wl,-soname,$(LIBXTRA).so.$(MAJOR) \
-		$(LIBXTRA_SHARED_OBJS) -o $@ -L$(LIB_DIR) -ljfs-core
+		$(LIBXTRA_SHARED_OBJS) -o $@ -L$(LIB_DIR) -ljfs-core -lm
 
 $(LIB_DIR)/$(LIBXTRA).so: $(LIB_DIR)/$(LIBXTRA).so.$(MAJOR).$(MINOR)
 	mkdir -p $(LIB_DIR)
