@@ -10,7 +10,7 @@
 #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #  GNU General Public License for more details.
 
-LIBRARY=libjfs
+LIBRARY=libjfs-core
 LIBXTRA=libjfs-xtra
 
 MAJOR=2
@@ -36,7 +36,7 @@ WARN= -pedantic -Wall -ansi
 OPT= -O2 -g
 INCS=
 DEFS=
-LIBS= -L$(LIB_DIR) -ljfs-xtra -ljfs -lm
+LIBS= -L$(LIB_DIR) -ljfs-xtra -ljfs-core -lm
 
 EXTRA_LDFLAGS=
 EXTRA_CFLAGS=
@@ -82,6 +82,7 @@ LIBXTRA_STATIC_OBJS = $(LIBXTRA_SOURCES:.cpp=.static.o)
 libs: $(LIB_DIR)/$(LIBRARY).a $(LIB_DIR)/$(LIBRARY).so $(LIB_DIR)/$(LIBXTRA).a $(LIB_DIR)/$(LIBXTRA).so
 
 $(LIB_DIR)/$(LIBRARY).so.$(MAJOR).$(MINOR): $(LIBRARY_SHARED_OBJS)
+	mkdir -p $(LIB_DIR)
 	$(CPP) $(LDFLAGS) -shared \
 		-Wl,-soname,$(LIBRARY).so.$(MAJOR) \
 		$(LIBRARY_SHARED_OBJS) -o $@ 
@@ -93,12 +94,14 @@ $(LIB_DIR)/$(LIBRARY).so: $(LIB_DIR)/$(LIBRARY).so.$(MAJOR).$(MINOR)
 	ln -s $@.$(MAJOR) $@
 
 $(LIB_DIR)/$(LIBRARY).a: $(LIBRARY_STATIC_OBJS)
+	mkdir -p $(LIB_DIR)
 	$(AR) $@ $+
 
 $(LIB_DIR)/$(LIBXTRA).so.$(MAJOR).$(MINOR): $(LIBXTRA_SHARED_OBJS) $(LIB_DIR)/$(LIBRARY).so
+	mkdir -p $(LIB_DIR)
 	$(CPP) $(LDFLAGS) -shared \
 		-Wl,-soname,$(LIBXTRA).so.$(MAJOR) \
-		$(LIBXTRA_SHARED_OBJS) -o $@ -L$(LIB_DIR) -ljfs
+		$(LIBXTRA_SHARED_OBJS) -o $@ -L$(LIB_DIR) -ljfs-core
 
 $(LIB_DIR)/$(LIBXTRA).so: $(LIB_DIR)/$(LIBXTRA).so.$(MAJOR).$(MINOR)
 	rm -f $@.$(MAJOR)
@@ -107,6 +110,7 @@ $(LIB_DIR)/$(LIBXTRA).so: $(LIB_DIR)/$(LIBXTRA).so.$(MAJOR).$(MINOR)
 	ln -s $@.$(MAJOR) $@
 
 $(LIB_DIR)/$(LIBXTRA).a: $(LIBXTRA_STATIC_OBJS)
+	mkdir -p $(LIB_DIR)
 	$(AR) $@ $+
 
 PROGRAMS = $(LIB_DIR)/$(LIBRARY).so $(LIB_DIR)/$(LIBXTRA).so \
@@ -118,62 +122,76 @@ programs: $(PROGRAMS)
 
 JFC_OBJS = jfc.o jfs2wlib.o jfw2rlib.o jfs_text.o
 $(BIN_PREFIX)jfc: jfc.o
+	mkdir -p $(BIN_DIR)
 	$(CPP) -o $@ $< $(LIBS)
 
 JFR_OBJS = jfr.o jfr_lib.o jfg_lib.o jft_lib.o jfs_text.o
 $(BIN_PREFIX)jfr: jfr.o
+	mkdir -p $(BIN_DIR)
 	$(CPP) -o $@ $< $(LIBS)
 
 JFR2S_OBJS = jfr2s.o jfr2wlib.o jfw2slib.o jfr_lib.o jfg_lib.o jfs_text.o
 $(BIN_PREFIX)jfr2s: jfr2s.o
+	mkdir -p $(BIN_DIR)
 	$(CPP) -o $@ $< $(LIBS)
 
 JHLP_OBJS = jhlp.o jhlp_lib.o jfm_lib.o
 $(BIN_PREFIX)jhlp: jhlp.o
+	mkdir -p $(BIN_DIR)
 	$(CPP) -o $@ $< $(LIBS)
 
 ../doc/bin/jhlp: $(JHLP_OBJS)
-	test -d ../doc/bin/ || mkdir ../doc/bin/
+	mkdir -p ../doc/bin/
 	$(CPP) -o $@ $(JHLP_OBJS) -lm
 
 JFPLOT_OBJS = jfplot.o jfpltlib.o jopt_lib.o jfr_lib.o jfg_lib.o jfs_text.o
 $(BIN_PREFIX)jfplot: jfplot.o
+	mkdir -p $(BIN_DIR)
 	$(CPP) -o $@ $< $(LIBS)
 
 JFRPLT_OBJS = jfrplt.o jopt_lib.o jfr_lib.o jfg_lib.o jfs_text.o jft_lib.o
 $(BIN_PREFIX)jfrplt: jfrplt.o
+	mkdir -p $(BIN_DIR)
 	$(CPP) -o $@ $< $(LIBS)
 
 JFR2C_OBJS = jfr2c.o jfr2clib.o jfr_lib.o jfg_lib.o jfs_text.o
 $(BIN_PREFIX)jfr2c: jfr2c.o
+	mkdir -p $(BIN_DIR)
 	$(CPP) -o $@ $< $(LIBS)
 
 JFR2HTM_OBJS = jfr2htm.o jfr2hlib.o jfr_lib.o jfg_lib.o jfs_text.o
 $(BIN_PREFIX)jfr2htm: jfr2htm.o
+	mkdir -p $(BIN_DIR)
 	$(CPP) -o $@ $< $(LIBS)
 
 JFEA_OBJS = jfea.o jfea_lib.o jfg_lib.o jfp_lib.o jfr_lib.o jft_lib.o jfs_text.o
 $(BIN_PREFIX)jfea: jfea.o
+	mkdir -p $(BIN_DIR)
 	$(CPP) -o $@ $< $(LIBS)
 
 JFID3_OBJS = jfid3.o jfid3lib.o jfg_lib.o jfp_lib.o jfr_lib.o jft_lib.o jfs_text.o
 $(BIN_PREFIX)jfid3: jfid3.o
+	mkdir -p $(BIN_DIR)
 	$(CPP) -o $@ $< $(LIBS)
 
 JFRD_OBJS = jfrd.o jfrd_lib.o jfg_lib.o jfp_lib.o jfr_lib.o jft_lib.o jfs_text.o
 $(BIN_PREFIX)jfrd: jfrd.o
+	mkdir -p $(BIN_DIR)
 	$(CPP) -o $@ $< $(LIBS)
 
 JFFAM_OBJS = jffam.o jffamlib.o jfg_lib.o jfp_lib.o jfr_lib.o jft_lib.o jfs_text.o
 $(BIN_PREFIX)jffam: jffam.o
+	mkdir -p $(BIN_DIR)
 	$(CPP) -o $@ $< $(LIBS)
 
 JFGP_OBJS = jfgp.o jfgp_lib.o jfg_lib.o jfp_lib.o jfr_lib.o jft_lib.o jfs_text.o
 $(BIN_PREFIX)jfgp: jfgp.o
+	mkdir -p $(BIN_DIR)
 	$(CPP) -o $@ $< $(LIBS)
 
 JFI_OBJS = jfi.o jfi_lib.o jfg_lib.o jfp_lib.o jfr_lib.o jft_lib.o jfs_text.o
 $(BIN_PREFIX)jfi: jfi.o
+	mkdir -p $(BIN_DIR)
 	$(CPP) -o $@ $< $(LIBS)
 
 .SUFFIXES:	.o .c .cpp .rc _resources.o
