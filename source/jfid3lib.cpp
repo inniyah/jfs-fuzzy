@@ -116,10 +116,10 @@ static char jfid3_text[JFRD_MAX_TEXT];
 
 
 static unsigned char *jfid3_darea = NULL;   /* the rule-base.                */
-static long jfid3_data_size = 10000; /* number of bytes allocated to         */
+static unsigned long jfid3_data_size = 10000; /* number of bytes allocated to         */
                                      /* rule-base (value from jfid3_run).    */
-static long          jfid3_ff_darea = 0;    /* first-free s-rule.            */
-static long          jfid3_drec_size;       /* size af en s_rule.            */
+static unsigned long          jfid3_ff_darea = 0;    /* first-free s-rule.            */
+static unsigned long          jfid3_drec_size;       /* size af en s_rule.            */
 
   /* En s_rule har foelgende indhold:  score (float).               */
   /*                                   data_set_no (long).          */
@@ -566,14 +566,14 @@ static void jfid3_s_update(int dno)
     { new_score = jfid3_dscore;
       new_data_set_no = jfid3_data_set_no;
       if (jfid3_h_dset == 1)
-        fprintf(jfid3_hfile, "  %4d  %8.4f  replace(%d)\n",
+        fprintf(jfid3_hfile, "  %4ld  %8.4f  replace(%lu)\n",
                              jfid3_ipcount, jfid3_dscore, rb_data_set_no);
     }
     else
     { new_score = rb_score;
       new_data_set_no = rb_data_set_no;
       if (jfid3_h_dset == 1)
-        fprintf(jfid3_hfile, "  %4d  %8.4f  ignore_eq(%d)\n",
+        fprintf(jfid3_hfile, "  %4ld  %8.4f  ignore_eq(%lu)\n",
                              jfid3_ipcount, jfid3_dscore, rb_data_set_no);
     }
   }
@@ -581,7 +581,7 @@ static void jfid3_s_update(int dno)
   { new_score = rb_score + jfid3_dscore;
     new_data_set_no = rb_data_set_no;
     if (jfid3_h_dset == 1)
-      fprintf(jfid3_hfile, "  %4d  %8.4f  update(%d)\n",
+      fprintf(jfid3_hfile, "  %4ld  %8.4f  update(%lu)\n",
                            jfid3_ipcount, jfid3_dscore, rb_data_set_no);
   }
 
@@ -701,7 +701,7 @@ static void jfid3_resolve_contradiction(unsigned long rno1, unsigned long rno2)
   { if (score_1 >= score_2)
     { /* remove rule-2 : */
       if (jfid3_h_dset == 1)
-        fprintf(jfid3_hfile, "  %4d  %8.4f  ignore_conflict(%d)\n",
+        fprintf(jfid3_hfile, "  %4ld  %8.4f  ignore_conflict(%lu)\n",
                               jfid3_ipcount, score_2, dset_no_1);
       jfid3_s_copy(rno2, jfid3_ff_darea - 1);
       jfid3_ff_darea--;
@@ -709,7 +709,7 @@ static void jfid3_resolve_contradiction(unsigned long rno1, unsigned long rno2)
     else
     { /* remove rule-1 (by replacing in with rule-2): */
       if (jfid3_h_dset == 1)
-        fprintf(jfid3_hfile, "  %4d  %8.4f  replace_conflict(%d)\n",
+        fprintf(jfid3_hfile, "  %4ld  %8.4f  replace_conflict(%lu)\n",
                              jfid3_ipcount, score_2, dset_no_1);
       jfid3_s_copy(rno1, rno2);
       jfid3_ff_darea--;
@@ -719,7 +719,7 @@ static void jfid3_resolve_contradiction(unsigned long rno1, unsigned long rno2)
   { jfid3_darea[adr1] = 1;  /* set conflict to true */
     jfid3_darea[adr2] = 1;
     if (jfid3_h_dset == 1)
-      fprintf(jfid3_hfile, "  %4d  %8.4f  insert_conflict(%d)\n",
+      fprintf(jfid3_hfile, "  %4ld  %8.4f  insert_conflict(%lu)\n",
                            jfid3_ipcount, score_2, dset_no_1);
   }
   jfid3_c_contradictions++;
@@ -782,7 +782,7 @@ static int jfid3_in_leaf(void)
 
 static int jfid3_empty_leaf(void)  /* return 1 if no rule in actual leaf */
 {
-  int res, m;
+  unsigned int res, m;
 
   res = 1;
   for (m = 0; res == 1 && m < jfid3_ff_darea; m++)
@@ -945,7 +945,7 @@ static void jfid3_red_contra(void)
             if (ens == JFRD_CMP_CONTRADICTION)
             { if (jfid3_dscore > n1_score)
               { if (jfid3_h_dset == 1)
-                  fprintf(jfid3_hfile, "  remove(%d) contradict(%d)\n",
+                  fprintf(jfid3_hfile, "  remove(%lu) contradict(%lu)\n",
                                         n1_data_set_no, jfid3_data_set_no);
                 cc += n1_score;
                 n1_score = jfid3_dscore;
@@ -954,7 +954,7 @@ static void jfid3_red_contra(void)
               }
               else
               { if (jfid3_h_dset == 1)
-                  fprintf(jfid3_hfile, "  remove(%d) contradict(%d)\n",
+                  fprintf(jfid3_hfile, "  remove(%lu) contradict(%lu)\n",
                                         jfid3_data_set_no, n1_data_set_no);
                 cc += jfid3_dscore;
               }
@@ -990,7 +990,7 @@ static void jfid3_rm_rules(void)
     ascore += jfid3_dscore;
     if (jfid3_dscore < jfid3_min_score)
     { if (jfid3_h_dset == 1)
-        fprintf(jfid3_hfile, "  remove(%d) reason_score(%8.4f)\n",
+        fprintf(jfid3_hfile, "  remove(%lu) reason_score(%8.4f)\n",
                              jfid3_data_set_no, jfid3_dscore);
       jfid3_s_copy(n1, jfid3_ff_darea - 1);
       jfid3_ff_darea--;
@@ -1007,7 +1007,8 @@ static void jfid3_rm_rules(void)
 
 static void jfid3_hist_rules(void)
 {
-  int n1, v;
+  unsigned int n1;
+  int v;
   float ascore;
   struct jfg_var_desc vdesc;
   struct jfg_adjectiv_desc adesc;
@@ -1027,7 +1028,7 @@ static void jfid3_hist_rules(void)
       jfg_adjectiv(&adesc, jfid3_head, vdesc.f_adjectiv_no + jfid3_then_var.cur);
       fprintf(jfid3_hfile, "%s ", adesc.name);
       if (jfid3_h_rules == 2)
-        fprintf(jfid3_hfile, "%4d %8.4f", jfid3_data_set_no, jfid3_dscore);
+        fprintf(jfid3_hfile, "%4lu %8.4f", jfid3_data_set_no, jfid3_dscore);
       fprintf(jfid3_hfile, "\n");
     }
   }
@@ -1176,7 +1177,7 @@ static int jfid3_data(void)
       }
       else
       { if (jfid3_h_dset == 1)
-          fprintf(jfid3_hfile, "  %4d  %8.4f  insert\n",
+          fprintf(jfid3_hfile, "  %4ld  %8.4f  insert\n",
                                jfid3_ipcount, jfid3_dscore);
       }
     }
@@ -1238,7 +1239,7 @@ int jfid3_run(char *op_fname, char *ip_fname, char *da_fname, char *field_sep,
               char *hfile_name, int h_dsets, int h_rules, float min_score,
               char *sout_fname, int append, int batch)
 {
-  int m;
+  unsigned int m;
   unsigned char *pc;
   int slut;
   char txt[80];
