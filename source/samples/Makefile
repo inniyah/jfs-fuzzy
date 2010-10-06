@@ -34,7 +34,8 @@ CPPFLAGS= $(OPT) $(WARN) $(INCS) $(DEFS)
 
 BIN_DIR = bin/
 
-PROGRAMS = $(BIN_DIR)jfg_ex01 $(BIN_DIR)jfg_ex02 $(BIN_DIR)jfg_ex03 \
+PROGRAMS = \
+	$(BIN_DIR)jfg_ex01 $(BIN_DIR)jfg_ex02 $(BIN_DIR)jfg_ex03 \
 	$(BIN_DIR)jfg_ex04 $(BIN_DIR)jfp_ex01 $(BIN_DIR)jfp_ex02 \
 	$(BIN_DIR)jfp_ex03 $(BIN_DIR)jfp_ex04 \
 	$(BIN_DIR)jfr_ex01 $(BIN_DIR)jfr_ex02
@@ -42,7 +43,7 @@ PROGRAMS = $(BIN_DIR)jfg_ex01 $(BIN_DIR)jfg_ex02 $(BIN_DIR)jfg_ex03 \
 all: bin $(PROGRAMS)
 
 bin:
-	test -d bin/ || mkdir bin
+	mkdir -p bin
 
 $(BIN_DIR)jfg_ex01: jfg_ex01.o
 	$(CPP) -o $@ $< $(LIBS)

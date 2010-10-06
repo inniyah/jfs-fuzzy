@@ -84,16 +84,16 @@ extern char *jfs_t_dfus[];
 /* functions:                                                          */
 
 int jfst_txt_find(const char *txts[], int count, char *name);
-int jfst_rname_find(const char *name);  // find reserved word
-int jfst_htype_find(const char *name);  // find hedge-type
-int jfst_dtype_find(const char *name);  // find domain-type
-int jfst_defuz_find(const char *name);  // find defuz
-int jfst_otype_find(const char *name);  // find operator-type
-int jfst_ohmode_find(const char *name);// find operator_hedge_mode
-int jfst_vtype_find(const char *name);  // find variable-type
-int jfst_dctype_find(const char *name); // find domain-composite-type
-int jfst_sfunc_find(const char *name);  // find single-arg-function
-int jfst_dfunc_find(const char *name);  // find opertaor/double-funktion
-int jfst_vfunc_find(const char *name);  // find variable-function
+int jfst_rname_find(const char *name);  /* find reserved word */
+int jfst_htype_find(const char *name);  /* find hedge-type */
+int jfst_dtype_find(const char *name);  /* find domain-type */
+int jfst_defuz_find(const char *name);  /* find defuz */
+int jfst_otype_find(const char *name);  /* find operator-type */
+int jfst_ohmode_find(const char *name); /* find operator_hedge_mode */
+int jfst_vtype_find(const char *name);  /* find variable-type */
+int jfst_dctype_find(const char *name); /* find domain-composite-type */
+int jfst_sfunc_find(const char *name);  /* find single-arg-function */
+int jfst_dfunc_find(const char *name);  /* find opertaor/double-funktion */
+int jfst_vfunc_find(const char *name);  /* find variable-function */
 
 #endif

@@ -24,9 +24,8 @@
 #include "jfs2wlib.h"
 #include "jfw2rlib.h"
 
-//---------------------------------------------------------------------------
 #ifdef __BCPLUSPLUS__
-  USEUNIT("..\..\COMMON\jfs_text.cpp");
+USEUNIT("..\..\COMMON\jfs_text.cpp");
 USEUNIT("..\..\COMMON\jfw2rlib.cpp");
 USEUNIT("..\..\COMMON\jfs2wlib.cpp");
 //---------------------------------------------------------------------------
@@ -43,7 +42,8 @@ struct jf_option_desc { const char *option;
                       };               /* -2: sidste argument */
 
 struct jf_option_desc jf_options[] =
-  {     {"-e", 1},         /* 0 */
+  {
+        {"-e", 1},         /* 0 */
         {"-s", 0},         /* 1 */
         {"-o", 1},         /* 2 */
         {"-mt",1},         /* 3 */
@@ -69,7 +69,6 @@ const char bslash[] = "\\";
 const char jfc_version[] =
       "JFC    version  2.03    Copyright (c) 1999-2000 Jan E. Mortensen";
 
-
 const char *extensions[] = {
 	"jfs",     /* 0 */
 	"jfw",     /* 1 */
@@ -82,7 +81,6 @@ static int isoption(const char *s);
 static int us_error(int silent_mode);
 static int jf_about(void);
 int jf_getoption(const char *argv[], int no, int argc);
-
 
 
 static void ext_subst(char *d, const char *e, int forced)
@@ -126,9 +124,9 @@ static int jf_about(void)
   printf("\n\n%s\n\n", jfc_version);
   printf("by Jan E. Mortensen       email:  jemor@inet.uni2.dk\n\n");
 
-  printf("usage: jfc [options] jfs\n\n");
+  printf("usage: jfc [options] <file.jfs>\n\n");
   printf(
-"JFC is the JFS compiler. It compiles the file <jfs>. Depending on the compile-\n");
+"JFC is the JFS compiler. It compiles the file <file.jfs>. Depending on the compile-\n");
   printf(
 "mode it compiles from a jfs-file or a jfw-file, to a jfw-file or a jfr-file.\n\n");
 

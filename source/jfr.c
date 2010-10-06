@@ -380,14 +380,13 @@ struct jfr_err_desc jfr_err_texts[] = {
 
 static void ext_subst(char *d, const char *e, int forced);
 static int jf_error(int errno, const char *name, int mode);
-int jf_tmap_find(struct jfr_tmap_desc *map, const char *txt);
+int jf_tmap_find(struct jf_tmap_desc *map, const char *txt);
 int jf_getoption(const char *argv[], int no, int argc);
 void jf_ftoa(char *txt, float f);
 int closest_adjectiv(int var_no, float val);
 static int kb_ip_get(struct jft_data_record *v, int var_no);
 static int fl_ip_get(struct jft_data_record *dd, int var_no);
 int jfr_getvar(struct jft_data_record *dd, int var_no);
-static int jfs_ip_get(void);
 void jf_align(char *txt, int tlen, int side);
 void jpr_text(FILE *op, int var_no);
 void f_print(FILE *op, float val);

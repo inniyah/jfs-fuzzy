@@ -31,10 +31,8 @@
   USEUNIT("..\..\COMMON\jfp_lib.cpp");
   USEUNIT("..\..\COMMON\jfr_lib.cpp");
   USEUNIT("..\..\COMMON\jffamlib.cpp");
-//---------------------------------------------------------------------------
 #endif
 
-//---------------------------------------------------------------------------
 const char usage_1[] =
 "usage: jffam [-D dm] [-d df] [-f fs] [-o of] [-Mp ps] [-Md ds]";
 const char usage_2[] =
@@ -47,7 +45,8 @@ struct jf_option_desc {
 	int argc;      /* -1: variabelt */
 };               /* -2: sidste argument */
 
-struct jf_option_desc jf_options[] = {     {"-f",  1},        /*  0 */
+struct jf_option_desc jf_options[] = {
+	{"-f",  1},        /*  0 */
 	{"-s",  0},        /*  1 */
 	{"-D",  1},        /*  2 */
 	{"-d", -1},        /*  3 */
@@ -67,7 +66,7 @@ struct jf_option_desc jf_options[] = {     {"-f",  1},        /*  0 */
 	{"-?",  0},        /* 17 */
 	{"?",   0},        /* 18 */
 	{" ",  -2}
-  };
+};
 
 
 int data_mode = JFT_FM_INPUT_EXPECTED;

@@ -377,7 +377,7 @@ static void jfw2s_title_handle(void)
   if (strlen(jf_head.title) != 0)
     fprintf(jfw2s_op, "\ntitle \"%s\";\n", jf_head.title);
   jfw2s_comment_write(jf_head.comment_no);
-  // jfw2s_flush();
+  /* jfw2s_flush(); */
 }
 
 static void jfw2s_domains_handle(void)

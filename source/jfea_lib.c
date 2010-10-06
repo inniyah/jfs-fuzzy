@@ -120,7 +120,8 @@ struct jfea_rm_ind_desc  /* remember info for repat-mutation */
   int succes;
   int direction;
 };
-static jfea_rm_ind_desc jfea_rm_ind;
+
+static struct jfea_rm_ind_desc jfea_rm_ind;
 
 /*********************************************************************/
 /* Individual-description:                                           */
@@ -195,7 +196,6 @@ static int jfea_var_no(const char *text);
 static int jfea_set_adesc(const char *opword, const char *vname, int input);
 static int jfea_isoption(const char *txt);
 static int jfea_get_command(int argc);
-//static void jfea_pl_create(char type, int address, int limit_c, int mode);
 static int jfea_adesc_create(void);
 static float jfea_rand_dget(void);
 static float jfea_rand_iv_dget(float iinf, float isup);
@@ -1808,7 +1808,7 @@ int jfea_init(void *jfr_head, int ind_c, int rule_c, int fixed_rules,
   }
   if (rs < 128)
     rs = 128;
-  size = sizeof(jfg_tree_desc) * rs;
+  size = sizeof(struct jfg_tree_desc) * rs;
   if ((jfea_tree = (struct jfg_tree_desc *) malloc(size)) == NULL)
   { free(jfea_pop.scores);
     free(jfea_inds);

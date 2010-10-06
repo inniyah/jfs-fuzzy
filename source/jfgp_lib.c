@@ -288,8 +288,7 @@ static void jfgp_i_judge(int ind_no);
 static int jfgp_random(int sup);
 static int jfgp_ind_rand(int sign);
 
-static int jfgp_gp_br_ins(int atom_no);
-static int jfgp_gpi2p(long ind_no);
+static int jfgp_gp_br_ins(long atom_no);
 static int jfgp_i2p(long source_no);
 
 static signed short jfgp_1_count(long ano);
@@ -301,7 +300,7 @@ static signed short jfgp_ir_change(long ano, signed short value);
 static signed short jfgp_rule_change(signed short hno, signed short value);
 
 static long jfgp_i_rrha(long ano, long iano);
-static signed short jfgp_rrha_atom(signed short rhno);
+static long jfgp_rrha_atom(long rhno);
 static long jfgp_mutate(unsigned short stat_no,
                         long sano_1, long sano_2, long sano_3);
 static int jfgp_uc_argc(int mno);

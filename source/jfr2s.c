@@ -25,14 +25,13 @@
 #include "jfr2wlib.h"
 #include "jfw2slib.h"
 
-//---------------------------------------------------------------------------
 #ifdef __BCPLUSPLUS__
-  USEUNIT("..\..\COMMON\jfs_text.cpp");
+USEUNIT("..\..\COMMON\jfs_text.cpp");
 USEUNIT("..\..\COMMON\jfw2slib.cpp");
 USEUNIT("..\..\COMMON\jfr_lib.cpp");
 USEUNIT("..\..\COMMON\jfr2wlib.cpp");
 USEUNIT("..\..\COMMON\jfg_lib.cpp");
-//---------------------------------------------------------------------------
+
 #pragma argsused
 #endif
 
@@ -108,7 +107,6 @@ static int jf_about(void)
 {
 
   printf("\nJFR2S   version  2.01   Copyright (c) 1998-1999 Jan E. Mortensen\n\n");
-  // printf("by Jan E. Mortensen         email: jemor@inet.uni2.dk\n\n");
   printf("usage: jfr2s [options] rf\n\n");
 
   printf("JFR2S is a JFS converter. It converts the jfr/jfw-file <rf> back to\n");

@@ -23,8 +23,6 @@
 #include "jft_lib.h"
 #include "jfrd_lib.h"
 
-
-//---------------------------------------------------------------------------
 #ifdef __BCPLUSPLUS
 USEUNIT("..\..\COMMON\jfs_text.cpp");
 USEUNIT("..\..\COMMON\jft_lib.cpp");
@@ -32,7 +30,7 @@ USEUNIT("..\..\COMMON\jfp_lib.cpp");
 USEUNIT("..\..\COMMON\jfr_lib.cpp");
 USEUNIT("..\..\COMMON\jfrd_lib.cpp");
 USEUNIT("..\..\COMMON\jfg_lib.cpp");
-//---------------------------------------------------------------------------
+
 #pragma argsused
 #endif
 

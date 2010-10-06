@@ -21,6 +21,7 @@
 #include <string.h>
 #include <ctype.h>
 #include <math.h>
+#include <string.h>
 #include "jfm_lib.h"
 
 struct jhlp_head_desc
@@ -655,7 +656,7 @@ static int jhlp_licmp(char *txt, int fid)
 
 static void jhlp_set_filename(char *fname)
 {
-  // changes the current file-name to fname (and initialises line_no). */
+  /* changes the current file-name to fname (and initialises line_no). */
 
   strcpy(jhlp_cur_fname, fname);
   jhlp_line_no = 0;

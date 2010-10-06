@@ -359,7 +359,6 @@ static struct jfc_err_desc jfc_err_texts[] =
   static void jfc_first_domains(void);
   static int jfc_adjectiv_ins(void);
   static int jfc_var_ins(int var_type);
-  static void jfc_first_vars(void);
   static int jfc_hedge_ins(void);
   static void jfc_first_hedges(void);
   static int jfc_relation_ins(void);
@@ -381,7 +380,6 @@ static struct jfc_err_desc jfc_err_texts[] =
 static int jfc_error(int eno, char *name, int mode)
 {
   int m, v;
-  //char *t;
 
   m = -1;
   if (jfc_gl_error_mode != JFE_FATAL)
@@ -931,7 +929,6 @@ static int jfc_plf_insert(int *id)
 {
   int tilst, slut, lcount, tflag;
   char *s;
-  // float x, y, hx, hy;
 
   tilst = 0; slut = 0; lcount = 0;
   jfc_head->limits[jfc_head->limit_c].flags = 0;

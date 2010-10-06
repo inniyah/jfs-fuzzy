@@ -215,57 +215,57 @@ int jfst_txt_find(const char *txts[], int count, const char *name)
   return -1;
 }
 
-int jfst_rname_find(const char *name)  // find reserved word
+int jfst_rname_find(const char *name)  /* find reserved word */
 {
   return jfst_txt_find(jfs_t_reserved, JFS_RES_COUNT, name);
 }
 
-int jfst_htype_find(const char *name)  // find hedge-type
+int jfst_htype_find(const char *name)  /* find hedge-type */
 {
   return jfst_txt_find(jfs_t_hts, JFS_HT_COUNT, name);
 }
 
-int jfst_dtype_find(const char *name)  // find domain-type
+int jfst_dtype_find(const char *name)  /* find domain-type */
 {
   return jfst_txt_find(jfs_t_dts, JFS_DT_COUNT, name);
 }
 
-int jfst_defuz_find(const char *name)  // find defuz
+int jfst_defuz_find(const char *name)  /* find defuz */
 {
   return jfst_txt_find(jfs_t_vds, JFS_VD_COUNT, name);
 }
 
-int jfst_otype_find(const char *name)  // find operator-type
+int jfst_otype_find(const char *name)  /* find operator-type */
 {
   return jfst_txt_find(jfs_t_fops, JFS_FOP_COUNT, name);
 }
 
-int jfst_ohmode_find(const char *name) // find operator_hedge_mode
+int jfst_ohmode_find(const char *name) /* find operator_hedge_mode */
 {
   return jfst_txt_find(jfs_t_oph_modes, JFS_OHM_COUNT, name);
 }
 
-int jfst_vtype_find(const char *name)  // find variable-type
+int jfst_vtype_find(const char *name)  /* find variable-type */
 {
   return jfst_txt_find(jfs_t_vts, JFS_VT_COUNT, name);
 }
 
-int jfst_dctype_find(const char *name)  // find domain-composite-type
+int jfst_dctype_find(const char *name)  /* find domain-composite-type */
 {
   return jfst_txt_find(jfs_t_vcfs, JFS_VCF_COUNT, name);
 }
 
-int jfst_sfunc_find(const char *name)  // find single-arg-function
+int jfst_sfunc_find(const char *name)  /* find single-arg-function */
 {
   return jfst_txt_find(jfs_t_sfus, JFS_SFU_COUNT, name);
 }
 
-int jfst_dfunc_find(const char *name) // find opertaor/double-funktion
+int jfst_dfunc_find(const char *name) /* find opertaor/double-funktion */
 {
   return jfst_txt_find(jfs_t_dfus, JFS_DFU_COUNT, name);
 }
 
-int jfst_vfunc_find(const char *name) // find variable-function
+int jfst_vfunc_find(const char *name) /* find variable-function */
 {
   return jfst_txt_find(jfs_t_vfus, JFS_VFU_COUNT, name);
 }
