@@ -321,7 +321,6 @@ static void jfr2c_leaf_write(int id);
 static void jfr2c_init_write(char *funcname);
 static void jfr2c_rules_write(char *funcname);
 static void jfr2c_jfs_write(char *funcname);
-static void jfr2c_head_write(void);
 static void jfr2c_t_write(const char **txts);
 static int jfr2c_program_write(char *funcname, char *progname, char *hname);
 static int jfr2c_file_append(char *dfname, char *sfname);
@@ -876,7 +875,7 @@ static void jfr2c_relations_write(void)
   { jfg_relation(&rdesc, jfr_head, m);
     fprintf(jfr2c_op, "static %s r%d(%s x, %s y) /* %s */\n",
             jfr2c_t_real, m, jfr2c_t_real, jfr2c_t_real, rdesc.name);
-    fprintf(jfr2c_op, "{\n  return ", m);
+    fprintf(jfr2c_op, "{\n  return %d", m);
     fprintf(jfr2c_dcl,"static %s r%d(%s x, %s y);\n",
             jfr2c_t_real, m, jfr2c_t_real, jfr2c_t_real);
     if ((rdesc.flags & JFS_RF_HEDGE) != 0)
@@ -2005,7 +2004,7 @@ static void jfr2c_defuz_write(void)
               fprintf(jfr2c_op, ";\n");
             }
             else
-              fprintf(jfr2c_op, "    v%=f%;\n",vno, vdesc.f_fzvar_no + a);
+              fprintf(jfr2c_op, "    v%d=f%d;\n",vno, vdesc.f_fzvar_no + a);
             break;
 	       }
         if (d == 0)

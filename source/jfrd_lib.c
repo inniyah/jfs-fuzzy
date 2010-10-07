@@ -1529,7 +1529,7 @@ static int jfrd_red_in(void)
       np++;
     }
     fprintf(sout,
-         "\n    in-reduction finished. %d rules deleted.\n",
+         "\n    in-reduction finished. %ld rules deleted.\n",
          jfrd_ff_darea - jfrd_ff_c_rules);
   }
 

@@ -533,7 +533,7 @@ int jfr2w_conv(char *de_fname, char *so_fname, char *sout_fname,
       jfr2w_stdout = fopen(sout_fname, "a");
     if (jfr2w_stdout == NULL)
     { jfr2w_stdout = stdout;
-      fprintf(jfr2w_stdout, "Cannot open %s for output.\n");
+      fprintf(jfr2w_stdout, "Cannot open %s for output.\n", sout_fname);
     }
   }
   jfr2w_errmode = JFE_NONE;

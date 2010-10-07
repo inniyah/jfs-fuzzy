@@ -1445,7 +1445,10 @@ static int jfr2htm_printf_check(const char *words[], int a)
 
   sw = 1;
   if (strcmp(words[0], jfr2htm_t_fprintf) == 0)
-  { char *wd = strdup(words[sw]); /* printf-destination */
+  {
+    char *wd; /* printf-destination */
+    wd = (char *)(malloc (strlen(words[sw]) + 1));
+    if (wd != NULL) strcpy(wd, words[sw]);
     if (strlen(wd) > 31)
       wd[31] = '\0';
     id = -1;
@@ -1625,14 +1628,20 @@ static int jfr2htm_program_check(void)
                              jfr2htm_t_stdout);
                     }
                     else
-                    { char *wd0 = strdup(jfr2htm_words[p]); /* name */
+                    {
+                      char *wd0; /* name */
+                      wd0 = (char *)(malloc (strlen(jfr2htm_words[p]) + 1));
+                      if (wd0 != NULL) strcpy(wd0, jfr2htm_words[p]);
+
                       char *wd = jfr2htm_ttrunc(wd0, 32);
                       p = 1;
                       strcpy(jfr2htm_textareas[jfr2htm_ff_textarea].name, wd);
                       free(wd0);
                     }
                     p++;
-                    w0 = strdup(jfr2htm_words[p]); /* label */
+                    w0; /* label */
+                    w0 = (char *)(malloc (strlen(jfr2htm_words[p]) + 1));
+                    if (w0 != NULL) strcpy(w0, jfr2htm_words[p]);
                     w = jfr2htm_ttrunc(w0, 128);
                     strcpy(jfr2htm_textareas[jfr2htm_ff_textarea].label, w);
                     p++;
@@ -2699,7 +2708,10 @@ static int jfr2htm_run_write(void)
               if (a > 0)
               { if (strcmp(jfr2htm_words[0], jfr2htm_t_java) == 0)
                 { if (a > 1)
-                  { char *w = strdup(jfr2htm_words[1]);
+                  {
+                    char *w;
+                    w = (char *)(malloc (strlen(jfr2htm_words[1]) + 1));
+                    if (w != NULL) strcpy(w, jfr2htm_words[1]);
                     if (w[0] == '"')
                       w++;
                     if (w[strlen(w) - 1] == '"')
