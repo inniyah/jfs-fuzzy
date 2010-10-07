@@ -34,7 +34,7 @@ RESCOMP     = windres
 
 WARN?= -pedantic -Wall -ansi
 OPT?= -O2 -g
-INCS=
+INCS= -Iinclude
 DEFS=
 LIBS= -L$(LIB_DIR) -ljfs-xtra -ljfs-core -lm
 
@@ -51,8 +51,14 @@ LDFLAGS= -Wl,-z,defs -Wl,--as-needed -Wl,--no-undefined $(EXTRA_LDFLAGS)
 # jfp_lib = Functions to change a compiled jfs-program.
 # jfs_text = JFS constant-texts. 
 
-LIBRARY_SOURCES= jft_lib.c jfm_lib.c jopt_lib.c jfr_lib.c jfg_lib.c \
-	jfp_lib.c jfs_text.c
+LIBRARY_SOURCES= \
+	core/jft_lib.c \
+	core/jfm_lib.c \
+	core/jopt_lib.c \
+	core/jfr_lib.c \
+	core/jfg_lib.c \
+	core/jfp_lib.c \
+	core/jfs_text.c
 
 # jfs2wlib = JFS converter. Converts a JFS-file to a JFW-file.
 # jfw2rlib = JFS converter. Converts a JFW-file to a JFR-file.
@@ -69,10 +75,21 @@ LIBRARY_SOURCES= jft_lib.c jfm_lib.c jopt_lib.c jfr_lib.c jfg_lib.c \
 # jfgp_lib = JFS rule discover-functions using Genetic programing.
 # jfi_lib = JFS  improver-functions using evolutionary programing.
 
-LIBXTRA_SOURCES = jfs2wlib.c jfw2rlib.c jfr2wlib.c jfw2slib.c \
-	jhlp_lib.c jfpltlib.c jfr2clib.c jfr2hlib.c jfea_lib.c \
-	jfid3lib.c jfrd_lib.c jffamlib.c jfgp_lib.c jfi_lib.c
-
+LIBXTRA_SOURCES = \
+	xtra/jfs2wlib.c \
+	xtra/jfw2rlib.c \
+	xtra/jfr2wlib.c \
+	xtra/jfw2slib.c \
+	xtra/jhlp_lib.c \
+	xtra/jfpltlib.c \
+	xtra/jfr2clib.c \
+	xtra/jfr2hlib.c \
+	xtra/jfea_lib.c \
+	xtra/jfid3lib.c \
+	xtra/jfrd_lib.c \
+	xtra/jffamlib.c \
+	xtra/jfgp_lib.c \
+	xtra/jfi_lib.c
 
 LIBRARY_SHARED_OBJS = $(LIBRARY_SOURCES:.c=.shared.o)
 LIBRARY_STATIC_OBJS = $(LIBRARY_SOURCES:.c=.static.o)
@@ -122,77 +139,78 @@ PROGRAMS = $(LIB_DIR)/$(LIBRARY).so $(LIB_DIR)/$(LIBXTRA).so \
 
 programs: $(PROGRAMS)
 
-JFC_OBJS = jfc.o jfs2wlib.o jfw2rlib.o jfs_text.o
-$(BIN_PREFIX)jfc: jfc.o
+#JFC_OBJS = jfc.o jfs2wlib.o jfw2rlib.o jfs_text.o
+$(BIN_PREFIX)jfc: cmds/jfc.o
 	mkdir -p $(BIN_DIR)
 	$(CC) -o $@ $< $(LIBS)
 
-JFR_OBJS = jfr.o jfr_lib.o jfg_lib.o jft_lib.o jfs_text.o
-$(BIN_PREFIX)jfr: jfr.o
+#JFR_OBJS = jfr.o jfr_lib.o jfg_lib.o jft_lib.o jfs_text.o
+$(BIN_PREFIX)jfr: cmds/jfr.o
 	mkdir -p $(BIN_DIR)
 	$(CC) -o $@ $< $(LIBS)
 
-JFR2S_OBJS = jfr2s.o jfr2wlib.o jfw2slib.o jfr_lib.o jfg_lib.o jfs_text.o
-$(BIN_PREFIX)jfr2s: jfr2s.o
+#JFR2S_OBJS = jfr2s.o jfr2wlib.o jfw2slib.o jfr_lib.o jfg_lib.o jfs_text.o
+$(BIN_PREFIX)jfr2s: cmds/jfr2s.o
 	mkdir -p $(BIN_DIR)
 	$(CC) -o $@ $< $(LIBS)
 
-JHLP_OBJS = jhlp.o jhlp_lib.o jfm_lib.o
-$(BIN_PREFIX)jhlp: jhlp.o
+#JHLP_OBJS = jhlp.o jhlp_lib.o jfm_lib.o
+$(BIN_PREFIX)jhlp: cmds/jhlp.o
 	mkdir -p $(BIN_DIR)
 	$(CC) -o $@ $< $(LIBS)
 
+JHLP_OBJS = cmds/jhlp.o xtra/jhlp_lib.o core/jfm_lib.o
 ../doc/bin/jhlp: $(JHLP_OBJS)
 	mkdir -p ../doc/bin/
 	$(CC) -o $@ $(JHLP_OBJS) -lm
 
-JFPLOT_OBJS = jfplot.o jfpltlib.o jopt_lib.o jfr_lib.o jfg_lib.o jfs_text.o
-$(BIN_PREFIX)jfplot: jfplot.o
+#JFPLOT_OBJS = jfplot.o jfpltlib.o jopt_lib.o jfr_lib.o jfg_lib.o jfs_text.o
+$(BIN_PREFIX)jfplot: cmds/jfplot.o
 	mkdir -p $(BIN_DIR)
 	$(CC) -o $@ $< $(LIBS)
 
-JFRPLT_OBJS = jfrplt.o jopt_lib.o jfr_lib.o jfg_lib.o jfs_text.o jft_lib.o
-$(BIN_PREFIX)jfrplt: jfrplt.o
+#JFRPLT_OBJS = jfrplt.o jopt_lib.o jfr_lib.o jfg_lib.o jfs_text.o jft_lib.o
+$(BIN_PREFIX)jfrplt: cmds/jfrplt.o
 	mkdir -p $(BIN_DIR)
 	$(CC) -o $@ $< $(LIBS)
 
-JFR2C_OBJS = jfr2c.o jfr2clib.o jfr_lib.o jfg_lib.o jfs_text.o
-$(BIN_PREFIX)jfr2c: jfr2c.o
+#JFR2C_OBJS = jfr2c.o jfr2clib.o jfr_lib.o jfg_lib.o jfs_text.o
+$(BIN_PREFIX)jfr2c: cmds/jfr2c.o
 	mkdir -p $(BIN_DIR)
 	$(CC) -o $@ $< $(LIBS)
 
-JFR2HTM_OBJS = jfr2htm.o jfr2hlib.o jfr_lib.o jfg_lib.o jfs_text.o
-$(BIN_PREFIX)jfr2htm: jfr2htm.o
+#JFR2HTM_OBJS = jfr2htm.o jfr2hlib.o jfr_lib.o jfg_lib.o jfs_text.o
+$(BIN_PREFIX)jfr2htm: cmds/jfr2htm.o
 	mkdir -p $(BIN_DIR)
 	$(CC) -o $@ $< $(LIBS)
 
-JFEA_OBJS = jfea.o jfea_lib.o jfg_lib.o jfp_lib.o jfr_lib.o jft_lib.o jfs_text.o
-$(BIN_PREFIX)jfea: jfea.o
+#JFEA_OBJS = jfea.o jfea_lib.o jfg_lib.o jfp_lib.o jfr_lib.o jft_lib.o jfs_text.o
+$(BIN_PREFIX)jfea: cmds/jfea.o
 	mkdir -p $(BIN_DIR)
 	$(CC) -o $@ $< $(LIBS)
 
-JFID3_OBJS = jfid3.o jfid3lib.o jfg_lib.o jfp_lib.o jfr_lib.o jft_lib.o jfs_text.o
-$(BIN_PREFIX)jfid3: jfid3.o
+#JFID3_OBJS = jfid3.o jfid3lib.o jfg_lib.o jfp_lib.o jfr_lib.o jft_lib.o jfs_text.o
+$(BIN_PREFIX)jfid3: cmds/jfid3.o
 	mkdir -p $(BIN_DIR)
 	$(CC) -o $@ $< $(LIBS)
 
-JFRD_OBJS = jfrd.o jfrd_lib.o jfg_lib.o jfp_lib.o jfr_lib.o jft_lib.o jfs_text.o
-$(BIN_PREFIX)jfrd: jfrd.o
+#JFRD_OBJS = jfrd.o jfrd_lib.o jfg_lib.o jfp_lib.o jfr_lib.o jft_lib.o jfs_text.o
+$(BIN_PREFIX)jfrd: cmds/jfrd.o
 	mkdir -p $(BIN_DIR)
 	$(CC) -o $@ $< $(LIBS)
 
-JFFAM_OBJS = jffam.o jffamlib.o jfg_lib.o jfp_lib.o jfr_lib.o jft_lib.o jfs_text.o
-$(BIN_PREFIX)jffam: jffam.o
+#JFFAM_OBJS = jffam.o jffamlib.o jfg_lib.o jfp_lib.o jfr_lib.o jft_lib.o jfs_text.o
+$(BIN_PREFIX)jffam: cmds/jffam.o
 	mkdir -p $(BIN_DIR)
 	$(CC) -o $@ $< $(LIBS)
 
-JFGP_OBJS = jfgp.o jfgp_lib.o jfg_lib.o jfp_lib.o jfr_lib.o jft_lib.o jfs_text.o
-$(BIN_PREFIX)jfgp: jfgp.o
+#JFGP_OBJS = jfgp.o jfgp_lib.o jfg_lib.o jfp_lib.o jfr_lib.o jft_lib.o jfs_text.o
+$(BIN_PREFIX)jfgp: cmds/jfgp.o
 	mkdir -p $(BIN_DIR)
 	$(CC) -o $@ $< $(LIBS)
 
-JFI_OBJS = jfi.o jfi_lib.o jfg_lib.o jfp_lib.o jfr_lib.o jft_lib.o jfs_text.o
-$(BIN_PREFIX)jfi: jfi.o
+#JFI_OBJS = jfi.o jfi_lib.o jfg_lib.o jfp_lib.o jfr_lib.o jft_lib.o jfs_text.o
+$(BIN_PREFIX)jfi: cmds/jfi.o
 	mkdir -p $(BIN_DIR)
 	$(CC) -o $@ $< $(LIBS)
 
