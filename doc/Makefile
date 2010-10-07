@@ -10,13 +10,16 @@
 #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #  GNU General Public License for more details.
 
+WARN?= -pedantic -Wall -ansi
+OPT?= -O2 -g
+
 all: tmp-stamp-jfs tmp-stamp-runa tmp-stamp-learna \
 	tmp-stamp-jdoc tmp-stamp-source1
 
 JHLP= bin/jhlp
 
 $(JHLP):
-	cd ../source; make ../doc/bin/jhlp
+	cd ../source; WARN="$(WARN)" OPT="$(OPT)" $(MAKE) ../doc/bin/jhlp
 
 JFS_FILES= jfs.jhp jfs.jhd jfs.jhn intro.jhd started.jhd jfl.jhp jfldecl.jhd \
 	jflprog.jhd jfsw.jhp jfsw.jhd jfc.jhp jfc.jhd jfr2s.jhp jfr2s.jhd \

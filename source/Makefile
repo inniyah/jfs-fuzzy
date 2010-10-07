@@ -32,8 +32,8 @@ RANLIB= ranlib
 RESFLAGS    = --include-dir /mingw/include --include-dir . --define __WIN32__ --define __WIN95__ --define __GNUWIN32__
 RESCOMP     = windres
 
-WARN= -pedantic -Wall -ansi
-OPT= -O2 -g
+WARN?= -pedantic -Wall -ansi
+OPT?= -O2 -g
 INCS=
 DEFS=
 LIBS= -L$(LIB_DIR) -ljfs-xtra -ljfs-core -lm
