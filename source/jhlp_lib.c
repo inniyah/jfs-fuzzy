@@ -21,7 +21,6 @@
 #include <string.h>
 #include <ctype.h>
 #include <math.h>
-#include <string.h>
 #include "jfm_lib.h"
 
 struct jhlp_head_desc
@@ -2484,8 +2483,10 @@ static int jhlp_write_glosary(const char *_name)
   int res, id, odid, did;
   struct jhlp_glt_desc *gdesc;
   struct jhlp_odata_desc *odesc;
-  char *name = strdup(_name);
+  char *name;
 
+  name = (char *)(malloc (strlen(_name) + 1));
+  if (name != NULL) strcpy(name, _name);
   res = 0;
   jhlp_set_length(name, 15);
   id = jhlp_find_glt(JHLP_DM_GLOS, name);
@@ -2526,8 +2527,10 @@ static int jhlp_write_include(const char *_name)
   int res, id, odid, did, skrevet;
   struct jhlp_glt_desc *gdesc;
   struct jhlp_odata_desc *odesc;
-  char *name = strdup(_name);
+  char *name;
 
+  name = (char *)(malloc (strlen(_name) + 1));
+  if (name != NULL) strcpy(name, _name);
   res = 0;
   jhlp_set_length(name, 15);
   id = jhlp_find_glt(JHLP_DM_INCLUDE, jhlp_t_text);

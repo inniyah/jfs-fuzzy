@@ -2767,7 +2767,9 @@ static void jfr2c_rules_write(char *funcname)
               if (a > 0)
               { if (strcmp(jfr2c_words[0], jfr2c_t_c) == 0)
                 { if (a > 1)
-                  { char *w = strdup(jfr2c_words[1]);
+                  { char *w;
+                    w = (char *)(malloc (strlen(jfr2c_words[1]) + 1));
+                    if (w != NULL) strcpy(w, jfr2c_words[1]);
                     if (w[0] == '"')
                       w++;
                     if (w[strlen(w) - 1] == '"')
