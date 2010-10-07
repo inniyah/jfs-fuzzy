@@ -1,4 +1,4 @@
-#  (C) 2005 Miriam Ruiz
+#  (C) 2005-2010 Miriam Ruiz
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -24,6 +24,7 @@ JFS_FILES= jfs.jhp jfs.jhd jfs.jhn intro.jhd started.jhd jfl.jhp jfldecl.jhd \
 
 # documentation for basic system
 tmp-stamp-jfs: $(JHLP) jfs.jhc $(JFS_FILES)
+	mkdir -p html
 	$(JHLP) -c -hi jfs -e tmp-install.log -a  -si html/jfs
 	touch tmp-stamp-jfs
 
@@ -32,6 +33,7 @@ RUNA_FILES= runa.jhp jfrw.jhp jfrw.jhd jfr2c.jhp jfr2c.jhd jfr2htm.jhp \
 
 # documentation for conversition tools
 tmp-stamp-runa: $(JHLP) runa.jhc $(RUNA_FILES)
+	mkdir -p html
 	$(JHLP) -c -hi runa -e tmp-install.log -a -si html/jfs
 	touch tmp-stamp-runa
 
@@ -41,6 +43,7 @@ LEARNA_FILES= learna.jhp learna.jhd jfi.jhp jfi.jhd jfgp.jhp jfgp.jhd \
 
 # documentation for learning tools
 tmp-stamp-learna: $(JHLP) learna.jhc $(LEARNA_FILES)
+	mkdir -p html
 	$(JHLP) -c -hi learna -e tmp-install.log -a -si html/jfs
 	touch tmp-stamp-learna
 
@@ -49,6 +52,7 @@ JDOC_FILES= jdoc.jhp jfplot.jhp jfplot.jhd jfrplt.jhp jfrplt.jhd \
 
 # documentation for documentation tools
 tmp-stamp-jdoc: $(JHLP) jdoc.jhc $(JDOC_FILES)
+	mkdir -p html
 	$(JHLP) -c -hi jdoc -e tmp-install.log -a -si html/jfs
 	touch tmp-stamp-jdoc
 
@@ -56,12 +60,13 @@ SOURCE1_FILES= source1.jhp source1.jhd jfr_lib.jhd jfg_lib.jhd jfp_lib.jhd
 
 # documentation for source code
 tmp-stamp-source1: $(JHLP) source1.jhc $(SOURCE1_FILES)
+	mkdir -p html
 	$(JHLP) -c -hi source1 -e tmp-install.log -a -si html/jfs
 	touch tmp-stamp-source1
 
 clean:
-	rm -f html/*
-	rm -rf bin
-	rm -f tmp-*
+	rm -rfv html
+	rm -rfv bin
+	rm -fv tmp-*
 
 distclean: clean
