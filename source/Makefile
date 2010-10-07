@@ -248,7 +248,7 @@ SHARED_CFLAGS= $(STATIC_CFLAGS) -fPIC
 	$(CC) -o $@ -c $+ $(STATIC_CFLAGS)
 
 clean: 
-	rm -f *.o *~
+	rm -f *.o core/*.o xtra/*.o cmds/*.o *~
 
 distclean: clean
 	rm -f $(PROGRAMS) $(LIB_DIR)/*.a $(LIB_DIR)/*.so $(LIB_DIR)/*.so.*
