@@ -1507,7 +1507,7 @@ static int jfr2htm_printf_check(const char *words[], int a)
 
 static int jfr2htm_program_check(void)
 {
-  int m, fu, res, a, ft, p;
+  int m, fu, res, a, ft, p=0;
   unsigned short c, i, e;
   struct jfg_statement_desc sdesc;
   struct jfg_var_desc vdesc;
@@ -1629,17 +1629,16 @@ static int jfr2htm_program_check(void)
                     }
                     else
                     {
-                      char *wd0; /* name */
+                      char *wd, *wd0; /* name */
                       wd0 = (char *)(malloc (strlen(jfr2htm_words[p]) + 1));
                       if (wd0 != NULL) strcpy(wd0, jfr2htm_words[p]);
 
-                      char *wd = jfr2htm_ttrunc(wd0, 32);
+                      wd = jfr2htm_ttrunc(wd0, 32);
                       p = 1;
                       strcpy(jfr2htm_textareas[jfr2htm_ff_textarea].name, wd);
                       free(wd0);
                     }
                     p++;
-                    w0; /* label */
                     w0 = (char *)(malloc (strlen(jfr2htm_words[p]) + 1));
                     if (w0 != NULL) strcpy(w0, jfr2htm_words[p]);
                     w = jfr2htm_ttrunc(w0, 128);
@@ -2167,7 +2166,7 @@ static void jfr2htm_defuz_write(void)
               fprintf(jfr2htm_op, ";\n");
             }
             else
-              fprintf(jfr2htm_op, "%sv%d=%s%f;\n",
+              fprintf(jfr2htm_op, "%sv%d=%s%d;\n",
                       jfr2htm_prefix_txt, vno,
                       jfr2htm_prefix_txt, vdesc.f_fzvar_no + a);
             break;
@@ -2851,7 +2850,7 @@ static int jfr2htm_vget(struct jfg_var_desc *vdesc, int vno, int fsetset)
   /* read a variable-description, set argument-values in jfr2htm_vargs */
 
   struct jfg_domain_desc ddesc;
-  int ft, is_ovar, varg;
+  int ft=JFR2HTM_FT_DEFAULT, is_ovar, varg;
 
   if (vno >= jfr2htm_spdesc.f_ovar_no &&
       vno < jfr2htm_spdesc.f_ovar_no + jfr2htm_spdesc.ovar_c)
@@ -3371,7 +3370,7 @@ static void jfr2htm_formvar_write(int vno, int is_ovar,
       jfg_adjectiv(&adesc, jfr_head, vdesc.f_adjectiv_no);
       fprintf(jfr2htm_op, "': this.value = '");
       jfr2htm_float(adesc.center);
-      fprintf(jfr2htm_op, "'\">", adesc.center);
+      fprintf(jfr2htm_op, "%f'\">", adesc.center);
       break;
     case JFR2HTM_FT_RADIO:
     case JFR2HTM_FT_RADIO_M:

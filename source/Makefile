@@ -10,8 +10,8 @@
 #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #  GNU General Public License for more details.
 
-LIBRARY=libjfs-core
-LIBXTRA=libjfs-xtra
+LIBRARY=libjfs
+LIBXTRA=libjfs-helpers
 
 MAJOR=2
 MINOR=0
