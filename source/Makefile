@@ -140,14 +140,14 @@ PROGRAMS = $(LIB_DIR)/$(LIBRARY).so $(LIB_DIR)/$(LIBXTRA).so \
 programs: $(PROGRAMS)
 
 #JFC_OBJS = jfc.o jfs2wlib.o jfw2rlib.o jfs_text.o
-$(BIN_PREFIX)jfc: cmds/jfc.o
+$(BIN_PREFIX)jfc: cmds/jfc.o cmds/cmds_common.o
 	mkdir -p $(BIN_DIR)
-	$(CC) -o $@ $< $(LIBS)
+	$(CC) -o $@ $+ $(LIBS)
 
 #JFR_OBJS = jfr.o jfr_lib.o jfg_lib.o jft_lib.o jfs_text.o
-$(BIN_PREFIX)jfr: cmds/jfr.o
+$(BIN_PREFIX)jfr: cmds/jfr.o cmds/cmds_common.o
 	mkdir -p $(BIN_DIR)
-	$(CC) -o $@ $< $(LIBS)
+	$(CC) -o $@ $+ $(LIBS)
 
 #JFR2S_OBJS = jfr2s.o jfr2wlib.o jfw2slib.o jfr_lib.o jfg_lib.o jfs_text.o
 $(BIN_PREFIX)jfr2s: cmds/jfr2s.o

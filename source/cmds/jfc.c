@@ -1,13 +1,8 @@
   /*************************************************************************/
   /*                                                                       */
-  /* jfc.cpp    Version  2.03    Copyright (c) 1999-2000 Jan E. Mortensen  */
-  /*                                                                       */
-  /* JFS Compiler.                                                         */
-  /*                                                                       */
-  /* by Jan E. Mortensen     email:  jemor@inet.uni2.dk                    */
-  /*    Lollandsvej 35 3.tv.                                               */
-  /*    DK-2000 Frederiksberg                                              */
-  /*    Denmark                                                            */
+  /* jfc.c - JFS Compiler                                                  */
+  /*                             Copyright (c) 1999-2000 Jan E. Mortensen  */
+  /*                                       Copyright (c) 2000 Miriam Ruiz  */
   /*                                                                       */
   /*************************************************************************/
 
@@ -16,6 +11,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
+#include "cmds_common.h"
 #include "jfs2wlib.h"
 #include "jfw2rlib.h"
 
@@ -24,12 +20,7 @@
 #define CM_SR   3
 #define CM_SWR  4
 
-struct jf_option_desc { const char *option;
-                        int argc;      /* -1: variabelt */
-                      };               /* -2: sidste argument */
-
-struct jf_option_desc jf_options[] =
-  {
+struct jfscmd_option_desc jf_options[] = {
         {"-e", 1},         /* 0 */
         {"-s", 0},         /* 1 */
         {"-o", 1},         /* 2 */
@@ -44,19 +35,32 @@ struct jf_option_desc jf_options[] =
         {"-?", 0},
         {"?",  0},
         {" ", -2}
-   };
+};
 
-const char usage_1[] =
-  "usage: jfc [-o jfrf] [-e errf] [-em emode] [-so sout] [-s] [-a] ";
-const char usage_2[] =
-  "           [-m ctyp] [-mt mc] [-mw wc] [-ms ss] [-w m]           jfs";
+static const char usage[] =
+  "jfc [-o jfrf] [-e errf] [-em emode] [-so sout] [-s] [-a] [-m ctyp] [-mt mc] [-mw wc] [-ms ss] [-w m] <file.jfs>";
 
-const char bslash[] = "\\";
+static const char *about[] = {
+  "usage: jfc [options] <file.jfs>",
+  "",
+  "JFC is the JFS compiler. It compiles the given file, depending on the options, from a jfs-file or a jfw-file, to a jfw-file or a jfr-file.",
+  "",
+  "Options:",
+  "-m <cm>      : compile-mode. <cm> in {'sr', 'sw', 'wr', 'swr'}.",
+  "-s           : silent (don't write messages to stdout).",
+  "-e <errf>    : write error messages to the file <errf>.",
+  "-so <sof>    : redirect messages from stdout to <sof>.",
+  "-a           : append to error-file/stdout-file.",
+  "-em <m>      : error message format <m> in {'s' (standard), 'c'(compact)}.",
+  "-o <jfrf>    : write the compiled program to the file <jfrf>.",
+  "-mt <tc>     : <tc> is maximal number of chars in sentence.",
+  "-mw <wc>     : <wc> is maximal number of words in sentence.",
+  "-ms <ss>     : <ss> is size of expression stack.",
+  "-w <m>       : <m>='y':wait for RETURN, 'n';dont wait, 'e':wait if errors.",
+  NULL
+};
 
-const char jfc_version[] =
-      "JFC    version  2.03    Copyright (c) 1999-2000 Jan E. Mortensen";
-
-const char *extensions[] = {
+static const char *extensions[] = {
 	"jfs",     /* 0 */
 	"jfw",     /* 1 */
 	"jfr"      /* 2 */
@@ -64,102 +68,22 @@ const char *extensions[] = {
 
 static int jfc_wait_mode = 0;
 
-static int isoption(const char *s);
-static int us_error(int silent_mode);
-static int jf_about(void);
-int jf_getoption(const char *argv[], int no, int argc);
-
-
-static void ext_subst(char *d, const char *e, int forced)
-{
-  int m, fundet;
-  char punkt[] = ".";
-
-  fundet = 0;
-  for (m = strlen(d) - 1; m >= 0 && fundet == 0 ; m--)
-  { if (d[m] == '.')
-    { fundet = 1;
-      if (forced == 1)
-        d[m] = '\0';
-    }
-  }
-  if (fundet == 0 || forced == 1)
-  { if (strlen(e) != 0)
-      strcat(d, punkt);
-    strcat(d, e);
-  }
-}
-
-static int isoption(const char *s)
-{
-  if (s[0] == '-' || s[0] == '?')
-    return 1;
-  return 0;
-}
-
 static int us_error(int silent_mode)
 {
-   if (silent_mode == 0)
-     printf("\n%s\n%s\n", usage_1, usage_2);
-   return 1;
+	if (silent_mode == 0) {
+		jfscmd_fprint_wrapped(stdout, 69, "usage: ", "       ", usage);
+	}
+	return 1;
 }
 
-static int jf_about(void)
+static void wait_if_needed()
 {
-  char tmp[80];
-
-  printf("\n\n%s\n\n", jfc_version);
-  printf("by Jan E. Mortensen       email:  jemor@inet.uni2.dk\n\n");
-
-  printf("usage: jfc [options] <file.jfs>\n\n");
-  printf(
-"JFC is the JFS compiler. It compiles the file <file.jfs>. Depending on the compile-\n");
-  printf(
-"mode it compiles from a jfs-file or a jfw-file, to a jfw-file or a jfr-file.\n\n");
-
-  printf("OPTIONS\n");
-  printf("-m <cm>      : compile-mode. <cm> in {'sr', 'sw', 'wr', 'swr'}.\n");
-  printf("-s           : silent (don't write messages to stdout).\n");
-  printf("-e <errf>    : write error messages to the file <errf>. \n");
-  printf("-so <sof>    : redirect messages from stdout to <sof>.\n");
-  printf("-a           : append to error-file/stdout-file.\n");
-  printf("-em <m>      : error message format <m> in {'s' (standard), 'c'(compact)}.\n");
-  printf("-o <jfrf>    : write the compiled program to the file <jfrf>.\n");
-  printf("-mt <tc>     : <tc> is maximal number of chars in sentence.\n");
-  printf("-mw <wc>     : <wc> is maximal number of words in sentence.\n");
-  printf("-ms <ss>     : <ss> is size of expression stack.\n");
-  printf("-w <m>       : <m>='y':wait for RETURN, 'n';dont wait, 'e':wait if errors.\n");
-  if (jfc_wait_mode !=  0)
-  { printf("Press RETURN to continue");
-    fgets(tmp, 10, stdin);
-  }
-  return 0;
-}
-
-int jf_getoption(const char *argv[], int no, int argc)
-{
-  int m, v, res;
-
-  res = -2;
-  for (m = 0; res == -2; m++)
-  { if (jf_options[m].argc == -2)
-      res = -1;
-    else
-    if (strcmp(jf_options[m].option, argv[no]) == 0)
-    { res = m;
-      if (jf_options[m].argc > 0)
-      { if (no + jf_options[m].argc >= argc)
-          res = -1; /* missing arguments */
-        else
-        { for (v = 0; v < jf_options[m].argc; v++)
-          { if (isoption(argv[no + 1 + v]) == 1)
-              res = -1;
-          }
-        }
-      }
-    }
-  }
-  return res;
+	char tmp[80];
+	if (jfc_wait_mode !=  0)
+	{
+		printf("Press RETURN to continue");
+		fgets(tmp, 10, stdin);
+	}
 }
 
 int main(int argc, const char *argv[])
@@ -184,17 +108,21 @@ int main(int argc, const char *argv[])
   jfc_silent_mode = jfc_err_message_mode = el_mode = 0;
   append_mode = 0;
   comp_mode = CM_SR;
-  if (argc == 1)
-    return jf_about();
+  if (argc == 1) {
+    jfscmd_print_about(about);
+    return 0;
+  }
   if (argc == 2 && strcmp(argv[1], "-w") == 0)
   { jfc_wait_mode = 1;
-    return jf_about();
+    jfscmd_print_about(about);
+    wait_if_needed();
+    return 0;
   }
   strcpy(so_fname, argv[argc - 1]);
-  if (isoption(so_fname) == 1)
+  if (jfscmd_isoption(so_fname) == 1)
     return us_error(jfc_silent_mode);
   for (m = 1; m < argc - 1; )
-  { option_no = jf_getoption(argv, m, argc - 1);
+  { option_no = jfscmd_getoption(jf_options, argv, m, argc - 1);
     if (option_no == -1)
       return us_error(jfc_silent_mode);
     m++;
@@ -285,27 +213,27 @@ int main(int argc, const char *argv[])
     strcpy(de_fname, so_fname);
   switch (comp_mode)
   {  case CM_SW:
-       ext_subst(so_fname, extensions[0], 1);
-       ext_subst(de_fname, extensions[1], 1);
+       jfscmd_ext_subst(so_fname, extensions[0], 1);
+       jfscmd_ext_subst(de_fname, extensions[1], 1);
        strcpy(tmp_fname, de_fname);
        break;
      case CM_WR:
-       ext_subst(so_fname, extensions[1], 1);
+       jfscmd_ext_subst(so_fname, extensions[1], 1);
        strcpy(tmp_fname, so_fname);
-       ext_subst(de_fname, extensions[2], 1);
+       jfscmd_ext_subst(de_fname, extensions[2], 1);
        break;
      case CM_SR:
-       ext_subst(so_fname, extensions[0], 1);
+       jfscmd_ext_subst(so_fname, extensions[0], 1);
        tmpnam(tmp_fname);
-       ext_subst(tmp_fname, extensions[1], 1);
-       ext_subst(de_fname, extensions[2], 1);
+       jfscmd_ext_subst(tmp_fname, extensions[1], 1);
+       jfscmd_ext_subst(de_fname, extensions[2], 1);
        el_mode = 1;
        break;
      case CM_SWR:
-       ext_subst(so_fname, extensions[0], 1);
+       jfscmd_ext_subst(so_fname, extensions[0], 1);
        strcpy(tmp_fname, de_fname);
-       ext_subst(tmp_fname, extensions[1], 1);
-       ext_subst(de_fname, extensions[2], 1);
+       jfscmd_ext_subst(tmp_fname, extensions[1], 1);
+       jfscmd_ext_subst(de_fname, extensions[2], 1);
        el_mode = 1;
        break;
   }
@@ -319,7 +247,7 @@ int main(int argc, const char *argv[])
       sout = stdout;
   }
   if (jfc_silent_mode == 0)
-  { fprintf(sout, "\n%s\n\n", jfc_version);
+  { fprintf(sout, "\n%s\n\n", jfs_copyright);
     fprintf(sout, "compiling: %s\n\n", so_fname);
   }
   if (strlen(sout_fname) != 0)
@@ -368,4 +296,3 @@ int main(int argc, const char *argv[])
     fclose(sout);
   return m;
 }
-

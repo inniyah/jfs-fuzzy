@@ -1,15 +1,10 @@
-  /*********************************************************************/
-  /*                                                                   */
-  /* jfr.c   Version  2.03   Copyright (c) 1998-2000 Jan E. Mortensen  */
-  /*                                                                   */
-  /* JFS- command-line run program.                                    */
-  /*                                                                   */
-  /* by Jan E. Mortensen     email:  jemor@inet.uni2.dk                */
-  /*    Lollandsvej 35 3.tv.                                           */
-  /*    DK-2000 Frederiksberg                                          */
-  /*    Denmark                                                        */
-  /*                                                                   */
-  /*********************************************************************/
+  /*************************************************************************/
+  /*                                                                       */
+  /* jfr.c - Run JFR program from the command line                         */
+  /*                             Copyright (c) 1998-2000 Jan E. Mortensen  */
+  /*                                       Copyright (c) 2000 Miriam Ruiz  */
+  /*                                                                       */
+  /*************************************************************************/
 
 #define JFE_WARNING 0
 #define JFE_ERROR   1
@@ -21,24 +16,18 @@
 #include <string.h>
 #include <math.h>
 #include <time.h>
-
+#include "cmds_common.h"
 #include "jfr_lib.h"
 #include "jfg_lib.h"
 #include "jft_lib.h"
 #include "jfs_cons.h"
 
-const char *usage[] =
-{ "usage: jfr [-f fs] [-p dec] [-m md] [-c] [-e] [-wa [wm]] [-lm m]",
-  "           [-D [dam]] [-O [opm]] [-d {daf}] [-o [opf]] [-l [lf]]",
-  "           [-rs ss] [-u [ua]] [-w] [-a] [-uv m] [-pm [mf]]        jfrf"
-};
+const char usage[]=
+	"jfr [-f fs] [-p dec] [-m md] [-c] [-e] [-wa [wm]] [-lm m]"
+	" [-D [dam]] [-O [opm]] [-d {daf}] [-o [opf]] [-l [lf]]"
+	" [-rs ss] [-u [ua]] [-w] [-a] [-uv m] [-pm [mf]] <file.jfr>";
 
-struct jf_option_desc {
-	const char *option;
-	int argc;      /* -1: variabelt */
-};               /* -2: sidste argument */
-
-struct jf_option_desc jf_options[] =
+struct jfscmd_option_desc jf_options[] =
 {
 	{"-f",  1},        /*  0 */
 	{"-p",  1},        /*  1 */
@@ -108,12 +97,13 @@ float *confidences;
 
 #define V_IVAR_C_MAX 8
 struct v_ivar_desc      /* input variable angivet med '*' */
-		   { float start_v;
-		     float addent;
-		     int   ivar_no;
-		     int   antal;     /* -1: step centers */
-		     int   akt;
-		   };
+{
+	float start_v;
+	float addent;
+	int   ivar_no;
+	int   antal;     /* -1: step centers */
+	int   akt;
+};
 
 struct v_ivar_desc v_ivars[V_IVAR_C_MAX];
 int v_ivar_c;
@@ -153,55 +143,56 @@ int fmode = JFT_FM_INPUT;  /* jft-file-mode, is converted to data_mode, ident_mo
 #define UM_INPUT_LOCAL 3
 int undef_mode = UM_INPUT;
 
-int dfile_c   = 1;     /* no off data-files.                     */
-int dfile_nos[16];    /* argv[d_file_nos[0]= first datafil.      */
-		                     /* -1: dfilename = jfrname.dat.           */
-int this_eof  = 0;     /* eof actual file.                       */
+int dfile_c   = 1;      /* no off data-files.                     */
+int dfile_nos[16];      /* argv[d_file_nos[0]= first datafil.     */
+                        /* -1: dfilename = jfrname.dat.           */
+int this_eof  = 0;      /* eof actual file.                       */
 
-int d_filt_mode = 0;   /* 0: dont use distance-filter,           */
-		                     /* 1: use distance filter.                */
+int d_filt_mode = 0;    /* 0: dont use distance-filter,           */
+                        /* 1: use distance filter.                */
 
-float d_filter = 0.0;  /* distance filter value.                 */
+float d_filter = 0.0;   /* distance filter value.                 */
 
-int a_filt_mode = 0;   /* 0: dont use adjectiv-error-filter,     */
-		                     /* 1: use adjectiv-error-filter.          */
+int a_filt_mode = 0;    /* 0: dont use adjectiv-error-filter,     */
+                        /* 1: use adjectiv-error-filter.          */
 
-int op_stat       = -1;/* 1: write output-statistic.             */
-int op_ivars      = 0; /* 1: write ivars,                        */
-int op_ovars      = 0; /* 1: write ovars,                        */
-int op_expected   = 0; /* 1: write expected values,              */
-int op_text       = 0; /* 1: write texts,                        */
-int op_fuzzy      = 0; /* 1: write fuzzy output variables.       */
-int op_key        = 0; /* 1: write key-value in line.            */
-int op_header     = 0; /* 1: write header-line.                  */
+int op_stat       = -1; /* 1: write output-statistic.             */
+int op_ivars      = 0;  /* 1: write ivars,                        */
+int op_ovars      = 0;  /* 1: write ovars,                        */
+int op_expected   = 0;  /* 1: write expected values,              */
+int op_text       = 0;  /* 1: write texts,                        */
+int op_fuzzy      = 0;  /* 1: write fuzzy output variables.       */
+int op_key        = 0;  /* 1: write key-value in line.            */
+int op_header     = 0;  /* 1: write header-line.                  */
 
-int op_penalty    = 0; /* 1: use penalty matrix.                 */
+int op_penalty    = 0;  /* 1: use penalty matrix.                 */
 
-int op_vformat    = -1;/* 0: write variable values as floats,    */
-		                     /* 1: write variable values as integers,  */
-		                     /* 2: write variable values as adjectives.*/
-		                     /*-1: benyt type fra doamin.              */
+int op_vformat    = -1; /* 0: write variable values as floats,    */
+                        /* 1: write variable values as integers,  */
+                        /* 2: write variable values as adjectives.*/
+                        /*-1: benyt type fra doamin.              */
 
 int op_append     = 0;
 
-int digits = 4;        /* no of digits after the decimal point (incl point).*/
+int digits = 4;         /* no of digits after the decimal point (incl point).*/
 
 #define LM_NONE    0
 #define LM_DEBUG   1
 #define LM_CHANGED 2
 #define LM_ALL     3
-int log_mode  = -1;    /* 0: ingen log,                          */
-                       /* 1: write changed to log,               */
-                       /* 2: log for alle fyrende regler.        */
 
-int warn_input   = 0;  /* warnings if variable out of range.     */
-int warn_calc    = 0;  /* warnings if illegal function values.   */
-int warn_stack   = 1;  /* warnings if stack over/under-flow.     */
+int log_mode  = -1;     /* 0: ingen log,                          */
+                        /* 1: write changed to log,               */
+                        /* 2: log for alle fyrende regler.        */
+
+int warn_input   = 0;   /* warnings if variable out of range.     */
+int warn_calc    = 0;   /* warnings if illegal function values.   */
+int warn_stack   = 1;   /* warnings if stack over/under-flow.     */
 
 int undef_value  = JFR_FCLR_DEFAULT;
 
 char field_sep[255];   /* 0: brug space, tab etc som felt-seperator, */
-              		       /* andet: kun field_sep er feltsepator. */
+                       /* andet: kun field_sep er feltsepator. */
 
 int stack_size   = 0;
 
@@ -219,7 +210,7 @@ struct dset_c_desc { int count[4];  /* 0: no of datasets in datafile. */
                                     /* 1: no of sets after filtering. */
                                     /* 2: no of sets with errrors.    */
                                     /* 3: no of set with missing val. */
-	              	   };
+};
 
 struct dset_c_desc *dset_cs;  /* dset_c[datafile_c + 1];    */
 
@@ -230,7 +221,7 @@ struct tot_stat_desc { int   worst_no;    /* dset_no med stoerste err. */
                        float pen_sum;     /* sum(penalty),             */
                        int   adj_err_c;   /* no adj error,             */
                        int   adj_d_err_c; /* no dsets with adj errors. */
-		 };
+};
 
 struct tot_stat_desc *tot_stats; /* tot_stats[datafile_c + 1]       */
 
@@ -254,7 +245,7 @@ char t10[]=     "Percent correct              ";
 char t11[]=     "Sum(distance)                ";
 char t12[]=     "Sum(sqr(difference))         ";
 char t13[]=     "Sum(penalty)                 ";
-char tt[] = "Total";
+char tt[] =     "Total";
 
 
 /*******************************************************************/
@@ -391,8 +382,6 @@ int jfr_ip_first(void);
 int jfr_ip_next(void);
 int jfr_err_judge(void);
 void jfr_opd_stat(void);
-static int isoption(const char *s);
-static int jf_about(void);
 static int us_error(void);
 
 
@@ -477,7 +466,7 @@ int jf_getoption(const char *argv[], int no, int argc)
 	      res = -1; /* missing arguments */
  	    else
 	    { for (v = 0; v < jf_options[m].argc; v++)
-	      { if (isoption(argv[no + 1 + v]) == 1)
+	      { if (jfscmd_isoption(argv[no + 1 + v]) == 1)
 	          res = -1;
 	      }
 	    }
@@ -1320,6 +1309,7 @@ void undef_handle(int vno)
     }
   }
 }
+
 void log_write(int mode)
 {
   struct jfr_stat_desc dprog_info;
@@ -1880,7 +1870,7 @@ int jfr_err_judge(void)   /* return 0: ingen fejl, 1: fejl */
 void jfr_opd_stat(void)
 {
   int missing, err, m;
-  float f, sqr_dist, penalty;
+  float f, sqr_dist, penalty = 0;
 
   dset_dist = 0.0;
   dset_adj_err_c = 0;
@@ -1901,11 +1891,10 @@ void jfr_opd_stat(void)
       f = -f;
     dset_dist += f * f;
     if (closest_adjectiv(spdesc.f_ovar_no + m, ovar_values[m]) !=
-	     closest_adjectiv(spdesc.f_ovar_no + m, exp_vars[m].farg))
+      closest_adjectiv(spdesc.f_ovar_no + m, exp_vars[m].farg))
                        dset_adj_err_c++;
     if (op_penalty == 1)
-      penalty
-        = jft_penalty_calc(ovar_values[0], exp_vars[0].farg);
+      penalty = jft_penalty_calc(ovar_values[0], exp_vars[0].farg);
   }
   sqr_dist = dset_dist;
   dset_dist = pow(dset_dist, 0.5);
@@ -1946,65 +1935,41 @@ void jfr_opd_stat(void)
   }
 }
 
-static int isoption(const char *s)
-{
-  if (s[0] == '-' || s[0] == '?')
-    return 1;
-  return 0;
-}
-
-static int jf_about(void)
-{
-  printf(
-"\nJFR    version 2.03    Copyright (c) 1998-2000 Jan E. Mortensen\n\n");
-  printf("usage: jfr [options] jfrf\n\n");
-
-  printf("JFR executes the compiled jfs-program <jfrf>. Options:\n\n");
-  /* printf("OPTIONS\n"); */
-  printf(
-"-p <dec>    : <dec> is precision.       -f <fs>    : <fs> field seperator.\n");
-  printf(
-"-d {<df>}   : Input from file(s) <df>.  -o [<of>]  : Ouput to file <of>.\n");
-  printf(
-"-a          : append output.            -w         : Wait for return.\n");
-  printf(
-"-c          : Use comma as dec-sep.     -rs ss     : <ss> Stacksize.\n");
-  printf(
-"-l [<lf>]   : write log-info to <lf>.   -pm [<-p>] : read penalty from <p>.\n");
-  printf("-m <md>     : Output only if distance(calc, expect) >= <md>.\n");
-  printf("-e          : Output only if adjective-error(calc, expect).\n");
-  printf(
-"-wa <wm>    : Warnings about <wm>={[v][c][s]} (v: var. out of range,\n");
-  printf(
-"              c: illegal function-arg, s: stack error).\n");
-  printf(
-"-D <dm>     : Datamode={[t][i][e]}|f. i:input, e:expect, t:text, f:firstline.\n");
-  printf(
-"-u <um>     : Ask for undef. vars. <um>=[i][l]. i:input, l:local.\n");
-  printf(
-"-uv <m>     : Fzvars for undefined. <m>=z:0.0, <m>=o:1.0, <m>=a:1/count.\n");
-
-  printf(
-"-lm <lm>    : Log-mode. <lm>=d:debug, <lm>=s:standard, <lm>=f:full.\n");
-  printf(
-"-O [<opm>]  : <opm>= {[i][o][e][u][t][s][f][a][k][h]}. Write i:input values,\n");
-  printf(
-"              o:output values, e:expected values, u:fuzzy output values,\n");
-  printf(
-"              t:texts, k:ident, h:header, s:statistic, f:as float, a:as adj.\n");
-  return 0;
-}
+static const char *about[] = {
+  "usage: jfr [options] <file.jfr>",
+  "",
+  "JFC is the JFS interpreter. It executes a compiled jfs-program.",
+  "",
+  "Options:",
+  "-p <dec>    : <dec> is precision.       -f <fs>    : <fs> field seperator.",
+  "-d {<df>}   : Input from file(s) <df>.  -o [<of>]  : Ouput to file <of>.",
+  "-a          : append output.            -w         : Wait for return.",
+  "-c          : Use comma as dec-sep.     -rs ss     : <ss> Stacksize.",
+  "-l [<lf>]   : write log-info to <lf>.   -pm [<-p>] : read penalty from <p>.",
+  "-m <md>     : Output only if distance(calc, expect) >= <md>.",
+  "-e          : Output only if adjective-error(calc, expect).",
+  "-wa <wm>    : Warnings about <wm>={[v][c][s]} (v: var. out of range,",
+  "              c: illegal function-arg, s: stack error).",
+  "-D <dm>     : Datamode={[t][i][e]}|f. i:input, e:expect, t:text, f:firstline.",
+  "-u <um>     : Ask for undef. vars. <um>=[i][l]. i:input, l:local.",
+  "-uv <m>     : Fzvars for undefined. <m>=z:0.0, <m>=o:1.0, <m>=a:1/count.",
+  "-lm <lm>    : Log-mode. <lm>=d:debug, <lm>=s:standard, <lm>=f:full.",
+  "-O [<opm>]  : <opm>= {[i][o][e][u][t][s][f][a][k][h]}. Write i:input values,",
+  "              o:output values, e:expected values, u:fuzzy output values,",
+  "              t:texts, k:ident, h:header, s:statistic, f:as float, a:as adj.",
+  NULL
+};
 
 static int us_error(void)         /* usage-error. Fejl i kald af jfs */
 {
-  char ttxt[82];
-
-  printf("\n%s\n%s\n%s\n", usage[0], usage[1], usage[2]);
-  if (wait_return == 1)
-  { printf("\nPress RETURN...");
-    fgets(ttxt, 80, stdin);
-  }
-  return 1;
+	char ttxt[82];
+	jfscmd_fprint_wrapped(stdout, 69, "usage: ", "       ", usage);
+	if (wait_return == 1)
+	{
+		printf("\nPress RETURN...");
+	fgets(ttxt, 80, stdin);
+	}
+	return 1;
 }
 
 int main(int argc, const char *argv[])
@@ -2015,8 +1980,10 @@ int main(int argc, const char *argv[])
 
   field_sep[0]  = '\0';
   dfile_c = 0;
-  if (argc == 1)
-    return jf_about();
+  if (argc == 1) {
+    jfscmd_print_about(about);
+    return 0;
+  }
   strcpy(so_fname, argv[argc - 1]);
   ext_subst(so_fname, extensions[0], 0);
   for (m = 1; m < argc - 1; )
@@ -2046,7 +2013,7 @@ int main(int argc, const char *argv[])
         break;
       case 4:              /* -wa */
         warn_input = warn_calc = warn_stack = 0;
-        if (m < argc - 1 && isoption(argv[m]) == 0)
+        if (m < argc - 1 && jfscmd_isoption(argv[m]) == 0)
         { for (v = 0; v < ((int) strlen(argv[m])); v++)
           { switch (argv[m][v])
             { case 'v':
@@ -2072,7 +2039,7 @@ int main(int argc, const char *argv[])
 	       break;
       case 6:              /* -D */
         data_mode = JFT_FM_NONE;
-        if (m < argc - 1 && isoption(argv[m]) == 0)
+        if (m < argc - 1 && jfscmd_isoption(argv[m]) == 0)
         { fmode = jf_tmap_find(jf_im_texts, argv[m]);
           if (fmode == -1)
             return us_error();
@@ -2106,7 +2073,7 @@ int main(int argc, const char *argv[])
 	       break;
       case 7:              /* -O */
         op_stat = 0;
-        if (m < argc - 1 && isoption(argv[m]) == 0)
+        if (m < argc - 1 && jfscmd_isoption(argv[m]) == 0)
         { for (v = 0; v < ((int) strlen(argv[m])); v++)
           { switch (argv[m][v])
             { case 's':
@@ -2152,8 +2119,8 @@ int main(int argc, const char *argv[])
         break;
       case 8:            /* -d */
 	       ip_medie = IP_FILE;
-        if (m  < argc - 1 && isoption(argv[m]) == 0)
-        { while (m < argc - 1 && isoption(argv[m]) == 0)
+        if (m  < argc - 1 && jfscmd_isoption(argv[m]) == 0)
+        { while (m < argc - 1 && jfscmd_isoption(argv[m]) == 0)
           { dfile_nos[dfile_c] = m;
             dfile_c++;
             m++;
@@ -2165,7 +2132,7 @@ int main(int argc, const char *argv[])
         }
         break;
       case 9:            /* -o */
-        if (m < argc - 1 && isoption(argv[m]) == 0)
+        if (m < argc - 1 && jfscmd_isoption(argv[m]) == 0)
         { strcpy(op_fname, argv[m]);
           ext_subst(op_fname, extensions[3], 0);
           m++;
@@ -2176,7 +2143,7 @@ int main(int argc, const char *argv[])
         }
         break;
       case 10:           /* -l */
-        if (m < argc - 1 && isoption(argv[m]) == 0)
+        if (m < argc - 1 && jfscmd_isoption(argv[m]) == 0)
         { strcpy(lo_fname, argv[m]);
           ext_subst(lo_fname, extensions[1], 0);
           m++;
@@ -2215,7 +2182,7 @@ int main(int argc, const char *argv[])
           return us_error();
         break;
       case 15:          /* -u */
-        if (m < argc - 1 && isoption(argv[m]) == 0)
+        if (m < argc - 1 && jfscmd_isoption(argv[m]) == 0)
         { if (strcmp(argv[m], "i") == 0)
             undef_mode = UM_INPUT;
           else
@@ -2249,7 +2216,7 @@ int main(int argc, const char *argv[])
         m++;
         break;
       case 17:          /* -pm */
-        if (m < argc - 1 && isoption(argv[m]) == 0)
+        if (m < argc - 1 && jfscmd_isoption(argv[m]) == 0)
         { strcpy(pm_fname, argv[m]);
           ext_subst(pm_fname, extensions[4], 0);
           m++;
@@ -2262,7 +2229,8 @@ int main(int argc, const char *argv[])
         break;
       case 18:          /* -?  */
       case 19:          /* ? */
-     	  return jf_about();
+        jfscmd_print_about(about);
+        return 0;
       default:
 	         return us_error();
     }    /* not option */
