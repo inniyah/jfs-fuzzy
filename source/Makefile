@@ -210,9 +210,9 @@ $(BIN_PREFIX)jfgp: cmds/jfgp.o
 	$(CC) -o $@ $< $(LIBS)
 
 #JFI_OBJS = jfi.o jfi_lib.o jfg_lib.o jfp_lib.o jfr_lib.o jft_lib.o jfs_text.o
-$(BIN_PREFIX)jfi: cmds/jfi.o
+$(BIN_PREFIX)jfi: cmds/jfi.o cmds/cmds_common.o
 	mkdir -p $(BIN_DIR)
-	$(CC) -o $@ $< $(LIBS)
+	$(CC) -o $@ $+ $(LIBS)
 
 .SUFFIXES:	.o .c .cpp .rc _resources.o
 

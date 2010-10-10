@@ -27,6 +27,31 @@ const char usage[]=
 	" [-D [dam]] [-O [opm]] [-d {daf}] [-o [opf]] [-l [lf]]"
 	" [-rs ss] [-u [ua]] [-w] [-a] [-uv m] [-pm [mf]] <file.jfr>";
 
+static const char *about[] = {
+  "usage: jfr [options] <file.jfr>",
+  "",
+  "JFC is the JFS interpreter. It executes a compiled jfs-program.",
+  "",
+  "Options:",
+  "-p <dec>    : <dec> is precision.       -f <fs>    : <fs> field seperator.",
+  "-d {<df>}   : Input from file(s) <df>.  -o [<of>]  : Ouput to file <of>.",
+  "-a          : append output.            -w         : Wait for return.",
+  "-c          : Use comma as dec-sep.     -rs ss     : <ss> Stacksize.",
+  "-l [<lf>]   : write log-info to <lf>.   -pm [<-p>] : read penalty from <p>.",
+  "-m <md>     : Output only if distance(calc, expect) >= <md>.",
+  "-e          : Output only if adjective-error(calc, expect).",
+  "-wa <wm>    : Warnings about <wm>={[v][c][s]} (v: var. out of range,",
+  "              c: illegal function-arg, s: stack error).",
+  "-D <dm>     : Datamode={[t][i][e]}|f. i:input, e:expect, t:text, f:firstline.",
+  "-u <um>     : Ask for undef. vars. <um>=[i][l]. i:input, l:local.",
+  "-uv <m>     : Fzvars for undefined. <m>=z:0.0, <m>=o:1.0, <m>=a:1/count.",
+  "-lm <lm>    : Log-mode. <lm>=d:debug, <lm>=s:standard, <lm>=f:full.",
+  "-O [<opm>]  : <opm>= {[i][o][e][u][t][s][f][a][k][h]}. Write i:input values,",
+  "              o:output values, e:expected values, u:fuzzy output values,",
+  "              t:texts, k:ident, h:header, s:statistic, f:as float, a:as adj.",
+  NULL
+};
+
 struct jfscmd_option_desc jf_options[] =
 {
 	{"-f",  1},        /*  0 */
@@ -355,10 +380,8 @@ struct jfr_err_desc jfr_err_texts[] = {
 	{   9999, "Unknown error!"},
 };
 
-static void ext_subst(char *d, const char *e, int forced);
 static int jf_error(int errno, const char *name, int mode);
 int jf_tmap_find(struct jf_tmap_desc *map, const char *txt);
-int jf_getoption(const char *argv[], int no, int argc);
 void jf_ftoa(char *txt, float f);
 int closest_adjectiv(int var_no, float val);
 static int kb_ip_get(struct jft_data_record *v, int var_no);
@@ -448,53 +471,6 @@ int jf_tmap_find(struct jf_tmap_desc *map, const char *txt)
       res = map[m].value;
   }
   return res;
-}
-
-int jf_getoption(const char *argv[], int no, int argc)
-{
-  int m, v, res;
-
-  res = -2;
-  for (m = 0; res == -2; m++)
-  { if (jf_options[m].argc == -2)
-      res = -1;
-    else
-    if (strcmp(jf_options[m].option, argv[no]) == 0)
-    { res = m;
-      if (jf_options[m].argc > 0)
-      { if (no + jf_options[m].argc >= argc)
-	      res = -1; /* missing arguments */
- 	    else
-	    { for (v = 0; v < jf_options[m].argc; v++)
-	      { if (jfscmd_isoption(argv[no + 1 + v]) == 1)
-	          res = -1;
-	      }
-	    }
-      }
-    }
-  }
-  return res;
-}
-
-
-static void ext_subst(char *d, const char *e, int forced)
-{
-  int m, fundet;
-  char punkt[] = ".";
-
-  fundet = 0;
-  for (m = strlen(d) - 1; m >= 0 && fundet == 0 ; m--)
-  { if (d[m] == '.')
-    { fundet = 1;
-      if (forced == 1)
-	    d[m] = '\0';
-    }
-  }
-  if (fundet == 0 || forced == 1)
-  { if (strlen(e) != 0)
-      strcat(d, punkt);
-    strcat(d, e);
-  }
 }
 
 void jf_ftoa(char *txt, float f)
@@ -1935,32 +1911,7 @@ void jfr_opd_stat(void)
   }
 }
 
-static const char *about[] = {
-  "usage: jfr [options] <file.jfr>",
-  "",
-  "JFC is the JFS interpreter. It executes a compiled jfs-program.",
-  "",
-  "Options:",
-  "-p <dec>    : <dec> is precision.       -f <fs>    : <fs> field seperator.",
-  "-d {<df>}   : Input from file(s) <df>.  -o [<of>]  : Ouput to file <of>.",
-  "-a          : append output.            -w         : Wait for return.",
-  "-c          : Use comma as dec-sep.     -rs ss     : <ss> Stacksize.",
-  "-l [<lf>]   : write log-info to <lf>.   -pm [<-p>] : read penalty from <p>.",
-  "-m <md>     : Output only if distance(calc, expect) >= <md>.",
-  "-e          : Output only if adjective-error(calc, expect).",
-  "-wa <wm>    : Warnings about <wm>={[v][c][s]} (v: var. out of range,",
-  "              c: illegal function-arg, s: stack error).",
-  "-D <dm>     : Datamode={[t][i][e]}|f. i:input, e:expect, t:text, f:firstline.",
-  "-u <um>     : Ask for undef. vars. <um>=[i][l]. i:input, l:local.",
-  "-uv <m>     : Fzvars for undefined. <m>=z:0.0, <m>=o:1.0, <m>=a:1/count.",
-  "-lm <lm>    : Log-mode. <lm>=d:debug, <lm>=s:standard, <lm>=f:full.",
-  "-O [<opm>]  : <opm>= {[i][o][e][u][t][s][f][a][k][h]}. Write i:input values,",
-  "              o:output values, e:expected values, u:fuzzy output values,",
-  "              t:texts, k:ident, h:header, s:statistic, f:as float, a:as adj.",
-  NULL
-};
-
-static int us_error(void)         /* usage-error. Fejl i kald af jfs */
+static int us_error(void) /* usage-error */
 {
 	char ttxt[82];
 	jfscmd_fprint_wrapped(stdout, 69, "usage: ", "       ", usage);
@@ -1985,9 +1936,9 @@ int main(int argc, const char *argv[])
     return 0;
   }
   strcpy(so_fname, argv[argc - 1]);
-  ext_subst(so_fname, extensions[0], 0);
+  jfscmd_ext_subst(so_fname, extensions[0], 0);
   for (m = 1; m < argc - 1; )
-  { option_no = jf_getoption(argv, m, argc - 1);
+  { option_no = jfscmd_getoption(jf_options, argv, m, argc - 1);
     if (option_no == -1)
       return us_error();
     m++;
@@ -2035,8 +1986,8 @@ int main(int argc, const char *argv[])
         }
         break;
       case 5:              /* -c */
-   	    dc_comma = 1;
-	       break;
+        dc_comma = 1;
+        break;
       case 6:              /* -D */
         data_mode = JFT_FM_NONE;
         if (m < argc - 1 && jfscmd_isoption(argv[m]) == 0)
@@ -2070,7 +2021,7 @@ int main(int argc, const char *argv[])
             data_mode = DM_INP_EXP; /* rettes senere */
           m++;
         }
-	       break;
+        break;
       case 7:              /* -O */
         op_stat = 0;
         if (m < argc - 1 && jfscmd_isoption(argv[m]) == 0)
@@ -2118,7 +2069,7 @@ int main(int argc, const char *argv[])
         }
         break;
       case 8:            /* -d */
-	       ip_medie = IP_FILE;
+        ip_medie = IP_FILE;
         if (m  < argc - 1 && jfscmd_isoption(argv[m]) == 0)
         { while (m < argc - 1 && jfscmd_isoption(argv[m]) == 0)
           { dfile_nos[dfile_c] = m;
@@ -2134,23 +2085,23 @@ int main(int argc, const char *argv[])
       case 9:            /* -o */
         if (m < argc - 1 && jfscmd_isoption(argv[m]) == 0)
         { strcpy(op_fname, argv[m]);
-          ext_subst(op_fname, extensions[3], 0);
+          jfscmd_ext_subst(op_fname, extensions[3], 0);
           m++;
         }
         else
         { strcpy(op_fname, so_fname);
-          ext_subst(op_fname, extensions[3], 1);
+          jfscmd_ext_subst(op_fname, extensions[3], 1);
         }
         break;
       case 10:           /* -l */
         if (m < argc - 1 && jfscmd_isoption(argv[m]) == 0)
         { strcpy(lo_fname, argv[m]);
-          ext_subst(lo_fname, extensions[1], 0);
+          jfscmd_ext_subst(lo_fname, extensions[1], 0);
           m++;
         }
         else
         { strcpy(lo_fname, so_fname);
-          ext_subst(lo_fname, extensions[1], 1);
+          jfscmd_ext_subst(lo_fname, extensions[1], 1);
         }
         break;
       case 11:           /* -lm */
@@ -2218,12 +2169,12 @@ int main(int argc, const char *argv[])
       case 17:          /* -pm */
         if (m < argc - 1 && jfscmd_isoption(argv[m]) == 0)
         { strcpy(pm_fname, argv[m]);
-          ext_subst(pm_fname, extensions[4], 0);
+          jfscmd_ext_subst(pm_fname, extensions[4], 0);
           m++;
         }
         else
         { strcpy(pm_fname, so_fname);
-          ext_subst(pm_fname, extensions[4], 1);
+          jfscmd_ext_subst(pm_fname, extensions[4], 1);
         }
         op_penalty = 1;
         break;
@@ -2232,7 +2183,7 @@ int main(int argc, const char *argv[])
         jfscmd_print_about(about);
         return 0;
       default:
-	         return us_error();
+        return us_error();
     }    /* not option */
   }  /* for  */
 
@@ -2249,11 +2200,11 @@ int main(int argc, const char *argv[])
   { /* saet ip_fname til foerste fil, bruges i init hvis first_line */
     if (dfile_nos[0] >= 0)
     { strcpy(ip_fname, argv[dfile_nos[0]]);
-      ext_subst(ip_fname, extensions[2], 0);
+      jfscmd_ext_subst(ip_fname, extensions[2], 0);
     }
     else
     { strcpy(ip_fname, so_fname);
-      ext_subst(ip_fname, extensions[2], 1);
+      jfscmd_ext_subst(ip_fname, extensions[2], 1);
     }
   }
 
@@ -2266,11 +2217,11 @@ int main(int argc, const char *argv[])
     if (ip_medie == IP_FILE)
     { if (dfile_nos[file_no] >= 0)
       { strcpy(ip_fname, argv[dfile_nos[file_no]]);
-        ext_subst(ip_fname, extensions[2], 0);
+        jfscmd_ext_subst(ip_fname, extensions[2], 0);
       }
       else
       { strcpy(ip_fname, so_fname);
-        ext_subst(ip_fname, extensions[2], 1);
+        jfscmd_ext_subst(ip_fname, extensions[2], 1);
       }
       slut = jft_fopen(ip_fname, fmode, 0);
       if (slut != 0)
