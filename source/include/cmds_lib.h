@@ -1,13 +1,13 @@
   /*************************************************************************/
   /*                                                                       */
-  /* cmds_common.h - Common subroutines for the command-line applications  */
+  /* cmds_lib.h - Common subroutines for the command-line applications     */
   /*                             Copyright (c) 1999-2000 Jan E. Mortensen  */
   /*                                       Copyright (c) 2010 Miriam Ruiz  */
   /*                                                                       */
   /*************************************************************************/
 
-#ifndef CMDS_COMMON_H__
-#define CMDS_COMMON_H__
+#ifndef JFS_CMDS_LIB_H__
+#define JFS_CMDS_LIB_H__
 
 #include <stdio.h>
 

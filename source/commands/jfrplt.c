@@ -16,7 +16,7 @@
 #include <string.h>
 #include <math.h>
 #include <time.h>
-#include "cmds_common.h"
+#include "cmds_lib.h"
 #include "jfr_lib.h"
 #include "jfg_lib.h"
 #include "jft_lib.h"

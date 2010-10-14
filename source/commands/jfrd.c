@@ -11,7 +11,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
-#include "cmds_common.h"
+#include "cmds_lib.h"
 #include "jft_lib.h"
 #include "jfrd_lib.h"
 

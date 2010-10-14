@@ -6,7 +6,7 @@
   /*                                                                       */
   /*************************************************************************/
 
-#include "cmds_common.h"
+#include "cmds_lib.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>

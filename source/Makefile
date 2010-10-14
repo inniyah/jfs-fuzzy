@@ -20,14 +20,15 @@
 
 
 LIBRARY=libjfs
-LIBXTRA=libjfs-helpers
+LIBHLPR=libjfs-helpers
 
 MAJOR=2
 MINOR=0
 
 LIB_DIR = ../lib
 BIN_DIR = ../bin
-BIN_PREFIX = $(BIN_DIR)/jfs-
+PRG_PREFIX = jfs-
+BIN_PREFIX = $(BIN_DIR)/$(PRG_PREFIX)
 
 all: libs programs
 
@@ -44,8 +45,8 @@ RESCOMP     = windres
 WARN?= -pedantic -Wall -ansi
 OPT?= -O2 -g
 INCS= -Iinclude
-DEFS=
-LIBS= -L$(LIB_DIR) -ljfs-xtra -ljfs-core -lm
+DEFS= -DPRG_PREFIX="$(PRG_PREFIX)"
+LIBS= -L$(LIB_DIR) -ljfs-helpers -ljfs-core -lm
 
 EXTRA_LDFLAGS=
 EXTRA_CFLAGS=
@@ -83,29 +84,31 @@ LIBRARY_SOURCES= \
 # jffamlib = JFS Fam-creation by a cellular automat.
 # jfgp_lib = JFS rule discover-functions using Genetic programing.
 # jfi_lib = JFS  improver-functions using evolutionary programing.
+# cmds_lib = Common subroutines for the command-line applications
 
-LIBXTRA_SOURCES = \
-	xtra/jfs2wlib.c \
-	xtra/jfw2rlib.c \
-	xtra/jfr2wlib.c \
-	xtra/jfw2slib.c \
-	xtra/jhlp_lib.c \
-	xtra/jfpltlib.c \
-	xtra/jfr2clib.c \
-	xtra/jfr2hlib.c \
-	xtra/jfea_lib.c \
-	xtra/jfid3lib.c \
-	xtra/jfrd_lib.c \
-	xtra/jffamlib.c \
-	xtra/jfgp_lib.c \
-	xtra/jfi_lib.c
+LIBHLPR_SOURCES = \
+	helpers/jfs2wlib.c \
+	helpers/jfw2rlib.c \
+	helpers/jfr2wlib.c \
+	helpers/jfw2slib.c \
+	helpers/jhlp_lib.c \
+	helpers/jfpltlib.c \
+	helpers/jfr2clib.c \
+	helpers/jfr2hlib.c \
+	helpers/jfea_lib.c \
+	helpers/jfid3lib.c \
+	helpers/jfrd_lib.c \
+	helpers/jffamlib.c \
+	helpers/jfgp_lib.c \
+	helpers/jfi_lib.c \
+	helpers/cmds_lib.c
 
 LIBRARY_SHARED_OBJS = $(LIBRARY_SOURCES:.c=.shared.o)
 LIBRARY_STATIC_OBJS = $(LIBRARY_SOURCES:.c=.static.o)
-LIBXTRA_SHARED_OBJS = $(LIBXTRA_SOURCES:.c=.shared.o)
-LIBXTRA_STATIC_OBJS = $(LIBXTRA_SOURCES:.c=.static.o)
+LIBHLPR_SHARED_OBJS = $(LIBHLPR_SOURCES:.c=.shared.o)
+LIBHLPR_STATIC_OBJS = $(LIBHLPR_SOURCES:.c=.static.o)
 
-libs: $(LIB_DIR)/$(LIBRARY).a $(LIB_DIR)/$(LIBRARY).so $(LIB_DIR)/$(LIBXTRA).a $(LIB_DIR)/$(LIBXTRA).so
+libs: $(LIB_DIR)/$(LIBRARY).a $(LIB_DIR)/$(LIBRARY).so $(LIB_DIR)/$(LIBHLPR).a $(LIB_DIR)/$(LIBHLPR).so
 
 $(LIB_DIR)/$(LIBRARY).so.$(MAJOR).$(MINOR): $(LIBRARY_SHARED_OBJS)
 	mkdir -p $(LIB_DIR)
@@ -124,24 +127,24 @@ $(LIB_DIR)/$(LIBRARY).a: $(LIBRARY_STATIC_OBJS)
 	mkdir -p $(LIB_DIR)
 	$(AR) $@ $+
 
-$(LIB_DIR)/$(LIBXTRA).so.$(MAJOR).$(MINOR): $(LIBXTRA_SHARED_OBJS) $(LIB_DIR)/$(LIBRARY).so
+$(LIB_DIR)/$(LIBHLPR).so.$(MAJOR).$(MINOR): $(LIBHLPR_SHARED_OBJS) $(LIB_DIR)/$(LIBRARY).so
 	mkdir -p $(LIB_DIR)
 	$(CC) $(LDFLAGS) -shared \
-		-Wl,-soname,$(LIBXTRA).so.$(MAJOR) \
-		$(LIBXTRA_SHARED_OBJS) -o $@ -L$(LIB_DIR) -ljfs-core -lm
+		-Wl,-soname,$(LIBHLPR).so.$(MAJOR) \
+		$(LIBHLPR_SHARED_OBJS) -o $@ -L$(LIB_DIR) -ljfs-core -lm
 
-$(LIB_DIR)/$(LIBXTRA).so: $(LIB_DIR)/$(LIBXTRA).so.$(MAJOR).$(MINOR)
+$(LIB_DIR)/$(LIBHLPR).so: $(LIB_DIR)/$(LIBHLPR).so.$(MAJOR).$(MINOR)
 	mkdir -p $(LIB_DIR)
-	cd $(LIB_DIR) && rm -fv $(LIBXTRA).so.$(MAJOR)
-	cd $(LIB_DIR) && ln -s $(LIBXTRA).so.$(MAJOR).$(MINOR) $(LIBXTRA).so.$(MAJOR)
-	cd $(LIB_DIR) && rm -fv $(LIBXTRA).so
-	cd $(LIB_DIR) && ln -s $(LIBXTRA).so.$(MAJOR) $(LIBXTRA).so
+	cd $(LIB_DIR) && rm -fv $(LIBHLPR).so.$(MAJOR)
+	cd $(LIB_DIR) && ln -s $(LIBHLPR).so.$(MAJOR).$(MINOR) $(LIBHLPR).so.$(MAJOR)
+	cd $(LIB_DIR) && rm -fv $(LIBHLPR).so
+	cd $(LIB_DIR) && ln -s $(LIBHLPR).so.$(MAJOR) $(LIBHLPR).so
 
-$(LIB_DIR)/$(LIBXTRA).a: $(LIBXTRA_STATIC_OBJS)
+$(LIB_DIR)/$(LIBHLPR).a: $(LIBHLPR_STATIC_OBJS)
 	mkdir -p $(LIB_DIR)
 	$(AR) $@ $+
 
-PROGRAMS = $(LIB_DIR)/$(LIBRARY).so $(LIB_DIR)/$(LIBXTRA).so \
+PROGRAMS = $(LIB_DIR)/$(LIBRARY).so $(LIB_DIR)/$(LIBHLPR).so \
 	$(BIN_PREFIX)jfc $(BIN_PREFIX)jfr $(BIN_PREFIX)jfr2s $(BIN_PREFIX)jhlp \
 	$(BIN_PREFIX)jfplot $(BIN_PREFIX)jfrplt $(BIN_PREFIX)jfr2c $(BIN_PREFIX)jfr2htm \
 	$(BIN_PREFIX)jfea $(BIN_PREFIX)jfid3 $(BIN_PREFIX)jfrd $(BIN_PREFIX)jffam $(BIN_PREFIX)jfgp $(BIN_PREFIX)jfi
@@ -149,79 +152,79 @@ PROGRAMS = $(LIB_DIR)/$(LIBRARY).so $(LIB_DIR)/$(LIBXTRA).so \
 programs: $(PROGRAMS)
 
 #JFC_OBJS = jfc.o jfs2wlib.o jfw2rlib.o jfs_text.o
-$(BIN_PREFIX)jfc: cmds/jfc.o cmds/cmds_common.o
+$(BIN_PREFIX)jfc: commands/jfc.o
 	mkdir -p $(BIN_DIR)
-	$(CC) -o $@ $+ $(LIBS)
+	$(CC) -o $@ $< $(LIBS)
 
 #JFR_OBJS = jfr.o jfr_lib.o jfg_lib.o jft_lib.o jfs_text.o
-$(BIN_PREFIX)jfr: cmds/jfr.o cmds/cmds_common.o
+$(BIN_PREFIX)jfr: commands/jfr.o
 	mkdir -p $(BIN_DIR)
-	$(CC) -o $@ $+ $(LIBS)
+	$(CC) -o $@ $< $(LIBS)
 
 #JFR2S_OBJS = jfr2s.o jfr2wlib.o jfw2slib.o jfr_lib.o jfg_lib.o jfs_text.o
-$(BIN_PREFIX)jfr2s: cmds/jfr2s.o cmds/cmds_common.o
+$(BIN_PREFIX)jfr2s: commands/jfr2s.o
 	mkdir -p $(BIN_DIR)
-	$(CC) -o $@ $+ $(LIBS)
+	$(CC) -o $@ $< $(LIBS)
 
 #JHLP_OBJS = jhlp.o jhlp_lib.o jfm_lib.o
-$(BIN_PREFIX)jhlp: cmds/jhlp.o cmds/cmds_common.o
+$(BIN_PREFIX)jhlp: commands/jhlp.o
 	mkdir -p $(BIN_DIR)
-	$(CC) -o $@ $+ $(LIBS)
+	$(CC) -o $@ $< $(LIBS)
 
-JHLP_OBJS = cmds/jhlp.o xtra/jhlp_lib.o core/jfm_lib.o cmds/cmds_common.o
+JHLP_OBJS = commands/jhlp.o helpers/jhlp_lib.o helpers/cmds_lib.o core/jfm_lib.o
 ../doc/bin/jhlp: $(JHLP_OBJS)
 	mkdir -p ../doc/bin/
 	$(CC) -o $@ $(JHLP_OBJS) -lm
 
 #JFPLOT_OBJS = jfplot.o jfpltlib.o jopt_lib.o jfr_lib.o jfg_lib.o jfs_text.o
-$(BIN_PREFIX)jfplot: cmds/jfplot.o cmds/cmds_common.o
+$(BIN_PREFIX)jfplot: commands/jfplot.o
 	mkdir -p $(BIN_DIR)
-	$(CC) -o $@ $+ $(LIBS)
+	$(CC) -o $@ $< $(LIBS)
 
 #JFRPLT_OBJS = jfrplt.o jopt_lib.o jfr_lib.o jfg_lib.o jfs_text.o jft_lib.o
-$(BIN_PREFIX)jfrplt: cmds/jfrplt.o cmds/cmds_common.o
+$(BIN_PREFIX)jfrplt: commands/jfrplt.o
 	mkdir -p $(BIN_DIR)
-	$(CC) -o $@ $+ $(LIBS)
+	$(CC) -o $@ $< $(LIBS)
 
 #JFR2C_OBJS = jfr2c.o jfr2clib.o jfr_lib.o jfg_lib.o jfs_text.o
-$(BIN_PREFIX)jfr2c: cmds/jfr2c.o cmds/cmds_common.o
+$(BIN_PREFIX)jfr2c: commands/jfr2c.o
 	mkdir -p $(BIN_DIR)
-	$(CC) -o $@ $+ $(LIBS)
+	$(CC) -o $@ $< $(LIBS)
 
 #JFR2HTM_OBJS = jfr2htm.o jfr2hlib.o jfr_lib.o jfg_lib.o jfs_text.o
-$(BIN_PREFIX)jfr2htm: cmds/jfr2htm.o cmds/cmds_common.o
+$(BIN_PREFIX)jfr2htm: commands/jfr2htm.o
 	mkdir -p $(BIN_DIR)
-	$(CC) -o $@ $+ $(LIBS)
+	$(CC) -o $@ $< $(LIBS)
 
 #JFEA_OBJS = jfea.o jfea_lib.o jfg_lib.o jfp_lib.o jfr_lib.o jft_lib.o jfs_text.o
-$(BIN_PREFIX)jfea: cmds/jfea.o cmds/cmds_common.o
+$(BIN_PREFIX)jfea: commands/jfea.o
 	mkdir -p $(BIN_DIR)
-	$(CC) -o $@ $+ $(LIBS)
+	$(CC) -o $@ $< $(LIBS)
 
 #JFID3_OBJS = jfid3.o jfid3lib.o jfg_lib.o jfp_lib.o jfr_lib.o jft_lib.o jfs_text.o
-$(BIN_PREFIX)jfid3: cmds/jfid3.o cmds/cmds_common.o
+$(BIN_PREFIX)jfid3: commands/jfid3.o
 	mkdir -p $(BIN_DIR)
-	$(CC) -o $@ $+ $(LIBS)
+	$(CC) -o $@ $< $(LIBS)
 
 #JFRD_OBJS = jfrd.o jfrd_lib.o jfg_lib.o jfp_lib.o jfr_lib.o jft_lib.o jfs_text.o
-$(BIN_PREFIX)jfrd: cmds/jfrd.o cmds/cmds_common.o
+$(BIN_PREFIX)jfrd: commands/jfrd.o
 	mkdir -p $(BIN_DIR)
-	$(CC) -o $@ $+ $(LIBS)
+	$(CC) -o $@ $< $(LIBS)
 
 #JFFAM_OBJS = jffam.o jffamlib.o jfg_lib.o jfp_lib.o jfr_lib.o jft_lib.o jfs_text.o
-$(BIN_PREFIX)jffam: cmds/jffam.o cmds/cmds_common.o
+$(BIN_PREFIX)jffam: commands/jffam.o
 	mkdir -p $(BIN_DIR)
-	$(CC) -o $@ $+ $(LIBS)
+	$(CC) -o $@ $< $(LIBS)
 
 #JFGP_OBJS = jfgp.o jfgp_lib.o jfg_lib.o jfp_lib.o jfr_lib.o jft_lib.o jfs_text.o
-$(BIN_PREFIX)jfgp: cmds/jfgp.o cmds/cmds_common.o
+$(BIN_PREFIX)jfgp: commands/jfgp.o
 	mkdir -p $(BIN_DIR)
-	$(CC) -o $@ $+ $(LIBS)
+	$(CC) -o $@ $< $(LIBS)
 
 #JFI_OBJS = jfi.o jfi_lib.o jfg_lib.o jfp_lib.o jfr_lib.o jft_lib.o jfs_text.o
-$(BIN_PREFIX)jfi: cmds/jfi.o cmds/cmds_common.o
+$(BIN_PREFIX)jfi: commands/jfi.o
 	mkdir -p $(BIN_DIR)
-	$(CC) -o $@ $+ $(LIBS)
+	$(CC) -o $@ $< $(LIBS)
 
 .SUFFIXES: .o .c .cpp .rc _resources.o
 
@@ -257,7 +260,7 @@ SHARED_CFLAGS= $(STATIC_CFLAGS) -fPIC
 	$(CC) -o $@ -c $+ $(STATIC_CFLAGS)
 
 clean: 
-	rm -f *.o core/*.o xtra/*.o cmds/*.o *~
+	rm -f *.o core/*.o helpers/*.o commands/*.o *~
 
 distclean: clean
 	rm -f $(PROGRAMS) $(LIB_DIR)/*.a $(LIB_DIR)/*.so $(LIB_DIR)/*.so.*

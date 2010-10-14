@@ -10,7 +10,7 @@
 #include <ctype.h>
 #include <stdlib.h>
 #include <string.h>
-#include "cmds_common.h"
+#include "cmds_lib.h"
 #include <math.h>
 #include "jft_lib.h"
 #include "jfid3lib.h"

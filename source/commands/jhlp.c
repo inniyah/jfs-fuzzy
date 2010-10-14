@@ -10,7 +10,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
-#include "cmds_common.h"
+#include "cmds_lib.h"
 #include "jhlp_lib.h"
 
 static const char usage[] =
