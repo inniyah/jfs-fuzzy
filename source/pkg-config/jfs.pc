@@ -1,0 +1,12 @@
+prefix=/usr
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+
+Name: JFS
+Description: Jan's Fuzzy System
+URL: http://repo.or.cz/w/jfs-fuzzy.git
+Version: 2.1
+Cflags: -I${includedir}
+Libs: -L${libdir} -ljfs
+Libs.private: -lm
