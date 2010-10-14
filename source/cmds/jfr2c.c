@@ -1,42 +1,49 @@
-
-  /************************************************************************/
-  /*                                                                      */
-  /* jfr2c.cpp   Version  2.05   Copyright (c) 1999-2001 Jan E. Mortensen */
-  /*                                                                      */
-  /* Program  to convert a compiled jfs-program to                        */
-  /* C-sourcecode.                                                        */
-  /*                                                                      */
-  /* by Jan E. Mortensen     email:  jemor@inet.uni2.dk                   */
-  /*    Lollandsvej 35 3.tv.                                              */
-  /*    DK-2000 Frederiksberg                                             */
-  /*    Denmark                                                           */
-  /*                                                                      */
-  /************************************************************************/
+  /*************************************************************************/
+  /*                                                                       */
+  /* jfr2c.c - Program to convert a compiled jfs-program to C-sourcecode   */
+  /*                             Copyright (c) 1998-2001 Jan E. Mortensen  */
+  /*                                       Copyright (c) 2010 Miriam Ruiz  */
+  /*                                                                       */
+  /*************************************************************************/
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
+#include "cmds_common.h"
 #include "jfr_lib.h"
 #include "jfg_lib.h"
 #include "jfr2clib.h"
 
 static FILE *sout;
 
-char usage_1[] =
-"usage: jfr2c [-g dg] [-Ss ss] [-St ts] [-om m] [-np] [-nr] [-nc]";
-char usage_2[] =
-"             [-ur] [-um] [-ui] [-n nm] [-so s] [-d] [-a] [-w] [-s] jfrf";
+static const char usage[] =
+	"jfr2c [-g dg] [-Ss ss] [-St ts] [-om m] [-np] [-nr] [-nc]"
+	" [-ur] [-um] [-ui] [-n nm] [-so s] [-d] [-a] [-w] [-s] <file.jfr>";
 
-char coptxt[] =
-"JFR2C  version 2.05  Copyright (c) 1999-2001 Jan E. Mortensen";
+static const char *about[] = {
+  "usage: jfr2c [options] <file.jfr>",
+  "",
+  "JFR2C is a JFS converter. It converts the compiled jfs-program <file.jfr> to C source code.",
+  "",
+  "Options:",
+  "-nr     : No argument rounding.    -np     : Use non-protected functions.",
+  "-ur     : Use C's relations.       -um     : Sse C's min/max-functions.",
+  "-s      : Silent.                  -so <s> : Redirect stdout to <s>.",
+  "-a      : Append to stdout.        -w      : Wait for return.",
+  "-ui     : Use inline-functions.",
+  "-nc     : No confidence values in C-function.",
+  "-o <of> : Write the C-sourcecode to <of>.c, <of>.h.",
+  "-d      : Use 'double' variables.",
+  "-n <nm> : The c-function gets the name <nm>.",
+  "-g <p>  : Precision. <p> is the number of decimals.",
+  "-om <m> : Optimization for <m>='sp':speed (default), <m>='si':size.",
+  "-St <s> : Max number of nodes in conversion tree (def 128).",
+  "-Ss <s> : Stack-size conversion stack (default 64).",
+  NULL
+};
 
-struct jf_option_desc { const char *option;
-                        int argc;  /* -1: variabelt,     */
-                                   /* -2: last argument. */
-                      };
-
-struct jf_option_desc jf_options[] = {
+struct jfscmd_option_desc jf_options[] = {
 	{"-np", 0},    /*  0 */
 	{"-o",  1},    /*  1 */
 	{"-om", 1},    /*  2 */
@@ -63,105 +70,10 @@ struct jf_option_desc jf_options[] = {
 /* Hjaelpe-funktioner                                                    */
 /*************************************************************************/
 
-
-static int isoption(const char *s)
-{
-  if (s[0] == '-' || s[0] == '?')
-    return 1;
-  return 0;
-}
-
 static int us_error(void)         /* usage-error. Fejl i kald af jfs */
 {
-  printf("\n%s\n%s\n", usage_1, usage_2);
+  jfscmd_fprint_wrapped(stdout, jfscmd_num_of_columns() - 7, "usage: ", "       ", usage);
   return 1;
-}
-
-
-
-static int jf_about(void)
-{
-
-  printf("\n%s\n\n", coptxt);
-  printf("usage: jfr2c [options] rf \n\n");
-  printf(
-"JFR2C is a JFS converter. It converts the compiled jfs-program <rf> to \n");
-  printf("C-sourcecode.\n\n");
-  printf("OPTIONS:\n");
-  printf(
-"-nr     : No argument rounding.    -np     : Use non-protected functions.\n");
-  printf(
-"-ur     : Use C's relations.       -um     : Sse C's min/max-functions.\n");
-  printf(
-"-s      : Silent.                  -so <s> : Redirect stdout to <s>.\n");
-  printf(
-"-a      : Append to stdout.        -w      : Wait for return.\n");
-  printf(
-"-ui     : Use inline-functions.\n");
-  printf(
-"-nc     : No confidence values in C-function.\n");
-  printf(
-"-o <of> : Write the C-sourcecode to <of>.c, <of>.h.\n");
-  printf(
-"-d      : Use 'double' variables.\n");
-  printf(
-"-n <nm> : The c-function gets the name <nm>.\n");
-  printf(
-"-g <p>  : Precision. <p> is the number of decimals.\n");
-  printf(
-"-om <m> : Optimization for <m>='sp':speed (default), <m>='si':size.\n");
-  printf(
-"-St <s> : Max number of nodes in conversion tree (def 128).\n");
-  printf(
-"-Ss <s> : Stack-size conversion stack (default 64).\n");
-  return 0;
-}
-
-int jf_getoption(const char *argv[], int no, int argc)
-{
-  int m, v, res;
-
-  res = -2;
-  for (m = 0; res == -2; m++)
-  { if (jf_options[m].argc == -2)
-      res = -1;
-    else
-    if (strcmp(jf_options[m].option, argv[no]) == 0)
-    { res = m;
-      if (jf_options[m].argc > 0)
-      { if (no + jf_options[m].argc >= argc)
-          res = -1; /* missing arguments */
-        else
-        { for (v = 0; v < jf_options[m].argc; v++)
-          { if (isoption(argv[no + 1 + v]) == 1)
-              res = -1;
-          }
-        }
-      }
-    }
-  }
-  return res;
-}
-
-
-static void ext_subst(char *d, const char *e, int forced)
-{
-  int m, fundet;
-  char punkt[] = ".";
-
-  fundet = 0;
-  for (m = strlen(d) - 1; m >= 0 && fundet == 0 ; m--)
-  { if (d[m] == '.')
-    { fundet = 1;
-      if (forced == 1)
-	    d[m] = '\0';
-    }
-  }
-  if (fundet == 0 || forced == 1)
-  { if (strlen(e) != 0)
-      strcat(d, punkt);
-    strcat(d, e);
-  }
 }
 
 int main(int argc, const char *argv[])
@@ -199,11 +111,14 @@ int main(int argc, const char *argv[])
   use_double = 0;
 
   if (argc == 1)
-    return jf_about();
+  {
+    jfscmd_print_about(about);
+    return 0;
+  }
   strcpy(so_fname, argv[argc - 1]);
-  ext_subst(so_fname, extensions[0], 0);
+  jfscmd_ext_subst(so_fname, extensions[0], 0);
   for (m = 1; m < argc - 1; )
-  { option_no = jf_getoption(argv, m, argc);
+  { option_no = jfscmd_getoption(jf_options, argv, m, argc);
     if (option_no == -1)
    	  return us_error();
     else
@@ -214,7 +129,7 @@ int main(int argc, const char *argv[])
           break;
         case 1:              /* -o */
           strcpy(de_fname, argv[m]);
-          ext_subst(de_fname, extensions[1], 0);
+          jfscmd_ext_subst(de_fname, extensions[1], 0);
           m++;
           break;
         case 2:          /* -om */
@@ -279,8 +194,8 @@ int main(int argc, const char *argv[])
           use_double = 1;
           break;
         default:          /* -?  */
-          return jf_about();
-          /* break; */
+          jfscmd_print_about(about);
+          return 0;
       }
     }
   }  /* for  */
@@ -295,14 +210,12 @@ int main(int argc, const char *argv[])
       printf("Cannot open %s for writing.\n", sout_fname);
     }
   }
-  if (silent == 0)
-    fprintf(sout, "\n%s\n", coptxt);
 
   if (strlen(so_fname) == 0)
     return us_error();
   if (strlen(de_fname) == 0)
   { strcpy(de_fname, so_fname);
-    ext_subst(de_fname, extensions[1], 1);
+    jfscmd_ext_subst(de_fname, extensions[1], 1);
   }
   if (strlen(func_name) == 0)
     strcpy(func_name, "jfs");

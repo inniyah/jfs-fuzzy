@@ -1,15 +1,10 @@
-  /*********************************************************************/
-  /*                                                                   */
-  /* jfgp.cpp  Version  2.03  Copyright (c) 1998-2000 Jan E. Mortensen */
-  /*                                                                   */
-  /* JFS rule discover-functions using Genetic programing.             */
-  /*                                                                   */
-  /* by Jan E. Mortensen     email:  jemor@inet.uni2.dk                */
-  /*    Lollandsvej 35 3.tv.                                           */
-  /*    DK-2000 Frederiksberg                                          */
-  /*    Denmark                                                        */
-  /*                                                                   */
-  /*********************************************************************/
+  /*************************************************************************/
+  /*                                                                       */
+  /* jfgp.c - JFS rule discover-functions using Genetic programing         */
+  /*                             Copyright (c) 1998-2000 Jan E. Mortensen  */
+  /*                                       Copyright (c) 2010 Miriam Ruiz  */
+  /*                                                                       */
+  /*************************************************************************/
 
 #include <stdio.h>
 #include <ctype.h>
@@ -18,6 +13,7 @@
 #include <float.h>
 #include <math.h>
 #include <time.h>
+#include "cmds_common.h"
 #include "jfr_lib.h"
 #include "jfg_lib.h"
 #include "jfp_lib.h"
@@ -27,6 +23,63 @@
 #define JFE_WARNING 0
 #define JFE_ERROR   1
 #define JFE_FATAL   2
+
+static const char usage[] =
+	"jfgp [-D dm] [-d df] [-o of] [-Et min] [-Ei ind] [-pm pm]"
+	" [-so so] [-a] [-w] [-mm m] [-f fs] [-r] [-sc m]"
+	" [-I ind] [-A atm] [-s] [-ml lev] [-sm s] [-gs s] <file.jfr>";
+
+static const char *about[] = {
+  "usage: jfgp [options] <file.jfr>",
+  "",
+  "JFGP modifies the jfr-program <file.jfr>. It replaces statements of the type:"
+    "'extern jfgp {<arg>} <dest>;' with if/case/return-statements.",
+  "<arg>::= fzvars {<v>} | vars {<v>} | functions {<f>} | float <p> | integer <i> <a> | arrays {<a>}",
+  "<dest>::= then {<v>} | assign {<v>} | case | return.",
+  "",
+  "Options:",
+  "-f <fs> : <fs> field-separator.   -gs <s> : tournament group-size.",
+  "-I <c>  : population size.        -A <a>  : number of atoms.",
+  "-s      : Silent.                 -r      : Score rounding to [0,1].",
+  "-so <s> : Write stdout to <s>.    -a      : Append stdout to <s>.",
+  "-Et <t> : Stop after <t> minutes. -Ei <i> : Stop after <i> individuals.",
+  "-w      : wait for RETURN.        -d <df> : Read data from the file <df>.",
+  "-sc <m> : calc f:fast, e:exact.   -pm <mf>: Read penalty-matrix from <mf>.",
+  "-o <of> : Write changed program to <of>.",
+  "-sm <s> : Score-method. 'a':avg,'s':sum,'s2':sum(sqr),'p':penalty-matrix.",
+  "-D <d>  : Data order. <d>={i|e|t}|f. i:input,e:expect,t:text,f:first-line.",
+  "-mm <m> : size-minimize. <m>='n':no, <m>='h':from halfway, <m>='y':yes.",
+  "-uv <m>    : value unknown vars. <m>=z:0,o:1,a:1/count,d0:conf=0,d:conf=1.",
+  NULL
+};
+
+struct jfscmd_option_desc jf_options[] =
+  {     {"-f",  1},        /*  0 */
+        {"-s",  0},        /*  1 */
+        {"-D",  1},        /*  2 */
+        {"-d",  1},        /*  3 */
+        {"-o",  1},        /*  4 */
+        {"-Et", 1},        /*  5 */
+        {"-sm", 1},        /*  6 */
+        {"-I",  1},        /*  7 */
+        {"-A",  1},        /*  8 */
+        {"-so", 1},        /*  9 */
+        {"-r",  0},        /* 10 */
+        {"-Ei", 1},        /* 11 */
+        {"-mm", 1},        /* 12 */
+        {"-m",  0},        /* 13 */
+        {"-rc", 1},        /* 14 */
+        {"-a",  0},        /* 15 */
+        {"-w",  0},        /* 16 */
+        {"-gs", 1},        /* 17 */
+        {"-sc", 1},        /* 18 */
+        {"-pm", 1},        /* 19 */
+        {"-uv", 1},        /* 20 */
+
+        {"-?",  0},        /* 21 */
+        {"?",   0},        /* 22 */
+        {" ",  -2}
+      };
 
 struct jfgp_hoved_desc
 {
@@ -81,57 +134,8 @@ time_t jfgp_cur_time;       /* Til HEAD (samlet tid ??)  */
 
 int jfgp_t_mode = 1000; /* tekst-mode */
 
-
 char jfgp_t_head[] =
 "  ind_no  best-score  avg-score  free-atoms  active-inds   used time";
-
-char jfgp_t_jfgp[] =
-"JFGP   version 2.03    Copyright (c) 1998-2000 Jan E. Mortensen";
-
-/*************************************************************************/
-/* Option-data                                                           */
-/*************************************************************************/
-
-const char usage_1[] =
-"usage: jfgp [-D dm] [-d df] [-o of] [-Et min] [-Ei ind] [-pm pm]   ";
-const char usage_2[] =
-"            [-so so] [-a] [-w] [-mm m] [-f fs] [-r] [-sc m]         ";
-const char usage_3[] =
-"            [-I ind] [-A atm] [-s] [-ml lev] [-sm s] [-gs s]     jfrf";
-
-struct jf_option_desc { const char *option;
-                        int argc;      /* -1: variabelt */
-                      };               /* -2: sidste argument */
-
-struct jf_option_desc jf_options[] =
-  {     {"-f",  1},        /*  0 */
-        {"-s",  0},        /*  1 */
-        {"-D",  1},        /*  2 */
-        {"-d",  1},        /*  3 */
-        {"-o",  1},        /*  4 */
-        {"-Et", 1},        /*  5 */
-        {"-sm", 1},        /*  6 */
-        {"-I",  1},        /*  7 */
-        {"-A",  1},        /*  8 */
-        {"-so", 1},        /*  9 */
-        {"-r",  0},        /* 10 */
-        {"-Ei", 1},        /* 11 */
-        {"-mm", 1},        /* 12 */
-        {"-m",  0},        /* 13 */
-        {"-rc", 1},        /* 14 */
-        {"-a",  0},        /* 15 */
-        {"-w",  0},        /* 16 */
-        {"-gs", 1},        /* 17 */
-        {"-sc", 1},        /* 18 */
-        {"-pm", 1},        /* 19 */
-        {"-uv", 1},        /* 20 */
-
-        {"-?",  0},        /* 21 */
-        {"?",   0},        /* 22 */
-        {" ",  -2}
-
-      };
-
 
 char da_fname[256] = "";
 char ip_fname[256] = "";
@@ -198,12 +202,7 @@ void *jfr_head = NULL;
 /* DIverse                                                               */
 /*************************************************************************/
 
-struct jf_tmap_desc {
-	int value;
-	const char *text;
-};
-
-struct jf_tmap_desc jf_im_texts[] =        /* input-modes */
+struct jfscmd_tmap_desc jf_im_texts[] =        /* input-modes */
 {
   { JFT_FM_INPUT_EXPECTED,     "ie"},
   { JFT_FM_INPUT_EXPECTED_KEY, "iet"},
@@ -269,10 +268,6 @@ struct jfr_err_desc jfr_err_texts[] =
 
 static void jf_luk(void);
 static int jf_error(int eno, char *name, int mode);
-static int jf_tmap_find(struct jf_tmap_desc *map, const char *txt);
-static int isoption(const char *s);
-static int jf_getoption(const char *argv[], int no, int argc);
-static void ext_subst(char *d, const char *e, int forced);
 static int jfgp_data_get(int mode);
 int this_compare(float score_1, int count_1,
                         float score_2, int count_2);
@@ -281,9 +276,6 @@ static float jfgp_d_judge(long data_no);
 float this_judge(void);
 static void jfgp_p_end(int mode);
 static int jfgp_test(void);
-static int jf_about(void);
-static int us_error(void);
-
 
 static void jf_luk(void)
 {
@@ -332,71 +324,6 @@ static int jf_error(int eno, char *name, int mode)
   return m;
 }
 
-static int jf_tmap_find(struct jf_tmap_desc *map, const char *txt)
-{
-  int m, res;
-  res = -2;
-  for (m = 0; res == -2; m++)
-  { if (map[m].value == -1
-       	|| strcmp(map[m].text, txt) == 0)
-      res = map[m].value;
-  }
-  return res;
-}
-
-int isoption(const char *s)
-{
-  if (s[0] == '-' || s[0] == '?')
-    return 1;
-  return 0;
-}
-
-static int jf_getoption(const char *argv[], int no, int argc)
-{
-  int m, v, res;
-
-  res = -2;
-  for (m = 0; res == -2; m++)
-  { if (jf_options[m].argc == -2)
-      res = -1;
-    else
-    if (strcmp(jf_options[m].option, argv[no]) == 0)
-    { res = m;
-      if (jf_options[m].argc > 0)
-      { if (no + jf_options[m].argc >= argc)
-          res = -1; /* missing arguments */
-        else
-        { for (v = 0; v < jf_options[m].argc; v++)
-          { if (isoption(argv[no + 1 + v]) == 1)
-              res = -1;
-          }
-        }
-      }
-    }
-  }
-  return res;
-}
-
-static void ext_subst(char *d, const char *e, int forced)
-{
-  int m, fundet;
-  char punkt[] = ".";
-
-  fundet = 0;
-  for (m = strlen(d) - 1; m >= 0 && fundet == 0 ; m--)
-  { if (d[m] == '.')
-    { fundet = 1;
-      if (forced == 1)
-        d[m] = '\0';
-    }
-  }
-  if (fundet == 0 || forced == 1)
-  { if (strlen(e) != 0)
-      strcat(d, punkt);
-    strcat(d, e);
-  }
-}
-
 /************************************************************************/
 /* Funktioner til indlaesning fra fil                                   */
 /************************************************************************/
@@ -404,7 +331,7 @@ static void ext_subst(char *d, const char *e, int forced)
 static int jfgp_data_get(int mode)
 {
   int slut, m;
-  long adr;
+  long adr = 0;
   float confs[256];
   char txt[256];
 
@@ -532,13 +459,12 @@ static float jfgp_d_judge(long data_no)
 float this_judge(void)
 {
   long d;
-  float res, sdist, dist, nbscore;
+  float res = 0, sdist = 0, dist = 0, nbscore = 0;
   int slut;
 
   if (jfgp_ss_mode == 0)  /* avg */
     nbscore = jfgp_stat.old_score * ((float) jfgp_data_c);
-  else
-  if (jfgp_ss_mode == 1 || jfgp_ss_mode == 3)  /* sum */
+  else if (jfgp_ss_mode == 1 || jfgp_ss_mode == 3)  /* sum */
     nbscore = jfgp_stat.old_score;
   slut = 0;
   for (d = 0; slut == 0 && d < jfgp_data_c; d++)
@@ -652,69 +578,20 @@ static int jfgp_test(void)
   return res;
 }
 
-static int us_error(void)         /* usage-error. Fejl i kald af jfs */
+static void wait_if_needed()
 {
   char dummy[80];
-
-  printf("\n%s\n", usage_1);
-  printf("%s\n", usage_2);
-  printf("%s\n", usage_3);
   if (jfgp_batch_mode == 0)
   { printf("Press RETURN to continue..");
     fgets(dummy, 78, stdin);
   }
-  return 1;
 }
 
-static int jf_about(void)
+static int us_error(void)         /* usage-error. Fejl i kald af jfs */
 {
-  char dummy[80];
-
-  printf("\n\n%s\n\n", jfgp_t_jfgp);
-
-  printf("usage: jfgp [options] jfrf\n\n");
-
-  printf(
-"JFGP modifies the jfr-program <jfrf>. It replaces statements of the type:\n");
-  printf(
-"'extern jfgp {<arg>} <dest>;' with if/case/return-statements. \n");
-  printf(
-"<arg>::= fzvars {<v>} | vars {<v>} | functions {<f>} | float <p>\n");
-  printf(
-"         | integer <i> <a> | arrays {<a>}\n");
-  printf(
-"<dest>::= then {<v>} | assign {<v>} | case | return.\n\n");
-
-  printf("OPTIONS\n");
-  printf(
-"-f <fs> : <fs> field-separator.   -gs <s> : tournament group-size.\n");
-  printf(
-"-I <c>  : population size.        -A <a>  : number of atoms.\n");
-  printf(
-"-s      : Silent.                 -r      : Score rounding to [0,1].\n");
-  printf(
-"-so <s> : Write stdout to <s>.    -a      : Append stdout to <s>.\n");
-  printf(
-"-Et <t> : Stop after <t> minutes. -Ei <i> : Stop after <i> individuals.\n");
-  printf(
-"-w      : wait for RETURN.        -d <df> : Read data from the file <df>.\n");
-  printf(
-"-sc <m> : calc f:fast, e:exact.   -pm <mf>: Read penalty-matrix from <mf>.\n");
-  printf(
-"-o <of> : Write changed program to <of>.\n");
-  printf(
-"-sm <s> : Score-method. 'a':avg,'s':sum,'s2':sum(sqr),'p':penalty-matrix.\n");
-  printf(
-"-D <d>  : Data order. <d>={i|e|t}|f. i:input,e:expect,t:text,f:first-line.\n");
-  printf(
-"-mm <m> : size-minimize. <m>='n':no, <m>='h':from halfway, <m>='y':yes.\n");
-  printf(
-"-uv <m>    : value unknown vars. <m>=z:0,o:1,a:1/count,d0:conf=0,d:conf=1.\n");
-  if (jfgp_batch_mode == 0)
-  { printf("Press RETURN to continue..");
-    fgets(dummy, 78, stdin);
-  }
-  return 0;
+  jfscmd_fprint_wrapped(stdout, jfscmd_num_of_columns() - 7, "usage: ", "       ", usage);
+  wait_if_needed();
+  return 1;
 }
 
 int main(int argc, const char *argv[])
@@ -751,15 +628,21 @@ int main(int argc, const char *argv[])
   jfgp_silent = 0;
 
   if (argc == 1)
-    return jf_about();
+  {
+    jfscmd_print_about(about);
+    return 0;
+  }
   if (argc == 2 && strcmp(argv[argc - 1], "-w") == 0)
-  { jfgp_batch_mode = 0;
-    return jf_about();
+  {
+    jfgp_batch_mode = 0;
+    jfscmd_print_about(about);
+    wait_if_needed();
+    return 0;
   }  
   strcpy(ip_fname, argv[argc - 1]);
-  ext_subst(ip_fname, extensions[0], 0);
+  jfscmd_ext_subst(ip_fname, extensions[0], 0);
   for (m = 1; m < argc - 1; )
-  { option_no = jf_getoption(argv, m, argc - 1);
+  { option_no = jfscmd_getoption(jf_options, argv, m, argc - 1);
     if (option_no == -1)
       return us_error();
     m++;
@@ -772,19 +655,19 @@ int main(int argc, const char *argv[])
         jfgp_silent = 1;
         break;
       case 2:              /* -D */
-        jfgp_fmode = jf_tmap_find(jf_im_texts, argv[m]);
+        jfgp_fmode = jfscmd_tmap_find(jf_im_texts, argv[m]);
         if (jfgp_fmode == -1)
           return us_error();
         m++;
         break;
       case 3:            /* -d */
         strcpy(da_fname, argv[m]);
-        ext_subst(da_fname, extensions[1], 0);
+        jfscmd_ext_subst(da_fname, extensions[1], 0);
         m++;
         break;
       case 4:            /* -o */
         strcpy(op_fname, argv[m]);
-        ext_subst(op_fname, extensions[0], 0);
+        jfscmd_ext_subst(op_fname, extensions[0], 0);
         m++;
         break;
       case 5:             /* -Et */
@@ -892,7 +775,9 @@ int main(int argc, const char *argv[])
         break;
       case 21:           /* ? */
       case 22:
-        return jf_about();
+        jfscmd_print_about(about);
+        wait_if_needed();
+        return 0;
       default:
         return us_error();
     }
@@ -900,12 +785,12 @@ int main(int argc, const char *argv[])
 
   if (strlen(op_fname) == 0)
   { strcpy(op_fname, ip_fname);
-    ext_subst(op_fname, extensions[0], 1);
+    jfscmd_ext_subst(op_fname, extensions[0], 1);
   }
 
   if (strlen(da_fname) == 0)
   { strcpy(da_fname, ip_fname);
-    ext_subst(da_fname, extensions[1], 1);
+    jfscmd_ext_subst(da_fname, extensions[1], 1);
   }
   if (strlen(sout_fname) != 0)
   { if (jfgp_append_mode == 0)
@@ -918,7 +803,6 @@ int main(int argc, const char *argv[])
     }
   }
 
-  fprintf(sout, "\n\n%s\n\n", jfgp_t_jfgp);
   m = jfg_init(JFG_PM_NORMAL, 200, 4);   /* Stacksize som parameter ? */
   if (m != 0)
     jf_error(m, jfgp_t_stack, JFE_FATAL);
@@ -941,7 +825,7 @@ int main(int argc, const char *argv[])
   if (jfgp_ss_mode == 3)
   { if (strlen(pm_fname) == 0)
     { strcpy(pm_fname, ip_fname);
-      ext_subst(pm_fname, extensions[2], 1);
+      jfscmd_ext_subst(pm_fname, extensions[2], 1);
     }
     if (jft_penalty_read(pm_fname) == -1)
       return jf_error(jft_error_desc.error_no, jft_error_desc.carg, JFE_FATAL);

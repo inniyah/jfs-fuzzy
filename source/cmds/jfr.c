@@ -1557,7 +1557,7 @@ static int init(void)
   if (fmode == JFT_FM_FIRST_LINE)
   { m = jft_fopen(ip_fname, fmode, 0);
     if (m != 0)
-	     jf_error(jft_error_desc.error_no, ip_fname, JFE_ERROR);
+      jf_error(jft_error_desc.error_no, ip_fname, JFE_ERROR);
     if (jft_dset_desc.key == 1)
       ident_mode = ID_START;
     else
@@ -1585,7 +1585,7 @@ static int init(void)
     { op_ivars = 1;
       if (data_mode == DM_INP_EXP || data_mode == DM_EXP_INP)
       { op_stat = 1;
-	       op_expected = 1;
+        op_expected = 1;
       }
     }
   }

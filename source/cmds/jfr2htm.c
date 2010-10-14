@@ -1,43 +1,31 @@
-  /***************************************************************************/
-  /*                                                                         */
-  /* jfr2htm.cpp  Version  2.04  Copyright (c) 1998, 1999 Jan E. Mortensen   */
-  /*                                                                         */
-  /* JFS Converter. Converts a compiled jfs-program to html                  */
-  /* (Javascript).                                                           */
-  /*                                                                         */
-  /* by Jan E. Mortensen     email:  jemor@inet.uni2.dk                      */
-  /*    Lollandsvej 35 3.tv.                                                 */
-  /*    DK-2000 Frederiksberg                                                */
-  /*    Denmark                                                              */
-  /*                                                                         */
-  /***************************************************************************/
+  /*************************************************************************/
+  /*                                                                       */
+  /* jfr2htm.c - JFS Converter. Converts a compiled jfs-program            */
+  /*   to HTML (Javascript)                                                */
+  /*                             Copyright (c) 1998-1999 Jan E. Mortensen  */
+  /*                                       Copyright (c) 2010 Miriam Ruiz  */
+  /*                                                                       */
+  /*************************************************************************/
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
 #include <time.h>
+#include "cmds_common.h"
 #include "jfr_lib.h"
 #include "jfg_lib.h"
 #include "jfr2hlib.h"
 
 static FILE *sout;
 static int jfr2htm_batch = 1;
-const char usage_1[] =
-"usage: jfr2htm [-g d] [-Ss s] [-St s] [-Sa c] [-j] [-Sh s]";
-const char usage_2[] =
-"               [-r] [-so sf] [-a] [-w] [-o of] [-ow] [-Nc] [-s]";
-const char usage_3[] =
-"               {-l m] [-Na] [-c] [-Cm m] [-Ct t] [-p f]         jfrf";
-const char coptxt[] =
-"JFR2HTM    version 2.04    Copyright (c) 1999-2000 Jan E. Mortensen";
 
-struct jf_option_desc { const char *option;
-                        int argc;  /* -1: variabelt,     */
-                                   /* -2: last argument. */
-                     };
+static const char usage[] =
+	"jfr2htm [-g d] [-Ss s] [-St s] [-Sa c] [-j] [-Sh s]"
+	" [-r] [-so sf] [-a] [-w] [-o of] [-ow] [-Nc] [-s]"
+	" [-l m] [-Na] [-c] [-Cm m] [-Ct t] [-p f] <file.jfr>";
 
-struct jf_option_desc jf_options[] =
+struct jfscmd_option_desc jf_options[] =
 {
     {"-r",  0},    /*  0 */
     {"-ow", 0},    /*  1 */
@@ -64,73 +52,47 @@ struct jf_option_desc jf_options[] =
     {" ",  -2}
 };
 
-static int isoption(const char *s);
-static int us_error(void);
-static int jf_about(void);
-int jf_getoption(const char *argv[], int no, int argc);
-static void ext_subst(char *d, const char *e, int forced);
-int filkopier(char *de_fname, char *so_fname);
-
-
 /*************************************************************************/
 /* Hjaelpe-funktioner                                                    */
 /*************************************************************************/
 
-
-static int isoption(const char *s)
-{
-  if (s[0] == '-' || s[0] == '?')
-    return 1;
-  return 0;
-}
-
 static int us_error(void)         /* usage-error. Fejl i kald af jfs */
 {
-  printf("\n%s\n%s\n%s\n", usage_1, usage_2, usage_3);
+  jfscmd_fprint_wrapped(stdout, jfscmd_num_of_columns() - 7, "usage: ", "       ", usage);
   return 1;
 }
+
+static const char *about[] = {
+  "usage: jfr2htm [options] <file.jfr>",
+  "",
+  "JFR2HTM is a JFS converter. It converts the compiled jfs-program <file.jfr> "
+    "to a HTML file, with the program converted to Javascript.",
+  "",
+  "Options:",
+  "-o <o>    : Write HTML file to <o>.    -j      : Write JavaScript to <o>.js.",
+  "-c         : write program comment.    -ow     : Overwrite HTML file.",
+  "-g <dec>   : <dec> is precision.       -Nc     : Don't check numbers.",
+  "-a         : Append output.            -w      : Wait for return.",
+  "-s         : Silent (to stdout).       -so <s> : Redirect stdout to <s>.",
+  "-Cm <m>    : <m> is max-confidence.    -Ct <t> : <t> is confidence text.",
+  "-Na        : Ignore var-arguments.     -p <p>  : <p> is object prefix.",
+  "-l <m>     : Label-placement: <m>='l':left, 'a':above, 't':table,",
+  "             'ab':above, extra blank line, 'mt': multicolumn table.",
+  "-Sh <ss>   : Include reference to the stylesheet <ss> in HTML-file.",
+  "-r         : Convert only program-part (not input/output-form).",
+  "-Sa <size> : Max number of characters in statement (default 512).",
+  "-St <size> : Max number of nodes in conversion tree (def 128).",
+  "-Ss <size> : Max stacksize conversion-stack (default 64).",
+  NULL
+};
 
 static int jf_about(void)
 {
   char txt[80];
 
   txt[0] = '\0';
-  printf("\n%s\n\n", coptxt);
-  printf("usage: jfr2htm [options] jfrf\n\n");
 
-  printf(
-"JFR2HTM is a JFS converter. It converts the compiled jfs-program <jfrf>.jfr\n");
-  printf("to a html-file, with the program converted to Javascript.\n\n");
-  printf("OPTIONS:\n");
-
-  printf(
-"-o <o>    : Write HTML file to <o>.    -j      : Write JavaScript to <o>.js.\n");
-  printf(
-"-c         : write program comment.    -ow     : Overwrite HTML file.\n");
-  printf(
-"-g <dec>   : <dec> is precision.       -Nc     : Don't check numbers.\n");
-  printf(
-"-a         : Append output.            -w      : Wait for return.\n");
-  printf(
-"-s         : Silent (to stdout).       -so <s> : Redirect stdout to <s>.\n");
-  printf(
-"-Cm <m>    : <m> is max-confidence.    -Ct <t> : <t> is confidence text.\n");
-  printf(
-"-Na        : Ignore var-arguments.     -p <p>  : <p> is object prefix.\n");
-  printf(
-"-l <m>     : Label-placement: <m>='l':left, 'a':above, 't':table,\n");
-  printf(
-"             'ab':above, extra blank line, 'mt': multicolumn table.\n");
-  printf(
-"-Sh <ss>   : Include reference to the stylesheet <ss> in HTML-file.\n");
-  printf(
-"-r         : Convert only program-part (not input/output-form).\n");
-  printf(
-"-Sa <size> : Max number of characters in statement (default 512).\n");
-  printf(
-"-St <size> : Max number of nodes in conversion tree (def 128).\n");
-  printf(
-"-Ss <size> : Max stacksize conversion-stack (default 64).\n");
+  jfscmd_print_about(about);
 
   if (jfr2htm_batch == 0)
   { printf("Press RETURN ....");
@@ -140,69 +102,27 @@ static int jf_about(void)
   return 0;
 }
 
-int jf_getoption(const char *argv[], int no, int argc)
-{
-  int m, v, res;
-
-  res = -2;
-  for (m = 0; res == -2; m++)
-  { if (jf_options[m].argc == -2)
-      res = -1;
-    else
-    if (strcmp(jf_options[m].option, argv[no]) == 0)
-    { res = m;
-      if (jf_options[m].argc > 0)
-      { if (no + jf_options[m].argc >= argc)
-          res = -1; /* missing arguments */
-        else
-        { for (v = 0; v < jf_options[m].argc; v++)
-          { if (isoption(argv[no + 1 + v]) == 1)
-              res = -1;
-          }
-        }
-      }
-    }
-  }
-  return res;
-}
-
-
-static void ext_subst(char *d, const char *e, int forced)
-{
-  int m, fundet;
-  char punkt[] = ".";
-
-  fundet = 0;
-  for (m = strlen(d) - 1; m >= 0 && fundet == 0 ; m--)
-  { if (d[m] == '.')
-    { fundet = 1;
-      if (forced == 1)
-        d[m] = '\0';
-    }
-  }
-  if (fundet == 0 || forced == 1)
-  { if (strlen(e) != 0)
-      strcat(d, punkt);
-    strcat(d, e);
-  }
-}
-
-int filkopier(char *de_fname, char *so_fname)
+static int jf_copy_file(char *de_fname, char *so_fname)
 {
   int c;
-  FILE *jfi_op;
-  FILE *jfi_ip;
+  FILE *jfi_op = NULL;
+  FILE *jfi_ip = NULL;
 
   if ((jfi_ip = fopen(so_fname, "rb")) == NULL)
-  { return 1;  /* overwrite */
+  {
+    return 1;  /* overwrite */
   }
+
   if ((jfi_op = fopen(de_fname, "wb")) == NULL)
-  { fprintf(sout, "cannot open the file: %s for writing\n", de_fname);
+  {
+    fprintf(sout, "cannot open the file: %s for writing\n", de_fname);
     fclose(jfi_ip);
     exit(0);
   }
+
   while ((c = getc(jfi_ip)) != EOF)
     putc(c, jfi_op);
+
   fclose(jfi_op);
   fclose(jfi_ip);
   return 0;
@@ -251,17 +171,17 @@ int main(int argc, const char *argv[])
   if (argc == 1)
     return jf_about();
   if (argc == 2)
-  { if (jf_getoption(argv, 1, argc) == 10)  /* -w */
+  { if (jfscmd_getoption(jf_options, argv, 1, argc) == 10)  /* -w */
     { jfr2htm_batch = 0;
       return jf_about();
     }
   }
 
   strcpy(so_fname, argv[argc - 1]);
-  ext_subst(so_fname, extensions[0], 1);
+  jfscmd_ext_subst(so_fname, extensions[0], 1);
 
   for (m = 1; m < argc - 1; )
-  { option_no = jf_getoption(argv, m, argc);
+  { option_no = jfscmd_getoption(jf_options, argv, m, argc);
     if (option_no == -1)
       return us_error();
     else
@@ -313,7 +233,7 @@ int main(int argc, const char *argv[])
           break;
         case 11:          /* -o */
           strcpy(de_fname, argv[m]);
-          ext_subst(de_fname, extensions[1], 0);
+          jfscmd_ext_subst(de_fname, extensions[1], 0);
           m++;
           break;
         case 12:         /* -Nc */
@@ -379,29 +299,27 @@ int main(int argc, const char *argv[])
       printf("Cannot open %s for writing.\n", sout_fname);
     }
   }
-  if (silent == 0)
-    fprintf(sout, "\n%s\n", coptxt);
 
   if (strlen(so_fname) == 0)
     return us_error();
   if (strlen(de_fname) == 0)
   { strcpy(de_fname, so_fname);
-    ext_subst(de_fname, extensions[1], 1);
+    jfscmd_ext_subst(de_fname, extensions[1], 1);
   }
   if (js_file == 1)
   { strcpy(js_fname, de_fname);
-    ext_subst(js_fname, extensions[2], 1);
+    jfscmd_ext_subst(js_fname, extensions[2], 1);
   }
 
   strcpy(rm_fname, de_fname);
-  ext_subst(rm_fname, extensions[3], 1);
+  jfscmd_ext_subst(rm_fname, extensions[3], 1);
 
 
   if (silent == 0)
     fprintf(sout, "\nconverting: %s\n", so_fname);
 
   if (overwrite == 0)
-    overwrite = filkopier(rm_fname, de_fname);
+    overwrite = jf_copy_file(rm_fname, de_fname);
 
   res = jfr2h_conv(de_fname, js_fname,
                    so_fname, rm_fname,
@@ -412,7 +330,7 @@ int main(int argc, const char *argv[])
                    sout);
 
   if (overwrite == 0 && res != 0)
-  { filkopier(de_fname, rm_fname);
+  { jf_copy_file(de_fname, rm_fname);
     fprintf(sout, "Errors in conversion. Original HTML file recovered.\n");
   }
 

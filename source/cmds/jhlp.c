@@ -1,28 +1,44 @@
-/***************************************************************************/
-/*                                                                         */
-/* jhlp.cpp        Version 1.02  Copyright (c) 1999-2000 Jan E. Mortensen  */
-/*                                                                         */
-/* Converts a jhlp-system to html.                                         */
-/*                                                                         */
-/* by Jan E. Mortensen     email:  jemor@inet.uni2.dk                      */
-/*    Lollandsvej 35 3.tv.                                                 */
-/*    DK-2000 Frederiksberg                                                */
-/*    Denmark                                                              */
-/*                                                                         */
-/***************************************************************************/
+  /*************************************************************************/
+  /*                                                                       */
+  /* jhlp.c - Converts a jhlp-system to HTML                               */
+  /*                             Copyright (c) 1999-2000 Jan E. Mortensen  */
+  /*                                       Copyright (c) 2010 Miriam Ruiz  */
+  /*                                                                       */
+  /*************************************************************************/
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
+#include "cmds_common.h"
 #include "jhlp_lib.h"
 
-struct jf_option_desc {
-	const char *option;
-	int argc;      /* -1: variabelt */
-};               /* -2: sidste argument */
+static const char usage[] =
+	"jhlp [-o dest] [-e ef] [-h head] [-so sout] [-hi hif] [-a] [-w]"
+	" [-s css] [-An n] [-Am m] [-si] [-c] <file.jhi>";
 
-struct jf_option_desc jf_options[] =
+static const char *about[] = {
+  "usage: jhlp [options] <file.jhi>",
+  "",
+  "JHLP converts the jhlp-system described by <file.jhi> to HTML.",
+  "",
+  "Options:",
+  "-o <dest>    : Write the html-system to the file <dest>.",
+  "-e <errf>    : write error messages to the file <errf>. ",
+  "-so <sof>    : redirect messages from stdout to <sof>.",
+  "-a           : append to error-file/stdout-file.",
+  "-h  <head>   : Convert only the subsystem defined by <head> (to a file).",
+  "-hi <jhc>    : Add the new jhc-file to <jhi> before convertion.",
+  "-s <css>     : Link all html-files to the stylesheet-file <css>.",
+  "-An <n>      : Allocate <n> nodes to temporary data.",
+  "-Am <m>      : Allocate <m> K to temporary data.",
+  "-w           : wait for RETURN.",
+  "-si          : silent.",
+  "-c           : copy image-files etc to destination-directory.",
+  NULL
+};
+
+struct jfscmd_option_desc jf_options[] =
   {     {"-e", 1},         /* 0 */
         {"-h", 1},         /* 1 */
         {"-o", 1},         /* 2 */
@@ -40,110 +56,18 @@ struct jf_option_desc jf_options[] =
         {" ", -2}
    };
 
-const char usage_1[] =
- "usage: jhlp [-o dest] [-e ef] [-h head] [-so sout] [-hi hif] [-a] [-w]";
-const char usage_2[] =
- "            [-s css] [-An n] [-Am m] [-si] {-c]                        hif";
+static const char bslash[] = "\\";
 
-const char bslash[] = "\\";
-
-const char jfh_version[] =
-      "JHLP    version  1.02   Copyright (c) 1999-2000 Jan E. Mortensen";
-
-const char *extensions[]  = { "jhi",     /* 0 */
+static const char *extensions[]  = {
+                        "jhi",     /* 0 */
                         "jhc",     /* 1 */
                         "htm"      /* 2 */
                       };
 
-static void ext_subst(char *d, const char *e, int forced);
-static int isoption(const char *s);
-static int us_error(void);
-static int jf_about(void);
-int jf_getoption(const char *argv[], int no, int argc);
-
-
-
-static void ext_subst(char *d, const char *e, int forced)
-{
-  int m, fundet;
-  char punkt[] = ".";
-
-  fundet = 0;
-  for (m = strlen(d) - 1; m >= 0 && fundet == 0 ; m--)
-  { if (d[m] == '.')
-    { fundet = 1;
-      if (forced == 1)
-        d[m] = '\0';
-    }
-  }
-  if (fundet == 0 || forced == 1)
-  { if (strlen(e) != 0)
-      strcat(d, punkt);
-    strcat(d, e);
-  }
-}
-
-static int isoption(const char *s)
-{
-  if (s[0] == '-' || s[0] == '?')
-    return 1;
-  return 0;
-}
-
 static int us_error(void)
 {
-   printf("\n%s\n%s\n", usage_1, usage_2);
-   return 1;
-}
-
-static int jf_about(void)
-{
-  printf("\n\n%s\n\n", jfh_version);
-
-  printf("usage: jhlp [options] jhi\n\n");
-  printf(
-"JHLP converts the jhlp-system described by <jhi> to html.\n\n");
-
-  printf("OPTIONS\n");
-  printf("-o <dest>    : Write the html-system to the file <dest>.\n");
-  printf("-e <errf>    : write error messages to the file <errf>. \n");
-  printf("-so <sof>    : redirect messages from stdout to <sof>.\n");
-  printf("-a           : append to error-file/stdout-file.\n");
-  printf("-h  <head>   : Convert only the subsystem defined by <head> (to a file).\n");
-  printf("-hi <jhc>    : Add the new jhc-file to <jhi> before convertion.\n");
-  printf("-s <css>     : Link all html-files to the stylesheet-file <css>.\n");
-  printf("-An <n>      : Allocate <n> nodes to temporary data.\n");
-  printf("-Am <m>      : Allocate <m> K to temporary data.\n");
-  printf("-w           : wait for RETURN.\n");
-  printf("-si          : silent.\n");
-  printf("-c           : copy image-files etc to destination-directory.\n");
-  return 0;
-}
-
-int jf_getoption(const char *argv[], int no, int argc)
-{
-  int m, v, res;
-
-  res = -2;
-  for (m = 0; res == -2; m++)
-  { if (jf_options[m].argc == -2)
-      res = -1;
-    else
-    if (strcmp(jf_options[m].option, argv[no]) == 0)
-    { res = m;
-      if (jf_options[m].argc > 0)
-      { if (no + jf_options[m].argc >= argc)
-          res = -1; /* missing arguments */
-        else
-        { for (v = 0; v < jf_options[m].argc; v++)
-          { if (isoption(argv[no + 1 + v]) == 1)
-              res = -1;
-          }
-        }
-      }
-    }
-  }
-  return res;
+  jfscmd_fprint_wrapped(stdout, jfscmd_num_of_columns() - 7, "usage: ", "       ", usage);
+  return 1;
 }
 
 int main(int argc, const char *argv[])
@@ -171,12 +95,15 @@ int main(int argc, const char *argv[])
   append_mode = 0;
   nodes = 0; mem = 0;
   if (argc == 1)
-    return jf_about();
+  {
+    jfscmd_print_about(about);
+    return 0;
+  }
   strcpy(jhi_fname, argv[argc - 1]);
-  if (isoption(jhi_fname) == 1)
+  if (jfscmd_isoption(jhi_fname) == 1)
     return us_error();
   for (m = 1; m < argc - 1; )
-  { option_no = jf_getoption(argv, m, argc - 1);
+  { option_no = jfscmd_getoption(jf_options, argv, m, argc - 1);
     if (option_no == -1)
       return us_error();
     m++;
@@ -232,20 +159,20 @@ int main(int argc, const char *argv[])
 
   if (strlen(jhi_fname) == 0)
     return us_error();
-  ext_subst(jhi_fname, extensions[0], 1);
+  jfscmd_ext_subst(jhi_fname, extensions[0], 1);
   strcpy(dest_dir, jhi_fname);
   for (m = strlen(dest_dir) - 1;
        m > 0 && dest_dir[m] != '\\' && dest_dir[m] != '/'; m--)
     dest_dir[m] = '\0';
   if (strlen(new_so_fname) != 0)
-    ext_subst(new_so_fname, extensions[1], 1);
+    jfscmd_ext_subst(new_so_fname, extensions[1], 1);
   if (strlen(head_name) != 0)
   { if (strlen(de_fname) == 0)
       strcpy(de_fname, jhi_fname);
-    ext_subst(de_fname, extensions[2], 1);
+    jfscmd_ext_subst(de_fname, extensions[2], 1);
   }
   if (strlen(stylesheet) != 0)
-    ext_subst(stylesheet, ".css", 0);
+    jfscmd_ext_subst(stylesheet, ".css", 0);
   if (strlen(sout_fname) != 0)
   { if (append_mode == 0)
       sout = fopen(sout_fname, "w");
@@ -254,7 +181,7 @@ int main(int argc, const char *argv[])
     if (sout == NULL)
       sout = stdout;
   }
-  fprintf(sout, "\n%s\n\n", jfh_version);
+
   fprintf(sout, "Creating html-files from: %s\n\n", jhi_fname);
 
   if (strlen(sout_fname) != 0)

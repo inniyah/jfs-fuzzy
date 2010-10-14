@@ -2,7 +2,7 @@
   /*                                                                       */
   /* cmds_common.c - Common subroutines for the command-line applications  */
   /*                             Copyright (c) 1999-2000 Jan E. Mortensen  */
-  /*                                       Copyright (c) 2000 Miriam Ruiz  */
+  /*                                       Copyright (c) 2010 Miriam Ruiz  */
   /*                                                                       */
   /*************************************************************************/
 
@@ -144,4 +144,32 @@ void jfscmd_ext_subst(char *d, const char *e, int forced)
 		strcat(d, punkt);
 		strcat(d, e);
 	}
+}
+
+void jfscmd_ext_rm(char *d)
+{
+	int m;
+
+	for (m = strlen(d) - 1; m > 0; m--)
+	{
+		if (d[m] == '.')
+		{
+			d[m] = '\0';
+			break;
+		}
+	if (d[m] == '/' || d[m] == '\\')
+		break;
+	}
+}
+
+int jfscmd_tmap_find(struct jfscmd_tmap_desc *map, const char *txt)
+{
+	int m, res;
+	res = -2;
+	for (m = 0; res == -2; m++)
+	{
+		if (map[m].value == -1 || strcmp(map[m].text, txt) == 0)
+		res = map[m].value;
+	}
+	return res;
 }

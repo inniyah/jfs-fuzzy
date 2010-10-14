@@ -1,21 +1,17 @@
-  /**********************************************************************/
-  /*                                                                    */
-  /* jfs2s.cpp Version  2.01   Copyright (c) 1998-1999 Jan E. Mortensen */
-  /*                                                                    */
-  /* JFS Invers compiler (Converts a JFR-file to a JFS-file or a        */
-  /* JFW-file).                                                         */
-  /*                                                                    */
-  /* by Jan E. Mortensen     email:  jemor@inet.uni2.dk                 */
-  /*    Lollandsvej 35 3.tv.                                            */
-  /*    DK-2000 Frederiksberg                                           */
-  /*    Denmark                                                         */
-  /*                                                                    */
-  /**********************************************************************/
+  /*************************************************************************/
+  /*                                                                       */
+  /* jfs2s.c - JFS Reverse compiler (Converts a JFR-file to a JFS-file     */
+  /*   or a JFW-file)                                                      */
+  /*                             Copyright (c) 1998-1999 Jan E. Mortensen  */
+  /*                                       Copyright (c) 2010 Miriam Ruiz  */
+  /*                                                                       */
+  /*************************************************************************/
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
+#include "cmds_common.h"
 #include "jfr_lib.h"
 #include "jfg_lib.h"
 #include "jfr2wlib.h"
@@ -26,22 +22,38 @@
 #define CM_WS   2
 #define CM_RWS  3
 
-char usage1[] =
-"usage: jfr2s [-m cm] [-o of] [-so sout] [-g dg] [-pm pm] [-a] [-v]";
-char usage2[] =
-"             [-Ss ss] [-St ts] [-Sa cs] [-t] [-k] [-w wm] [-n]       rf";
+static const char usage[] =
+	"jfr2s [-m cm] [-o of] [-so sout] [-g dg] [-pm pm] [-a] [-v]"
+	" [-Ss ss] [-St ts] [-Sa cs] [-t] [-k] [-w wm] [-n] <file.jfr>";
 
-struct jf_option_desc {
-	const char *option;
-	int argc;	/* -1: variabelt,     */
-			/* -2: last argument. */
+static const char *about[] = {
+  "usage: jfr2s [options] <file.jfr>",
+  "",
+  "JFR2S is a JFS converter. It converts the jfr/jfw-file <file.jfr> back to source code (jfs-file) or to a jfw-file.",
+  "",
+  "Options:",
+  "-m <cm>    : Conversion-mode. <cm> in {'rs', 'rw', 'ws', 'rws'}.",
+  "-o <of>    : Write the converted program to <of>.",
+  "-g <digits>: Max number of digits after decimal-point.",
+  "-n         : Write statement numbers.",
+  "-v         : Write variable numbers.",
+  "-t         : Write '|'-comments in switch-blocks.",
+  "-pm <mode> : Parenthes-mode: s: standard, e: extra parentheses.",
+  "-k         : Write keywords.",
+  "-Sa <size> : Max number of characters in statement (default 1024).",
+  "-St <size> : Max number of nodes in conversion-tree (def 128).",
+  "-Ss <size> : Max stack-size conversion-stack (default 64).",
+  "-so <sof>  : Redirect stdout-messages to <sof>.",
+  "-a         : Append messages to <sof>.",
+  "-w <m>     : <m>='y':Wait for RETURN, 'n':don't wait, 'e':wait if errors.",
+  NULL
 };
 
-struct jf_option_desc jf_options[] =
+struct jfscmd_option_desc jf_options[] =
   {
     {"-m",  1},    /*  0 */
     {"-g",  1},    /*  1 */
-    {"-pm", 1},   /*  2 */
+    {"-pm", 1},    /*  2 */
     {"-Sa", 1},    /*  3 */
     {"-St", 1},    /*  4 */
     {"-Ss", 1},    /*  5 */
@@ -58,113 +70,20 @@ struct jf_option_desc jf_options[] =
     {" ",  -2}
   };
 
-char t_standard[] = "s";
-char t_extra[]    = "e";
+static char t_standard[] = "s";
+static char t_extra[]    = "e";
 
-static int isoption(const char *s);
 static int us_error(void);
-static int jf_about(void);
-static int jf_getoption(const char *argv[], int no, int argc);
-static void ext_subst(char *d, const char *e, int forced);
-
 
 /*************************************************************************/
 /* Hjaelpe-funktioner                                                    */
 /*************************************************************************/
 
-
-static int isoption(const char *s)
-{
-  if (s[0] == '-' || s[0] == '?')
-    return 1;
-  return 0;
-}
-
 static int us_error(void)         /* usage-error. Fejl i kald af jfs */
 {
-  printf("\n%s\n", usage1);
-  printf("%s\n", usage2);
+  jfscmd_fprint_wrapped(stdout, jfscmd_num_of_columns() - 7, "usage: ", "       ", usage);
   return 1;
 }
-
-
-
-static int jf_about(void)
-{
-
-  printf("\nJFR2S   version  2.01   Copyright (c) 1998-1999 Jan E. Mortensen\n\n");
-  printf("usage: jfr2s [options] rf\n\n");
-
-  printf("JFR2S is a JFS converter. It converts the jfr/jfw-file <rf> back to\n");
-  printf("source code (jfs-file) or to a jfw-file.\n\n");
-  printf("OPTIONS:\n");
-
-  printf("-m <cm>    : Conversion-mode. <cm> in {'rs', 'rw', 'ws', 'rws'}.\n");
-  printf("-o <of>    : Write the converted program to <of>.\n");
-  printf("-g <digits>: Max number of digits after decimal-point.\n");
-  printf("-n         : Write statement numbers.\n");
-  printf("-v         : Write variable numbers.\n");
-  printf("-t         : Write '|'-comments in switch-blocks.\n");
-  printf("-pm <mode> : Parenthes-mode: s: standard, e: extra parentheses.\n");
-  printf("-k         : Write keywords.\n");
-  printf(
-  "-Sa <size> : Max number of characters in statement (default 1024).\n");
-  printf("-St <size> : Max number of nodes in conversion-tree (def 128).\n");
-  printf("-Ss <size> : Max stack-size conversion-stack (default 64).\n");
-  printf("-so <sof>  : Redirect stdout-messages to <sof>.\n");
-  printf("-a         : Append messages to <sof>.\n");
-  printf(
-  "-w <m>     : <m>='y':Wait for RETURN, 'n':don't wait, 'e':wait if errors.\n");
-  return 0;
-}
-
-static int jf_getoption(const char *argv[], int no, int argc)
-{
-  int m, v, res;
-
-  res = -2;
-  for (m = 0; res == -2; m++)
-  { if (jf_options[m].argc == -2)
-      res = -1;
-    else
-    if (strcmp(jf_options[m].option, argv[no]) == 0)
-    { res = m;
-      if (jf_options[m].argc > 0)
-      { if (no + jf_options[m].argc >= argc)
-          res = -1; /* missing arguments */
-        else
-        { for (v = 0; v < jf_options[m].argc; v++)
-          { if (isoption(argv[no + 1 + v]) == 1)
-              res = -1;
-          }
-        }
-      }
-    }
-  }
-  return res;
-}
-
-
-static void ext_subst(char *d, const char *e, int forced)
-{
-  int m, fundet;
-  char punkt[] = ".";
-
-  fundet = 0;
-  for (m = strlen(d) - 1; m >= 0 && fundet == 0 ; m--)
-  { if (d[m] == '.')
-    { fundet = 1;
-      if (forced == 1)
-        d[m] = '\0';
-    }
-  }
-  if (fundet == 0 || forced == 1)
-  { if (strlen(e) != 0)
-      strcat(d, punkt);
-    strcat(d, e);
-  }
-}
-
 
 int main(int argc, const char *argv[])
 {
@@ -199,10 +118,13 @@ int main(int argc, const char *argv[])
   append_mode  = 0;
 
   if (argc == 1)
-    return jf_about();
+  {
+    jfscmd_print_about(about);
+    return 0;
+  }
   strcpy(so_fname, argv[argc - 1]);
   for (m = 1; m < argc - 1; )
-  { option_no = jf_getoption(argv, m, argc);
+  { option_no = jfscmd_getoption(jf_options, argv, m, argc);
     m++;
     switch (option_no)
     { case 0:              /* -m  */
@@ -296,7 +218,8 @@ int main(int argc, const char *argv[])
         break;
       case 14:        /* -? */
       case 15:        /* ?  */
-        return jf_about();
+        jfscmd_print_about(about);
+        return 0;
       default:
         return us_error();
     }
@@ -317,26 +240,26 @@ int main(int argc, const char *argv[])
   switch (conv_mode)
   {
     case CM_RW:
-      ext_subst(so_fname, extensions[0], 1);
-      ext_subst(de_fname, extensions[2], 1);
+      jfscmd_ext_subst(so_fname, extensions[0], 1);
+      jfscmd_ext_subst(de_fname, extensions[2], 1);
       strcpy(tmp_fname, de_fname);
       break;
     case CM_RS:
-      ext_subst(so_fname, extensions[0], 1);
-      ext_subst(de_fname, extensions[1], 1);
+      jfscmd_ext_subst(so_fname, extensions[0], 1);
+      jfscmd_ext_subst(de_fname, extensions[1], 1);
       tmpnam(tmp_fname);
-      ext_subst(tmp_fname, extensions[2], 1);
+      jfscmd_ext_subst(tmp_fname, extensions[2], 1);
       break;
     case CM_WS:
-      ext_subst(so_fname, extensions[2], 1);
+      jfscmd_ext_subst(so_fname, extensions[2], 1);
       strcpy(tmp_fname, so_fname);
-      ext_subst(de_fname, extensions[1], 1);
+      jfscmd_ext_subst(de_fname, extensions[1], 1);
       break;
     case CM_RWS:
-      ext_subst(so_fname, extensions[0], 1);
+      jfscmd_ext_subst(so_fname, extensions[0], 1);
       strcpy(tmp_fname, de_fname);
-      ext_subst(tmp_fname, extensions[2], 1);
-      ext_subst(de_fname, extensions[1], 1);
+      jfscmd_ext_subst(tmp_fname, extensions[2], 1);
+      jfscmd_ext_subst(de_fname, extensions[1], 1);
       break;
   }
   fprintf(so,

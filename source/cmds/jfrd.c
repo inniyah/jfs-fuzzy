@@ -1,34 +1,48 @@
-  /************************************************************************/
-  /*                                                                      */
-  /* jfrd.cpp   Version 2.03    Copyright (c)  1998-2000 Jan E. Mortensen */
-  /*                                                                      */
-  /* JFS Rule-discover program.                                           */
-  /*                                                                      */
-  /* by Jan E. Mortensen     email:  jemor@inet.uni2.dk                   */
-  /*    Lollandsvej 35 3.tv.                                              */
-  /*    DK-2000 Frederiksberg                                             */
-  /*    Denmark                                                           */
-  /*                                                                      */
-  /************************************************************************/
+  /*************************************************************************/
+  /*                                                                       */
+  /* jfrd.c - JFS Rule-discover program                                    */
+  /*                             Copyright (c) 1998-2000 Jan E. Mortensen  */
+  /*                                       Copyright (c) 2010 Miriam Ruiz  */
+  /*                                                                       */
+  /*************************************************************************/
 
 #include <stdio.h>
 #include <ctype.h>
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
+#include "cmds_common.h"
 #include "jft_lib.h"
 #include "jfrd_lib.h"
 
-const char usage_1[] =
-"usage: jfrd [-D dm] [-d df] [-f fs] [-o of] [-Mp pb] [-S] [-so s]";
-const char usage_2[] =
-"            [-Md db] [-Mt t] [-r m] [-iw wgt] [-b] [-c m] [-e] {-a] [-w] jfrf";
-struct jf_option_desc {
-	const char *option;
-	int argc;      /* -1: variabelt */
-};               /* -2: sidste argument */
+static const char usage[] =
+	"jfrd [-D dm] [-d df] [-f fs] [-o of] [-Mp pb] [-S] [-so s]"
+	" [-Md db] [-Mt t] [-r m] [-iw wgt] [-b] [-c m] [-e] [-a]"
+	" [-w] <file.jfr>";
 
-struct jf_option_desc jf_options[] =
+static const char *about[] = {
+  "usage: jfrd [options] <file.jfr>",
+  "",
+  "JFRD replaces the statement 'extern jfrd input {[<op>] <vname>} output [<op>] <vname>'"
+    " in the jfs-program <file.jfr> with rules generated from a data file.",
+  "",
+  "Options:",
+  "-f <fs>    : <fs> field-separator.     -iw <wgt>  : 'ifw &<w>' statements.",
+  "-Mp <pb>   : Alloc <pb> K to program.  -Md <db>   : Alloc <db> K to rules.",
+  "-so <s>    : Redirect stdout to <s>.   -a         : Append stdout to <s>.",
+  "-w         : Wait for return.          -S         : Reduction in entered order.",
+  "-d <df>    : Read data from the file <df>.",
+  "-D <d>     : Data order. <d>={i|e|t}|f. i:input,e:expected,t:text,f:firstline.",
+  "-o <of>    : Write the changed jfs-program to the file <of>.",
+  "-Mt <mt>   : <mt> is Maximum number of minutes used in rewind-reduction.",
+  "-r <rm>    : reduce-mode. d:default,n:none,a:all,b:between,i:in,ib:inbetween.",
+  "-b         : Case-reduction.",
+  "-c <cr>    : Conflict-resolve: <cr>=s:score, <cr>=c:count.",
+  "-e         : Remove rules with default output value.",
+  NULL
+};
+
+struct jfscmd_option_desc jf_options[] =
   {    { "-f",  1},        /*  0 */
        { "-s",  0},        /*  1 */
        { "-D",  1},        /*  2 */
@@ -51,12 +65,7 @@ struct jf_option_desc jf_options[] =
        { " ",  -2}
      };
 
-struct jf_tmap_desc {
-	int value;
-	const char *text;
-};
-
-struct jf_tmap_desc jf_im_texts[] =        /* input-modes */
+struct jfscmd_tmap_desc jf_im_texts[] =        /* input-modes */
 {
   { JFT_FM_INPUT_EXPECTED,     "ie"},
   { JFT_FM_INPUT_EXPECTED_KEY, "iet"},
@@ -68,117 +77,12 @@ struct jf_tmap_desc jf_im_texts[] =        /* input-modes */
   { -1,                        ""}
 };
 
-static int isoption(const char *s);
-static int jf_getoption(const char *argv[], int no, int argc);
-static int jf_tmap_find(struct jf_tmap_desc *map, const char *txt);
-static void ext_subst(char *d, const char *e, int forced);
-static int jf_about(void);
 static int us_error(void);
 
-int isoption(const char *s)
+static int us_error(void) /* usage-error */
 {
-  if (s[0] == '-' || s[0] == '?')
-    return 1;
-  return 0;
-}
-
-static int jf_getoption(const char *argv[], int no, int argc)
-{
-  int m, v, res;
-
-  res = -2;
-  for (m = 0; res == -2; m++)
-  { if (jf_options[m].argc == -2)
-      res = -1;
-    else
-    if (strcmp(jf_options[m].option, argv[no]) == 0)
-    { res = m;
-      if (jf_options[m].argc > 0)
-      { if (no + jf_options[m].argc >= argc)
-          res = -1; /* missing arguments */
-        else
-        { for (v = 0; v < jf_options[m].argc; v++)
-          { if (isoption(argv[no + 1 + v]) == 1)
-              res = -1;
-          }
-        }
-      }
-    }
-  }
-  return res;
-}
-
-static void ext_subst(char *d, const char *e, int forced)
-{
-  int m, fundet;
-  char punkt[] = ".";
-
-  fundet = 0;
-  for (m = strlen(d) - 1; m >= 0 && fundet == 0 ; m--)
-  { if (d[m] == '.')
-    { fundet = 1;
-      if (forced == 1)
-        d[m] = '\0';
-    }
-  }
-  if (fundet == 0 || forced == 1)
-  { if (strlen(e) != 0)
-      strcat(d, punkt);
-    strcat(d, e);
-  }
-}
-
-static int jf_tmap_find(struct jf_tmap_desc *map, const char *txt)
-{
-  int m, res;
-  res = -2;
-  for (m = 0; res == -2; m++)
-  { if (map[m].value == -1
-       	|| strcmp(map[m].text, txt) == 0)
-      res = map[m].value;
-  }
-  return res;
-}
-
-static int us_error(void)         /* usage-error. Fejl i kald af jfs */
-{
-  printf("\n%s\n%s\n", usage_1, usage_2);
-  return 1;
-}
-
-static int jf_about(void)
-{
-  printf("\n\nJFRD   version 2.03  Copyright (c) 1998-2000 Jan E. Mortensen\n\n");
-
-  printf("usage: jfrd [options] jfrf\n\n");
-
-  printf(
-"JFRD replaces the statement:\n");
-  printf(
-"'extern jfrd input {[<op>] <vname>} output [<op>] <vname>' in the\n");
-  printf(
-"jfs-program <jfrf> with rules generated from a data file.\n\n");
-  printf("OPTIONS\n");
-
-  printf(
-"-f <fs>    : <fs> field-separator.     -iw <wgt>  : 'ifw &<w>' statements.\n");
-  printf(
-"-Mp <pb>   : Alloc <pb> K to program.  -Md <db>   : Alloc <db> K to rules.\n");
-  printf(
-"-so <s>    : Redirect stdout to <s>.   -a         : Append stdout to <s>.\n");
-  printf(
-"-w         : Wait for return.          -S         : Reduction in entered order.\n");
-  printf("-d <df>    : Read data from the file <df>.\n");
-  printf(
-"-D <d>     : Data order. <d>={i|e|t}|f. i:input,e:expected,t:text,f:firstline.\n");
-  printf("-o <of>    : Write the changed jfs-program to the file <of>.\n");
-  printf("-Mt <mt>   : <mt> is Maximum number of minutes used in rewind-reduction.\n");
-  printf(
-"-r <rm>    : reduce-mode. d:default,n:none,a:all,b:between,i:in,ib:inbetween.\n");
-  printf("-b         : Case-reduction.\n");
-  printf("-c <cr>    : Conflict-resolve: <cr>=s:score, <cr>=c:count.\n");
-  printf("-e         : Remove rules with default output value.\n");
-  return 0;
+	jfscmd_fprint_wrapped(stdout, jfscmd_num_of_columns() - 7, "usage: ", "       ", usage);
+	return 1;
 }
 
 int main(int argc, const char *argv[])
@@ -216,11 +120,14 @@ int main(int argc, const char *argv[])
 
 
   if (argc == 1)
-    return jf_about();
+  {
+    jfscmd_print_about(about);
+    return 0;
+  }
   strcpy(ip_fname, argv[argc - 1]);
-  ext_subst(ip_fname, extensions[0], 0);
+  jfscmd_ext_subst(ip_fname, extensions[0], 0);
   for (m = 1; m < argc - 1; )
-  { option_no = jf_getoption(argv, m, argc - 1);
+  { option_no = jfscmd_getoption(jf_options, argv, m, argc - 1);
     if (option_no == -1)
       return us_error();
     m++;
@@ -233,19 +140,19 @@ int main(int argc, const char *argv[])
         silent = 1;
         break;
       case 2:              /* -D */
-        data_mode = jf_tmap_find(jf_im_texts, argv[m]);
+        data_mode = jfscmd_tmap_find(jf_im_texts, argv[m]);
         if (data_mode == -1)
           return us_error();
         m++;
         break;
       case 3:            /* -d */
         strcpy(da_fname, argv[m]);
-        ext_subst(da_fname, extensions[1], 0);
+        jfscmd_ext_subst(da_fname, extensions[1], 0);
         m++;
         break;
       case 4:            /* -o */
         strcpy(op_fname, argv[m]);
-        ext_subst(op_fname, extensions[0], 1);
+        jfscmd_ext_subst(op_fname, extensions[0], 1);
         m++;
         break;
       case 5:             /* -Mp */
@@ -325,11 +232,11 @@ int main(int argc, const char *argv[])
 
   if (strlen(op_fname) == 0)
   { strcpy(op_fname, ip_fname);
-    ext_subst(op_fname, extensions[0], 1);
+    jfscmd_ext_subst(op_fname, extensions[0], 1);
   }
   if (strlen(da_fname) == 0)
   { strcpy(da_fname, ip_fname);
-    ext_subst(da_fname, extensions[1], 1);
+    jfscmd_ext_subst(da_fname, extensions[1], 1);
   }
   m = jfrd_run(op_fname, ip_fname, sout_fname, da_fname, data_mode, field_sep,
                prog_size, data_size, max_time, red_mode, red_weight, weight_value,

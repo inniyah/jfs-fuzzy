@@ -27,13 +27,14 @@
 #define JFI_VMAX 100
 
 static const char usage[] =
-  "jfea [-D dm] [-d df] [-f fs] [-o of] [-Et m] [-Ee e] [-fr] [-nd] [-s] [-I ic]"
-  " [-EI i] [-sm m] [-r] [-so s] [-a] [-w] [-R r] [-pm m] <file.jfr> ";
+	"jfea [-D dm] [-d df] [-f fs] [-o of] [-Et m] [-Ee e] [-fr] [-nd] [-s] [-I ic]"
+	" [-EI i] [-sm m] [-r] [-so s] [-a] [-w] [-R r] [-pm m] <file.jfr> ";
 
 static const char *about[] = {
   "usage: jfea [options] <file.jfr>",
   "",
-  "JFEA replaces a statement 'extern jfrd input {[<op>] <var>} output [<op>]<var>' in the jfs-program <file.jfr> with rules generated from a data file."
+  "JFEA replaces a statement 'extern jfrd input {[<op>] <var>} output [<op>]<var>' in the jfs-program <file.jfr>"
+    " with rules generated from a data file."
   "",
   "Options:",
   "-f <fs>    : Use <fs> field-separator.    -s:      : silent.",
@@ -181,12 +182,7 @@ void *jfr_head = NULL;
 /* Diverse                                                               */
 /*************************************************************************/
 
-struct jf_tmap_desc {
-	int value;
-	const char *text;
-};
-
-struct jf_tmap_desc jf_im_texts[] =        /* input-modes */
+struct jfscmd_tmap_desc jf_im_texts[] =        /* input-modes */
 {
   { JFT_FM_INPUT_EXPECTED,     "ie"},
   { JFT_FM_INPUT_EXPECTED_KEY, "iet"},
@@ -277,10 +273,6 @@ struct jfr_err_desc jfr_err_texts[] =
          {9999, "Unknown error!"},
      };
 
-static int jf_error(int eno, const char *name, int mode);
-static int jf_tmap_find(struct jf_tmap_desc *map, const char *txt);
-static int us_error(const char *argument);
-
 static int jf_error(int eno, const char *name, int mode)
 {
   int m, v, e;
@@ -323,18 +315,6 @@ static int jf_error(int eno, const char *name, int mode)
     m = -1;
   }
   return m;
-}
-
-static int jf_tmap_find(struct jf_tmap_desc *map, const char *txt)
-{
-  int m, res;
-  res = -2;
-  for (m = 0; res == -2; m++)
-  { if (map[m].value == -1
-       	|| strcmp(map[m].text, txt) == 0)
-      res = map[m].value;
-  }
-  return res;
 }
 
 /************************************************************************/
@@ -708,7 +688,7 @@ int main(int argc, const char *argv[])
        jfea_silent = 1;
        break;
       case 2:              /* -D */
-        jfea_fmode = jf_tmap_find(jf_im_texts, argv[m]);
+        jfea_fmode = jfscmd_tmap_find(jf_im_texts, argv[m]);
         if (jfea_fmode == -1)
           return us_error(argv[m]);
         m++;

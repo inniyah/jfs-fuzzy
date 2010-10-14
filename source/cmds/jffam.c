@@ -1,36 +1,25 @@
-  /**************************************************************************/
-  /*                                                                        */
-  /* jffam.cpp   Version  2.03   Copyright (c) 1998-2000 Jan E. Mortensen   */
-  /*                                                                        */
-  /* JFS Fam-creation by a cellular automat.                                */
-  /*                                                                        */
-  /* by Jan E. Mortensen     email:  jemor@inet.uni2.dk                     */
-  /*    Lollandsvej 35 3.tv.                                                */
-  /*    DK-2000 Frederiksberg                                               */
-  /*    Denmark                                                             */
-  /*                                                                        */
-  /**************************************************************************/
+  /*************************************************************************/
+  /*                                                                       */
+  /* jffam.c - JFS Fam-creation by a cellular automat                      */
+  /*                             Copyright (c) 1998-2000 Jan E. Mortensen  */
+  /*                                       Copyright (c) 2010 Miriam Ruiz  */
+  /*                                                                       */
+  /*************************************************************************/
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
+#include "cmds_common.h"
 #include "jft_lib.h"
 #include "jffamlib.h"
 
-const char usage_1[] =
-"usage: jffam [-D dm] [-d df] [-f fs] [-o of] [-Mp ps] [-Md ds]";
-const char usage_2[] =
-"            [-rf df] [-iw wgt] [-c m] [-r ru] [-ms s] [-nf]";
-const char usage_3[] =
-"            [-w] [-a] [-so sf] [-tt tm]                             jfrf";
+static const char usage[] =
+	"jffam [-D dm] [-d df] [-f fs] [-o of] [-Mp ps] [-Md ds]"
+	" [-rf df] [-iw wgt] [-c m] [-r ru] [-ms s] [-nf]"
+	" [-w] [-a] [-so sf] [-tt tm] <file.jfr>";
 
-struct jf_option_desc {
-	const char *option;
-	int argc;      /* -1: variabelt */
-};               /* -2: sidste argument */
-
-struct jf_option_desc jf_options[] = {
+struct jfscmd_option_desc jf_options[] = {
 	{"-f",  1},        /*  0 */
 	{"-s",  0},        /*  1 */
 	{"-D",  1},        /*  2 */
@@ -52,7 +41,6 @@ struct jf_option_desc jf_options[] = {
 	{"?",   0},        /* 18 */
 	{" ",  -2}
 };
-
 
 int data_mode = JFT_FM_INPUT_EXPECTED;
 
@@ -92,12 +80,7 @@ char t_avg[]   = "a";
 char t_minmax[]= "m";
 char t_delta[] = "d";
 
-struct jf_tmap_desc {
-	int value;
-	const char *text;
-};
-
-struct jf_tmap_desc jf_im_texts[] =        /* input-modes */
+struct jfscmd_tmap_desc jf_im_texts[] =        /* input-modes */
 {
   { JFT_FM_INPUT_EXPECTED,     "ie"},
   { JFT_FM_INPUT_EXPECTED_KEY, "iet"},
@@ -109,121 +92,34 @@ struct jf_tmap_desc jf_im_texts[] =        /* input-modes */
   { -1,                        ""}
 };
 
-static int isoption(const char *s);
-static int jf_getoption(const char *argv[], int no, int argc);
-static int jf_tmap_find(struct jf_tmap_desc *map, const char *txt);
-static void ext_subst(char *d, const char *e, int forced);
-static int jf_about(void);
 static int us_error(void);
 
-
-
-static int isoption(const char *s)
-{
-  if (s[0] == '-' || s[0] == '?')
-    return 1;
-  return 0;
-}
-
-static int jf_getoption(const char *argv[], int no, int argc)
-{
-  int m, v, res;
-
-  res = -2;
-  for (m = 0; res == -2; m++)
-  { if (jf_options[m].argc == -2)
-      res = -1;
-    else
-    if (strcmp(jf_options[m].option, argv[no]) == 0)
-    { res = m;
-      if (jf_options[m].argc > 0)
-      { if (no + jf_options[m].argc >= argc)
-      	  res = -1; /* missing arguments */
-        else
-        { for (v = 0; v < jf_options[m].argc; v++)
-          { if (isoption(argv[no + 1 + v]) == 1)
-              res = -1;
-          }
-        }
-      }
-    }
-  }
-  return res;
-}
-
-static void ext_subst(char *d, const char *e, int forced)
-{
-  int m, fundet;
-  char punkt[] = ".";
-
-  fundet = 0;
-  for (m = strlen(d) - 1; m >= 0 && fundet == 0 ; m--)
-  { if (d[m] == '.')
-    { fundet = 1;
-      if (forced == 1)
-       	d[m] = '\0';
-    }
-  }
-  if (fundet == 0 || forced == 1)
-  { if (strlen(e) != 0)
-      strcat(d, punkt);
-    strcat(d, e);
-  }
-}
-
-static int jf_tmap_find(struct jf_tmap_desc *map, const char *txt)
-{
-  int m, res;
-  res = -2;
-  for (m = 0; res == -2; m++)
-  { if (map[m].value == -1
-       	|| strcmp(map[m].text, txt) == 0)
-      res = map[m].value;
-  }
-  return res;
-}
-
-static int jf_about(void)
-{
-  printf(
-  "\n\nJFFAM   version 2.03    Copyright (c) 1998-2000 Jan E. Mortensen\n\n");
-
-  printf("usage: jffam [options] jfrf\n\n");
-
-  printf(
-"JFFAM replaces the statement:\n");
-  printf(
-"'extern jfrd input {[<op>] <vname>} output [<op>] <vname>' in the jfs-program\n");
-  printf(
-"<jfrf> with rules (a FAM) generated from a data file (by a CA).\n\n");
-  printf("OPTIONS\n");
-
-  printf(
-"-d <df>    : Data from file <df>.       -so <of>  : Redirect stdout to <of>.\n");
-  printf(
-"-a         : append output.             -w        : Wait for return.\n");
-  printf(
-"-Mp <pb>   : Alloc <pb> K to program.   -Md <db>  : Alloc <db> K to rules.\n");
-
-  printf("-f <fs>    : Use <fs> as field-separator.\n");
-  printf(
-"-D <d>     : Data order. <d>={i|e|t}|f. i:input,e:expected,t:text,f:firstline.\n");
-  printf("-o <of>    : Write the changed jfs-program to the file <of>.\n");
-  printf("-rf <rf>   : Write the generated rules to the data-file <rf>.\n");
-  printf("-iw <wgt>  : Generate 'ifw <wgt> ...' statements.\n");
-  printf("-c <cr>    : Conflict-resolve: <cr>=s:score, <cr>=c:count.\n");
-  printf(
-    "-r <ru>    : Rule used by CA. <ru>='a':avg, 'm':minmax, 'd':delta.\n");
-  printf(
-    "-ms <ms>   : <ms> is maximum number of steps in cellular automat.\n");
-  printf("-nf        : No fixed rules in cellular automat.\n");
-  printf("-tt <t>    : then-type: <t>='a':adjectiv, 'c':center.\n");
-  return 0;
-}
+static const char *about[] = {
+  "usage: jffam [options] <file.jfr>",
+  "",
+  "JFFAM replaces the statement: 'extern jfrd input {[<op>] <vname>} output [<op>] <vname>' "
+    "in the jfs-program <file.jfr> with rules (a FAM) generated from a data file (by a CA).",
+  "",
+  "Options:",
+  "-d <df>    : Data from file <df>.       -so <of>  : Redirect stdout to <of>.",
+  "-a         : append output.             -w        : Wait for return.",
+  "-Mp <pb>   : Alloc <pb> K to program.   -Md <db>  : Alloc <db> K to rules.",
+  "-f <fs>    : Use <fs> as field-separator.",
+  "-D <d>     : Data order. <d>={i|e|t}|f. i:input,e:expected,t:text,f:firstline.",
+  "-o <of>    : Write the changed jfs-program to the file <of>.",
+  "-rf <rf>   : Write the generated rules to the data-file <rf>.",
+  "-iw <wgt>  : Generate 'ifw <wgt> ...' statements.",
+  "-c <cr>    : Conflict-resolve: <cr>=s:score, <cr>=c:count.",
+  "-r <ru>    : Rule used by CA. <ru>='a':avg, 'm':minmax, 'd':delta.",
+  "-ms <ms>   : <ms> is maximum number of steps in cellular automat.",
+  "-nf        : No fixed rules in cellular automat.",
+  "-tt <t>    : then-type: <t>='a':adjectiv, 'c':center.",
+  NULL
+};
 
 static int us_error(void)         /* usage-error. Fejl i kald af jfs */
 {
-  printf("\n%s\n%s\n%s\n", usage_1, usage_2, usage_3);
+  jfscmd_fprint_wrapped(stdout, jfscmd_num_of_columns() - 7, "usage: ", "       ", usage);
   return 1;
 }
 
@@ -246,11 +142,15 @@ int main(int argc, const char *argv[])
   field_sep[0] = '\0';
 
   if (argc == 1)
-    return jf_about();
+  {
+    jfscmd_print_about(about);
+    return 0;
+  }
   strcpy(ip_fname, argv[argc - 1]);
-  ext_subst(ip_fname, extensions[0], 0);
+  jfscmd_ext_subst(ip_fname, extensions[0], 0);
   for (m = 1; m < argc - 1; )
-  { option_no = jf_getoption(argv, m, argc - 1);
+  {
+    option_no = jfscmd_getoption(jf_options, argv, m, argc - 1);
     if (option_no == -1)
       return us_error();
     m++;
@@ -262,25 +162,25 @@ int main(int argc, const char *argv[])
       case 1:              /* -s */
        	break;
       case 2:              /* -D */
-        data_mode = jf_tmap_find(jf_im_texts, argv[m]);
+        data_mode = jfscmd_tmap_find(jf_im_texts, argv[m]);
         if (data_mode == -1)
           return us_error();
         m++;
         break;
       case 3:            /* -d */
-        if (m < argc - 1 && isoption(argv[m]) == 0)
+        if (m < argc - 1 && jfscmd_isoption(argv[m]) == 0)
         { strcpy(da_fname, argv[m]);
-          ext_subst(da_fname, extensions[1], 0);
+          jfscmd_ext_subst(da_fname, extensions[1], 0);
           m++;
         }
         else
         { strcpy(da_fname, ip_fname);
-          ext_subst(da_fname, extensions[1], 1);
+          jfscmd_ext_subst(da_fname, extensions[1], 1);
         }
         break;
       case 4:            /* -o */
         strcpy(op_fname, argv[m]);
-        ext_subst(op_fname, extensions[0], 0);
+        jfscmd_ext_subst(op_fname, extensions[0], 0);
         m++;
         break;
       case 5:             /* -Mp */
@@ -293,7 +193,7 @@ int main(int argc, const char *argv[])
         break;
       case 7:            /* -rf */
         strcpy(ru_fname, argv[m]);
-        ext_subst(ru_fname, extensions[1], 0);
+        jfscmd_ext_subst(ru_fname, extensions[1], 0);
         m++;
         break;
       case 8:            /* -iw */
@@ -356,8 +256,8 @@ int main(int argc, const char *argv[])
         break;
       case 17:
       case 18:
-        return jf_about();
-        /* break;  */
+        jfscmd_print_about(about);
+        return 0;
       default:
        	return us_error();
     }
@@ -365,11 +265,11 @@ int main(int argc, const char *argv[])
 
   if (strlen(op_fname) == 0 && strlen(ru_fname) == 0)
   { strcpy(op_fname, ip_fname);
-    ext_subst(op_fname, extensions[0], 1);
+    jfscmd_ext_subst(op_fname, extensions[0], 1);
   }
   if (strlen(da_fname) == 0)
   { strcpy(da_fname, ip_fname);
-    ext_subst(da_fname, extensions[1], 1);
+    jfscmd_ext_subst(da_fname, extensions[1], 1);
   }
   res = jffam_run(op_fname, ip_fname, ru_fname, da_fname,
                   field_sep, data_mode, prog_size, data_size,

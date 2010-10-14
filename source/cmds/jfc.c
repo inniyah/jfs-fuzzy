@@ -20,25 +20,9 @@
 #define CM_SR   3
 #define CM_SWR  4
 
-struct jfscmd_option_desc jf_options[] = {
-        {"-e", 1},         /* 0 */
-        {"-s", 0},         /* 1 */
-        {"-o", 1},         /* 2 */
-        {"-mt",1},         /* 3 */
-        {"-mw",1},         /* 4 */
-        {"-ms",1},         /* 5 */
-        {"-a", 0},         /* 6 */
-        {"-em",1},         /* 7 */
-        {"-so",1},         /* 8 */
-        {"-m", 1},         /* 9 */
-        {"-w", 1},         /*10 */
-        {"-?", 0},
-        {"?",  0},
-        {" ", -2}
-};
-
 static const char usage[] =
-  "jfc [-o jfrf] [-e errf] [-em emode] [-so sout] [-s] [-a] [-m ctyp] [-mt mc] [-mw wc] [-ms ss] [-w m] <file.jfs>";
+	"jfc [-o jfrf] [-e errf] [-em emode] [-so sout] [-s] [-a] [-m ctyp]"
+	" [-mt mc] [-mw wc] [-ms ss] [-w m] <file.jfs>";
 
 static const char *about[] = {
   "usage: jfc [options] <file.jfs>",
@@ -58,6 +42,23 @@ static const char *about[] = {
   "-ms <ss>     : <ss> is size of expression stack.",
   "-w <m>       : <m>='y':wait for RETURN, 'n';dont wait, 'e':wait if errors.",
   NULL
+};
+
+struct jfscmd_option_desc jf_options[] = {
+        {"-e", 1},         /* 0 */
+        {"-s", 0},         /* 1 */
+        {"-o", 1},         /* 2 */
+        {"-mt",1},         /* 3 */
+        {"-mw",1},         /* 4 */
+        {"-ms",1},         /* 5 */
+        {"-a", 0},         /* 6 */
+        {"-em",1},         /* 7 */
+        {"-so",1},         /* 8 */
+        {"-m", 1},         /* 9 */
+        {"-w", 1},         /*10 */
+        {"-?", 0},
+        {"?",  0},
+        {" ", -2}
 };
 
 static const char *extensions[] = {
@@ -113,7 +114,8 @@ int main(int argc, const char *argv[])
     return 0;
   }
   if (argc == 2 && strcmp(argv[1], "-w") == 0)
-  { jfc_wait_mode = 1;
+  {
+    jfc_wait_mode = 1;
     jfscmd_print_about(about);
     wait_if_needed();
     return 0;

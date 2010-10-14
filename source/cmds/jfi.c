@@ -27,30 +27,8 @@
 #define JFI_VMAX 256
 
 static const char usage[] =
-  "jfi [-D dm] [-d df] [-f fs] [-o of] [-Et min] [-Ee er] [-pm p] [-I ic] [-EI i] [-sm m] [-s] [-r] [-so s] [-a] [-w] <file.jfr>";
-
-struct jfscmd_option_desc jf_options[] = {
-        {"-f",  1},        /*  0 */
-        {"-s",  0},        /*  1 */
-        {"-D",  1},        /*  2 */
-        {"-d",  1},        /*  3 */
-        {"-o",  1},        /*  4 */
-        {"-Et", 1},        /*  5 */
-        {"-Ee", 1},        /*  6 */
-        {"-I",  1},        /*  7 */
-        {"-Ei", 1},        /*  8 */
-        {"-sm", 1},        /*  9 */
-        {"-r",  0},        /* 10 */
-        {"-so", 1},        /* 11 */
-        {"-a",  0},        /* 12 */
-        {"-w",  0},        /* 13 */
-        {"-sc", 0},        /* 14 */
-        {"-uv", 1},        /* 15 */
-        {"-pm", 1},        /* 16 */
-        {"-?",  0},        /* 17 */
-        {"?",   0},        /* 18 */
-        {" ",  -2}
-};
+	"jfi [-D dm] [-d df] [-f fs] [-o of] [-Et min] [-Ee er] [-pm p]"
+	" [-I ic] [-EI i] [-sm m] [-s] [-r] [-so s] [-a] [-w] <file.jfr>";
 
 static const char *about[] = {
   "usage: jfi [options] <file.jfr>",
@@ -73,6 +51,29 @@ static const char *about[] = {
   "-sc <m>    : score-calc. <m>='f':fast, <m>='e':exact.",
   "-uv <m>    : value unknown vars. <m>=z:0,o:1,a:1/count,d0:conf=0,d:conf=1.",
   NULL
+};
+
+struct jfscmd_option_desc jf_options[] = {
+        {"-f",  1},        /*  0 */
+        {"-s",  0},        /*  1 */
+        {"-D",  1},        /*  2 */
+        {"-d",  1},        /*  3 */
+        {"-o",  1},        /*  4 */
+        {"-Et", 1},        /*  5 */
+        {"-Ee", 1},        /*  6 */
+        {"-I",  1},        /*  7 */
+        {"-Ei", 1},        /*  8 */
+        {"-sm", 1},        /*  9 */
+        {"-r",  0},        /* 10 */
+        {"-so", 1},        /* 11 */
+        {"-a",  0},        /* 12 */
+        {"-w",  0},        /* 13 */
+        {"-sc", 0},        /* 14 */
+        {"-uv", 1},        /* 15 */
+        {"-pm", 1},        /* 16 */
+        {"-?",  0},        /* 17 */
+        {"?",   0},        /* 18 */
+        {" ",  -2}
 };
 
 /************************************************************************/
@@ -156,12 +157,7 @@ int  jfi_append = 0;
 char jfi_field_sep[256];   /* 0: brug space, tab etc som felt-seperator, */
        /* andet: kun field_sep er feltsepator. */
 
-struct jf_tmap_desc {
-	int value;
-	const char *text;
-};
-
-struct jf_tmap_desc jf_im_texts[] =        /* input-modes */
+struct jfscmd_tmap_desc jf_im_texts[] =        /* input-modes */
 {
   { JFT_FM_INPUT_EXPECTED,     "ie"},
   { JFT_FM_INPUT_EXPECTED_KEY, "iet"},
@@ -241,7 +237,6 @@ struct jfr_err_desc jfr_err_texts[] =
 
 static void jf_close(void);
 static int jf_error(int eno, const char *name, int mode);
-static int jf_tmap_find(struct jf_tmap_desc *map, const char *txt);
 static int us_error(void);
 
 static void jf_close(void)
@@ -287,18 +282,6 @@ static int jf_error(int eno, const char *name, int mode)
     m = -1;
   }
   return m;
-}
-
-static int jf_tmap_find(struct jf_tmap_desc *map, const char *txt)
-{
-  int m, res;
-  res = -2;
-  for (m = 0; res == -2; m++)
-  { if (map[m].value == -1
-       	|| strcmp(map[m].text, txt) == 0)
-      res = map[m].value;
-  }
-  return res;
 }
 
 /************************************************************************/
@@ -507,7 +490,7 @@ float this_judge(void)
   return avg_err;
 }
 
-static int us_error(void)         /* usage-error. Fejl i kald af jfs */
+static int us_error(void) /* usage-error */
 {
 	jfscmd_fprint_wrapped(stdout, jfscmd_num_of_columns() - 7, "usage: ", "       ", usage);
 	if (jfi_batch == 0)
@@ -581,7 +564,7 @@ int main(int argc, const char *argv[])
        jfi_silent = 1;
        break;
       case 2:              /* -D */
-        jfi_fmode = jf_tmap_find(jf_im_texts, argv[m]);
+        jfi_fmode = jfscmd_tmap_find(jf_im_texts, argv[m]);
         if (jfi_fmode == -1)
           return us_error();
         m++;

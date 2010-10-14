@@ -1,31 +1,45 @@
-
-  /*********************************************************************/
-  /*                                                                   */
-  /* jfplot.cpp   Version  2.02   Copyright (c) 2000 Jan E. Mortensen  */
-  /*                                                                   */
-  /* Program  to plot the hedges, operators, fuzzification-functions   */
-  /* etc in a compiled jfs-program using GNUPLOT.                      */
-  /*                                                                   */
-  /* by Jan E. Mortensen     email:  jemor@inet.uni2.dk                */
-  /*    Lollandsvej 35 3.tv.                                           */
-  /*    DK-2000 Frederiksberg                                          */
-  /*    Denmark                                                        */
-  /*                                                                   */
-  /*********************************************************************/
+  /*************************************************************************/
+  /*                                                                       */
+  /* jfrplot.c - Program to plot the hedges, operators,                    */
+  /*   fuzzification-functions etc in a compiled jfs-program               */
+  /*   using Gnuplot                                                       */
+  /*                                  Copyright (c) 2000 Jan E. Mortensen  */
+  /*                                       Copyright (c) 2010 Miriam Ruiz  */
+  /*                                                                       */
+  /*************************************************************************/
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
+#include "cmds_common.h"
 #include "jfr_lib.h"
 #include "jfg_lib.h"
 #include "jfpltlib.h"
 #include "jopt_lib.h"
 
-static struct jfplt_param_desc params;
+static const char *about[] = {
+  "usage: jfplot [options] <file.jfr>",
+  "",
+  "JFPLOT writes plot-information about the compiled jfs-program <file.jfr> to a Gnuplot-file.",
+  "",
+  "Options:",
+  "-a      : append to stdout.",
+  "-w      : Wait for return.",
+  "-S <s>  : redirect stdout to <s>.",
+  "-o <of> : write the Gnuplot-file to <of>.plt.",
+  "-p <po> : write plot-info about <po>, where po is build of: 'h':hedges,",
+  "          'r':relations, 'o':operators, 'f:fuzification, 'd':defuzz.",
+  "-d {<o>}: write only plot-info about the objects {<o>}.",
+  "-g <p>  : precision. <p> is the number of decimals.",
+  "-m <sa> : number of samples used to generate graph (default 300).",
+  "-i <if> : read Gnuplot initialization from the file <if>.",
+  "-t <t> <e> [<d>]: Insert a 'set term <t>'-statement in Gnuplot-file. The plots",
+  "          are written to files in the directory <d> with extension <e>.",
+  NULL
+};
 
-const char coptxt[] =
-"JFPLOT    version 2.02    Copyright (c) 2000 Jan E. Mortensen";
+static struct jfplt_param_desc params;
 
 static int batch = 1;
 
@@ -103,61 +117,12 @@ static int jf_error(int eno, char *name, int mode)
 static int jf_about(void)
 {
   char txt[80];
-
-  printf("\n%s\n\n", coptxt);
-  printf("usage: jfplot [options] rf \n\n");
-  printf(
-"JFPLOT writes plot-information about the compiled jfs-program <rf> to \n");
-  printf("a Gnuplot-file.\n\n");
-  printf("OPTIONS:\n");
-  printf(
-"-a      : append to stdout.        -w      : Wait for return.\n");
-  printf(
-"-S <s>  : redirect stdout to <s>.\n");
-  printf(
-"-o <of> : write the Gnuplot-file to <of>.plt.\n");
-  printf(
-"-p <po> : write plot-info about <po>, where po is build of: 'h':hedges,\n");
-  printf(
-"          'r':relations, 'o':operators, 'f:fuzification, 'd':defuzz.\n");
-  printf(
-"-d {<o>}: write only plot-info about the objects {<o>}.\n");
-  printf(
-"-g <p>  : precision. <p> is the number of decimals.\n");
-  printf(
-"-m <sa> : number of samples used to generate graph (default 300).\n");
-  printf(
-"-i <if> : read Gnuplot initialization from the file <if>.\n");
-  printf(
-"-t <t> <e> [<d>]: Insert a 'set term <t>'-statement in Gnuplot-file. The plots\n");
-  printf(
-"          are written to files in the directory <d> with extension <e>.\n");
+  jfscmd_print_about(about);
   if (batch == 0)
   { printf("Press RETURN...");
     fgets(txt, 16, stdin);
   }
   return 0;
-}
-
-
-static void ext_subst(char *d, const char *e, int forced)
-{
-  int m, fundet;
-  char punkt[] = ".";
-
-  fundet = 0;
-  for (m = strlen(d) - 1; m >= 0 && fundet == 0 ; m--)
-  { if (d[m] == '.')
-    { fundet = 1;
-      if (forced == 1)
-	    d[m] = '\0';
-    }
-  }
-  if (fundet == 0 || forced == 1)
-  { if (strlen(e) != 0)
-      strcat(d, punkt);
-    strcat(d, e);
-  }
 }
 
 int main(int argc, const char *argv[])
@@ -203,7 +168,7 @@ int main(int argc, const char *argv[])
     }
   }
   strcpy(ip_fname, argv[argc - 1]);
-  ext_subst(ip_fname, extensions[0], 0);
+  jfscmd_ext_subst(ip_fname, extensions[0], 0);
   jopt_init(options, OPT_COUNT, argv, argc - 1);
   while (jopt_get(&option_no, largv, &largc) == 0)
   { switch (option_no)
@@ -232,7 +197,7 @@ int main(int argc, const char *argv[])
         break;
       case 1:              /* -o */
         strcpy(op_fname, largv[0]);
-        ext_subst(op_fname, extensions[1], 0);
+        jfscmd_ext_subst(op_fname, extensions[1], 0);
         break;
       case 2:          /* -d */
         for (m = 0; m < largc; m++)
@@ -242,7 +207,7 @@ int main(int argc, const char *argv[])
         break;
       case 3:          /* -i */
         strcpy(init_fname, largv[0]);
-        ext_subst(init_fname, extensions[2], 0);
+        jfscmd_ext_subst(init_fname, extensions[2], 0);
         break;
       case 4:          /* -S */
         strcpy(sout_fname, largv[0]);
@@ -288,7 +253,7 @@ int main(int argc, const char *argv[])
   if (res == 0)
   { if (strlen(op_fname) == 0)
     { strcpy(op_fname, ip_fname);
-      ext_subst(op_fname, extensions[1], 1);
+      jfscmd_ext_subst(op_fname, extensions[1], 1);
     }
     params.ipfname = ip_fname;
     params.opfname = op_fname;

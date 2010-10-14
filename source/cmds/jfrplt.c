@@ -1,15 +1,10 @@
-  /************************************************************************/
-  /*                                                                      */
-  /* jfrplt.c   Version  2.01   Copyright (c) 2000 Jan E. Mortensen       */
-  /*                                                                      */
-  /* Run a jfs-program with output to gnuplolt-files.                     */
-  /*                                                                      */
-  /* by Jan E. Mortensen     email:  jemor@inet.uni2.dk                   */
-  /*    Lollandsvej 35 3.tv.                                              */
-  /*    DK-2000 Frederiksberg                                             */
-  /*    Denmark                                                           */
-  /*                                                                      */
-  /************************************************************************/
+  /*************************************************************************/
+  /*                                                                       */
+  /* jfrplt.c - Run a jfs-program with output to gnuplot-files             */
+  /*                             Copyright (c) 1998-2000 Jan E. Mortensen  */
+  /*                                       Copyright (c) 2010 Miriam Ruiz  */
+  /*                                                                       */
+  /*************************************************************************/
 
 #define JFE_WARNING 0
 #define JFE_ERROR   1
@@ -21,17 +16,36 @@
 #include <string.h>
 #include <math.h>
 #include <time.h>
-
+#include "cmds_common.h"
 #include "jfr_lib.h"
 #include "jfg_lib.h"
 #include "jft_lib.h"
 #include "jfs_cons.h"
 #include "jopt_lib.h"
 
-const char *usage[] =
-{
-"usage: jfrplt [-f fs] [-p dec] [-d df] [-o of] [-i if] [-Ax a] [-Az a]",
-"              [-As] [-w [-wm]] [-a] [-t <t> <e> [<d>]] [-v vn] [-rs ss] jfrf"
+static const char usage[] =
+	"jfrplt [-f fs] [-p dec] [-d df] [-o of] [-i if] [-Ax a] [-Az a]"
+	" [-As] [-w [-wm]] [-a] [-t <t> <e> [<d>]] [-v vn] [-rs ss] <file.jfr>";
+
+static const char *about[] = {
+  "usage: jfrplt [options] <file.jfr>",
+  "",
+  "JFRPLT executes the compiled jfs-program <jfrf> and writes output to Gnuplot files.",
+  "",
+  "Options:",
+  "-p <dec>    : <dec> is precision.       -f <fs>    : <fs> field separator.",
+  "-d <df>     : input from file <df>.     -rs <ss>   : <ss> stacksize.",
+  "-Ax <a>     : rotation angle x-axis     -Az <a>    : rotation angle z-axis.",
+  "-a          : append output.",
+  "-v <ov>     : Plot only output variable <ov>.",
+  "-As         : Autoscale output axis.",
+  "-w <m>      : <m>='y':wait for RETURN, 'n':don't wait, 'e':wait if error.",
+  "-o <of>     : write output to the Gnuplot file <of>.plt, and the data files",
+  "              <of><vname>.dat (<vname> is the name of output variables).",
+  "-i <if>     : read gnuplot initialization from the file <if>.",
+  "-t <t> <e> [<d>]: Insert a 'set term <t>'-statement in gnuplot file. The plots",
+  "          are written to files in the directory <d> with extension <e>.",
+  NULL
 };
 
 struct jopt_desc options[] =
@@ -116,7 +130,7 @@ int ip_medie  = IP_KEYBOARD;
 int digits = 4;        /* no of digits after the decimal point (incl point).*/
 
 char field_sep[255];   /* 0: brug space, tab etc som felt-seperator, */
-              		       /* andet: kun field_sep er feltsepator. */
+                       /* andet: kun field_sep er feltsepator. */
 
 int stack_size   = 0;
 
@@ -124,30 +138,26 @@ int stack_size   = 0;
 #define WM_ERROR  1
 #define WM_YES    2
 
-int wait_return  = WM_NO;
+static int wait_return  = WM_NO;
 
-int op_append = 0;
+static int op_append = 0;
 
-float rot_x = 60;
-float rot_z = 300;
+static float rot_x = 60;
+static float rot_z = 300;
 
-int plt_2_gif = 0;
-int auto_scale = 0;
+static int plt_2_gif = 0;
+static int auto_scale = 0;
 
-char ov_name[64] = "";
-char op_dir[256] = "";
-char op_extension[64] = "";
-char term_name[256] = "";
+static char ov_name[64] = "";
+static char op_dir[256] = "";
+static char op_extension[64] = "";
+static char term_name[256] = "";
 
 /*******************************************************************/
 /* Variables to output-formating                                   */
 /*******************************************************************/
 
-char jf_empty[] = " ";
-char jf_space[80];
-char jfs_txt[512];
-
-char jf_file_txt[256];
+static char jf_empty[] = " ";
 
 struct jfr_err_desc {
 	int eno;
@@ -187,8 +197,6 @@ struct jfr_err_desc jfr_err_texts[] =
   {   9999, "Unknown error!"},
 };
 
-static void ext_subst(char *d, const char *e, int forced);
-static void ext_rm(char *d);
 static int jf_error(int errno, const char *name, int mode);
 void jf_ftoa(char *txt, float f);
 void jf_ftoit(char *txt, float f);
@@ -204,9 +212,6 @@ static int write_plt_data(int ov_no);
 static int init(void);
 int ip_first(void);
 int ip_next(void);
-static int jf_about(void);
-static int us_error(void);
-
 
 static int jf_error(int eno, const char *name, int mode)
 {
@@ -247,43 +252,6 @@ static int jf_error(int eno, const char *name, int mode)
     exit(res);
   }
   return -1;
-}
-
-static void ext_subst(char *d, const char *e, int forced)
-{
-  int m, fundet;
-  char punkt[] = ".";
-
-  fundet = 0;
-  for (m = strlen(d) - 1; m >= 0 && fundet == 0 ; m--)
-  { if (d[m] == '.')
-    { fundet = 1;
-      if (forced == 1)
-  	    d[m] = '\0';
-    }
-    else
-    if (d[m] == '/' || d[m] == '\\')
-      break;
-  }
-  if (fundet == 0 || forced == 1)
-  { if (strlen(e) != 0)
-      strcat(d, punkt);
-    strcat(d, e);
-  }
-}
-
-static void ext_rm(char *d)
-{
-  int m;
-
-  for (m = strlen(d) - 1; m > 0; m--)
-  { if (d[m] == '.')
-    { d[m] = '\0';
-      break;
-    }
-    if (d[m] == '/' || d[m] == '\\')
-      break;
-  }
 }
 
 void jf_ftoa(char *txt, float f)
@@ -801,7 +769,7 @@ int ip_next(void)
         ivar_values[v_ivars[a].ivar_no] = adesc.center;
         if (blank_linie == 0)
         { blank_linie = 1;
-	         fprintf(jfs_op_d, "\n");
+          fprintf(jfs_op_d, "\n");
         }
       }
       else
@@ -814,48 +782,11 @@ int ip_next(void)
   return 1;
 }
 
-static int jf_about(void)
-{
-  printf(
-"\nJFRPLT  version 2.01   Copyright (c) 2000 Jan E. Mortensen\n\n");
-  printf("usage: jfrplt [options] jfrf\n\n");
-
-  printf("JFRPLT executes the compiled jfs-program <jfrf> and writes output\n");
-  printf("to Gnuplot files.\n\n");
-  printf("OPTIONS\n");
-  printf(
-"-p <dec>    : <dec> is precision.       -f <fs>    : <fs> field separator.\n");
-  printf(
-"-d <df>     : input from file <df>.     -rs <ss>   : <ss> stacksize.\n");
-  printf(
-"-Ax <a>     : rotation angle x-axis     -Az <a>    : rotation angle z-axis.\n");
-  printf(
-"-a          : append output.\n");
-  printf(
-"-v <ov>     : Plot only output variable <ov>.\n");
-  printf(
-"-As         : Autoscale output axis.\n");
-  printf(
-"-w <m>      : <m>='y':wait for RETURN, 'n':don't wait, 'e':wait if error.\n");
-  printf(
-"-o <of>     : write output to the Gnuplot file <of>.plt, and the data files\n");
-  printf(
-"              <of><vname>.dat (<vname> is the name of output variables).\n");
-  printf(
-"-i <if>     : read gnuplot initialization from the file <if>.\n");
-  printf(
-"-t <t> <e> [<d>]: Insert a 'set term <t>'-statement in gnuplot file. The plots\n");
-  printf(
-"          are written to files in the directory <d> with extension <e>.\n");
-
-  return 0;
-}
-
-static int us_error(void)         /* usage-error. Fejl i kald af jfs */
+static int us_error(void) /* usage-error */
 {
   char ttxt[82];
 
-  printf("\n%s\n%s\n", usage[0], usage[1]);
+  jfscmd_fprint_wrapped(stdout, jfscmd_num_of_columns() - 7, "usage: ", "       ", usage);
   if (wait_return != WM_NO)
   { printf("\nPress RETURN...");
     fgets(ttxt, 80, stdin);
@@ -875,9 +806,12 @@ int main(int argc, const char *argv[])
   
   field_sep[0]  = '\0';
   if (argc == 1)
-    return jf_about();
+  {
+    jfscmd_print_about(about);
+    return 0;
+  }
   strcpy(so_fname, argv[argc - 1]);
-  ext_subst(so_fname, extensions[0], 0);
+  jfscmd_ext_subst(so_fname, extensions[0], 0);
 
   jopt_init(options, OPT_COUNT, argv, argc - 1);
   while ((res = jopt_get(&option_no, largv, &largc)) == 0)
@@ -898,13 +832,13 @@ int main(int argc, const char *argv[])
           strcpy(op_dir, largv[2]);
         break;
       case 4:            /* -d */
-	       ip_medie = IP_FILE;
+        ip_medie = IP_FILE;
         strcpy(ip_fname, largv[0]);
-        ext_subst(ip_fname, extensions[1], 0);
+        jfscmd_ext_subst(ip_fname, extensions[1], 0);
         break;
       case 5:            /* -o */
         strcpy(op_p_fname, largv[0]);
-        ext_subst(op_p_fname, extensions[2], 0);
+        jfscmd_ext_subst(op_p_fname, extensions[2], 0);
         break;
       case 6:           /* -a */
         op_append = 1;
@@ -924,7 +858,7 @@ int main(int argc, const char *argv[])
         break;
       case 8:          /* -i */
         strcpy(ps_fname, largv[0]);
-        ext_subst(ps_fname, extensions[2], 0);
+        jfscmd_ext_subst(ps_fname, extensions[2], 0);
         break;
       case 9:          /* -rs */
         stack_size = atoi(largv[0]);
@@ -942,7 +876,8 @@ int main(int argc, const char *argv[])
         break;
       case 13:          /* -?  */
       case 14:          /* ? */
-     	  return jf_about();
+        jfscmd_print_about(about);
+        return 0;
     }
   }  /* while  */
   if (jopt_error_desc.error_mode != JOPT_EM_NONE)
@@ -952,8 +887,9 @@ int main(int argc, const char *argv[])
 
   if (argc == 2)
   { if (strcmp(argv[1], "-w") == 0)
-    { wait_return = WM_YES;
-      jf_about();
+    {
+      wait_return = WM_YES;
+      jfscmd_print_about(about);
       if (wait_return == WM_YES)
       { printf("\nPress RETURN...");
         fgets(ttxt, 80, stdin);
@@ -967,7 +903,7 @@ int main(int argc, const char *argv[])
 
   if (strlen(op_p_fname) == 0)
   { strcpy(op_p_fname, so_fname);
-    ext_subst(op_p_fname, extensions[2], 1);
+    jfscmd_ext_subst(op_p_fname, extensions[2], 1);
   }
 
   init();
@@ -985,9 +921,9 @@ int main(int argc, const char *argv[])
     { jfg_var(&vdesc, jf_head, spdesc.f_ovar_no + m);
       if (strlen(ov_name) == 0 || strcmp(ov_name, vdesc.name) == 0)
       { strcpy(op_d_fname, op_p_fname);
-        ext_rm(op_d_fname);
+        jfscmd_ext_rm(op_d_fname);
         strcat(op_d_fname, vdesc.name);
-        ext_subst(op_d_fname, extensions[1], 0);
+        jfscmd_ext_subst(op_d_fname, extensions[1], 0);
         jfs_op_d = fopen(op_d_fname, "w");
         if (jfs_op_d == NULL)
           return jf_error(1, op_d_fname, JFE_FATAL);
@@ -1029,6 +965,3 @@ int main(int argc, const char *argv[])
 
   return jf_error(0, jf_empty, JFE_FATAL); /* no error */
 }
-
-
-
