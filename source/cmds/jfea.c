@@ -1,13 +1,8 @@
   /*************************************************************************/
   /*                                                                       */
-  /* jfea.cpp    Version  2.03  Copyright (c) 1999-2000 Jan E. Mortensen   */
-  /*                                                                       */
-  /* JFS  rule creater using evolutionary programing.                      */
-  /*                                                                       */
-  /* by Jan E. Mortensen     email:  jemor@inet.uni2.dk                    */
-  /*    Lollandsvej 35 3.tv.                                               */
-  /*    DK-2000 Frederiksberg                                              */
-  /*    Denmark                                                            */
+  /* jfea.c - JFS rule creater using evolutionary programing               */
+  /*                             Copyright (c) 1999-2000 Jan E. Mortensen  */
+  /*                                       Copyright (c) 2010 Miriam Ruiz  */
   /*                                                                       */
   /*************************************************************************/
 
@@ -18,6 +13,7 @@
 #include <float.h>
 #include <math.h>
 #include <time.h>
+#include "cmds_common.h"
 #include "jfr_lib.h"
 #include "jfg_lib.h"
 #include "jfp_lib.h"
@@ -30,6 +26,61 @@
 
 #define JFI_VMAX 100
 
+static const char usage[] =
+  "jfea [-D dm] [-d df] [-f fs] [-o of] [-Et m] [-Ee e] [-fr] [-nd] [-s] [-I ic]"
+  " [-EI i] [-sm m] [-r] [-so s] [-a] [-w] [-R r] [-pm m] <file.jfr> ";
+
+static const char *about[] = {
+  "usage: jfea [options] <file.jfr>",
+  "",
+  "JFEA replaces a statement 'extern jfrd input {[<op>] <var>} output [<op>]<var>' in the jfs-program <file.jfr> with rules generated from a data file."
+  "",
+  "Options:",
+  "-f <fs>    : Use <fs> field-separator.    -s:      : silent.",
+  "-I <c>     : Population size.             -r:      : score rounding to [0,1].",
+  "-so <s>    : Redirect stdout to <s>.      -a:      : Append to stdout.",
+  "-w         : Wait for RETURN.             -R <r>   : number of if-statements.",
+  "-fr        : fixed rules.                 -nd      : No rules default-adjectiv.",
+  "-Et <et>   : Stop after <et> minutes.     -Ee <e>  : Stop if error <= <e>.",
+  "-Ei <i>    : Stop after <i> individuals.  -pm <p>  : Read penalty from <p>.",
+  "-d <df>    : Read data from the file <df>.",
+  "-Es <p>    : Use <p> percent of datasets for cross-validation.",
+  "-D <d>     : Data-order. <d>={i|e|t}|f. i:input,e:expected,t:text,f:first-line.",
+  "-o <of>    : Write changed jfs-program to the file <of>.",
+  "-sm <s>    : score-method. a:avg, s:sum, s2:sum(sqr), p:penalty-matrix.",
+  "-sc <m>    : score-calc. <m>='f':fast, <m>='e':exact.",
+  "-uv <m>    : value unknown vars. <m>=z:0,o:1,a:1/count,d0:conf=0,d:conf=1.",
+  NULL
+};
+
+struct jfscmd_option_desc jf_options[] =
+  {     {"-f",  1},        /*  0 */
+        {"-s",  0},        /*  1 */
+        {"-D",  1},        /*  2 */
+        {"-d",  1},        /*  3 */
+        {"-o",  1},        /*  4 */
+        {"-Et", 1},        /*  5 */
+        {"-Ee", 1},        /*  6 */
+        {"-I",  1},        /*  7 */
+        {"-Ei", 1},        /*  8 */
+        {"-sm", 1},        /*  9 */
+        {"-r",  0},        /* 10 */
+        {"-so", 1},        /* 11 */
+        {"-a",  0},        /* 12 */
+        {"-w",  0},        /* 13 */
+        {"-sc", 0},        /* 14 */
+        {"-uv", 1},        /* 15 */
+        {"-R",  1},        /* 16 */
+        {"-fr", 0},        /* 17 */
+        {"-nd", 0},        /* 18 */
+        {"-Es", 1},        /* 19 */
+        {"-pm", 1},        /* 20 */
+
+        {"-?",  0},        /* 21 */
+        {"?",   0},        /* 22 */
+        {" ",  -2}
+
+      };
 
 /************************************************************************/
 /* Traenings-data-set                                                   */
@@ -89,52 +140,9 @@ int jfea_t_mode = 1000; /* tekst-mode */
 char jfea_t_head[] =
 "  ind_no best-score  avg-score  median-score  used time";
 
-char jfea_t_jfi[] =
-"JFEA   version  2.03    Copyright (c) 1999,2000  Jan E. Mortensen";
-
 /*************************************************************************/
 /* Option-data                                                           */
 /*************************************************************************/
-
-const char usage_1[] =
-"usage: jfea [-D dm] [-d df] [-f fs] [-o of] [-Et m] [-Ee e] [-fr] [-nd] [-s]";
-const char usage_2[] =
-"           [-I ic] [-EI i] [-sm m] [-r] [-so s] [-a] [-w] [-R r] [-pm m] jfrf ";
-
-struct jf_option_desc {
-	const char *option;
-	int argc;      /* -1: variabelt */
-};                /* -2: sidste argument */
-
-struct jf_option_desc jf_options[] =
-  {     {"-f",  1},        /*  0 */
-        {"-s",  0},        /*  1 */
-        {"-D",  1},        /*  2 */
-        {"-d",  1},        /*  3 */
-        {"-o",  1},        /*  4 */
-        {"-Et", 1},        /*  5 */
-        {"-Ee", 1},        /*  6 */
-        {"-I",  1},        /*  7 */
-        {"-Ei", 1},        /*  8 */
-        {"-sm", 1},        /*  9 */
-        {"-r",  0},        /* 10 */
-        {"-so", 1},        /* 11 */
-        {"-a",  0},        /* 12 */
-        {"-w",  0},        /* 13 */
-        {"-sc", 0},        /* 14 */
-        {"-uv", 1},        /* 15 */
-        {"-R",  1},        /* 16 */
-        {"-fr", 0},        /* 17 */
-        {"-nd", 0},        /* 18 */
-        {"-Es", 1},        /* 19 */
-        {"-pm", 1},        /* 20 */
-
-        {"-?",  0},        /* 21 */
-        {"?",   0},        /* 22 */
-        {" ",  -2}
-
-      };
-
 
 char da_fname[256] = "";
 char ip_fname[256] = "";
@@ -271,8 +279,6 @@ struct jfr_err_desc jfr_err_texts[] =
 
 static int jf_error(int eno, const char *name, int mode);
 static int jf_tmap_find(struct jf_tmap_desc *map, const char *txt);
-static int isoption(const char *s);
-static int jf_about(void);
 static int us_error(const char *argument);
 
 static int jf_error(int eno, const char *name, int mode)
@@ -329,59 +335,6 @@ static int jf_tmap_find(struct jf_tmap_desc *map, const char *txt)
       res = map[m].value;
   }
   return res;
-}
-
-int isoption(const char *s)
-{
-  if (s[0] == '-' || s[0] == '?')
-    return 1;
-  return 0;
-}
-
-int jf_getoption(const char *argv[], int no, int argc)
-{
-  int m, v, res;
-
-  res = -2;
-  for (m = 0; res == -2; m++)
-  { if (jf_options[m].argc == -2)
-      res = -1;
-    else
-    if (strcmp(jf_options[m].option, argv[no]) == 0)
-    { res = m;
-      if (jf_options[m].argc > 0)
-      { if (no + jf_options[m].argc >= argc)
-          res = -1; /* missing arguments */
-        else
-        { for (v = 0; v < jf_options[m].argc; v++)
-          { if (isoption(argv[no + 1 + v]) == 1)
-              res = -1;
-          }
-        }
-      }
-    }
-  }
-  return res;
-}
-
-static void ext_subst(char *d, const char *e, int forced)
-{
-  int m, fundet;
-  char punkt[] = ".";
-
-  fundet = 0;
-  for (m = strlen(d) - 1; m >= 0 && fundet == 0 ; m--)
-  { if (d[m] == '.')
-    { fundet = 1;
-      if (forced == 1)
-        d[m] = '\0';
-    }
-  }
-  if (fundet == 0 || forced == 1)
-  { if (strlen(e) != 0)
-      strcat(d, punkt);
-    strcat(d, e);
-  }
 }
 
 /************************************************************************/
@@ -675,11 +628,9 @@ static int jfea_set_early_stop(int val_pct)
   return 0;
 }
 
-
 static int us_error(const char *argument)         /* usage-error. Fejl i kald af jfs */
 {
-  printf("\n%s\n", usage_1);
-  printf("%s\n", usage_2);
+  jfscmd_fprint_wrapped(stdout, jfscmd_num_of_columns() - 7, "usage: ", "       ", usage);
   printf("Error in: %s\n", argument);
   if (jfea_batch == 0)
   { printf("Press RETURN ....");
@@ -688,45 +639,12 @@ static int us_error(const char *argument)         /* usage-error. Fejl i kald af
   return 1;
 }
 
-
-static int jf_about(void)
+static void wait_if_needed()
 {
-  printf("usage: jfea [options] jfrf\n\n");
-
-  printf(
-"JFEA replaces a statement 'extern jfrd input {[<op>] <var>} output [<op>]<var>'\n");
-  printf("in the jfs-program <jfrf> with rules generated from a data file.\n\n");
-  printf("OPTIONS\n");
-  printf(
-"-f <fs>    : Use <fs> field-separator.    -s:      : silent.\n");
-  printf(
-"-I <c>     : Population size.             -r:      : score rounding to [0,1].\n");
-  printf(
-"-so <s>    : Redirect stdout to <s>.      -a:      : Append to stdout.\n");
-  printf(
-"-w         : Wait for RETURN.             -R <r>   : number of if-statements.\n");
-  printf(
-"-fr        : fixed rules.                 -nd      : No rules default-adjectiv.\n");
-
-  printf(
-"-Et <et>   : Stop after <et> minutes.     -Ee <e>  : Stop if error <= <e>.\n");
-  printf(
-"-Ei <i>    : Stop after <i> individuals.  -pm <p>  : Read penalty from <p>.\n");
-  printf("-d <df>    : Read data from the file <df>.\n");
-  printf("-Es <p>    : Use <p> percent of datasets for cross-validation.\n");
-  printf(
-"-D <d>     : Data-order. <d>={i|e|t}|f. i:input,e:expected,t:text,f:first-line.\n");
-  printf("-o <of>    : Write changed jfs-program to the file <of>.\n");
-  printf(
-  "-sm <s>    : score-method. a:avg, s:sum, s2:sum(sqr), p:penalty-matrix.\n");
-  printf("-sc <m>    : score-calc. <m>='f':fast, <m>='e':exact.\n");
-  printf(
-"-uv <m>    : value unknown vars. <m>=z:0,o:1,a:1/count,d0:conf=0,d:conf=1.\n");
   if (jfea_batch == 0)
   { printf("Press RETURN...");
     fgets(jfea_field_sep, 78, stdin);
   }
-  return 0;
 }
 
 int main(int argc, const char *argv[])
@@ -762,19 +680,22 @@ int main(int argc, const char *argv[])
   val_pct = 0;
 
   if (argc == 1)
-  { printf("\n\n%s\n\n", jfea_t_jfi);
-    return jf_about();
+  {
+    jfscmd_print_about(about);
+    return 0;
   }
   if (argc == 2)
-  { if (jf_getoption(argv, 1, argc) == 13)
-    { printf("\n\n%s\n\n", jfea_t_jfi);
-      return jf_about();
+  { if (jfscmd_getoption(jf_options, argv, 1, argc) == 13)
+    {
+      jfscmd_print_about(about);
+      wait_if_needed();
+      return 0;
     }
   }
   strcpy(ip_fname, argv[argc - 1]);
-  ext_subst(ip_fname, extensions[0], 0);
+  jfscmd_ext_subst(ip_fname, extensions[0], 0);
   for (m = 1; m < argc - 1; )
-  { option_no = jf_getoption(argv, m, argc - 1);
+  { option_no = jfscmd_getoption(jf_options, argv, m, argc - 1);
     if (option_no == -1)
       return us_error(argv[m]);
     m++;
@@ -794,12 +715,12 @@ int main(int argc, const char *argv[])
         break;
       case 3:            /* -d */
         strcpy(da_fname, argv[m]);
-        ext_subst(da_fname, extensions[1], 0);
+        jfscmd_ext_subst(da_fname, extensions[1], 0);
         m++;
         break;
       case 4:            /* -o */
         strcpy(op_fname, argv[m]);
-        ext_subst(op_fname, extensions[0], 0);
+        jfscmd_ext_subst(op_fname, extensions[0], 0);
         m++;
         break;
       case 5:             /* -Et */
@@ -914,16 +835,15 @@ int main(int argc, const char *argv[])
       printf("Cannot open the file %s.\n", sout_fname);
     }
   }
-  fprintf(jfea_stdout, "\n\n%s\n\n", jfea_t_jfi);
 
   if (strlen(op_fname) == 0)
   { strcpy(op_fname, ip_fname);
-    ext_subst(op_fname, extensions[0], 1);
+    jfscmd_ext_subst(op_fname, extensions[0], 1);
   }
 
   if (strlen(da_fname) == 0)
   { strcpy(da_fname, ip_fname);
-    ext_subst(da_fname, extensions[1], 1);
+    jfscmd_ext_subst(da_fname, extensions[1], 1);
   }
 
   m = jfr_init(0);
@@ -947,7 +867,7 @@ int main(int argc, const char *argv[])
   if (jfea_err_mode == 3)
   { if (strlen(pm_fname) == 0)
     { strcpy(pm_fname, ip_fname);
-      ext_subst(pm_fname, extensions[2], 1);
+      jfscmd_ext_subst(pm_fname, extensions[2], 1);
     }
     m = jft_penalty_read(pm_fname);
     if (m == -1)

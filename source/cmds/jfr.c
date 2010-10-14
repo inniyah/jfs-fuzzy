@@ -2,7 +2,7 @@
   /*                                                                       */
   /* jfr.c - Run JFR program from the command line                         */
   /*                             Copyright (c) 1998-2000 Jan E. Mortensen  */
-  /*                                       Copyright (c) 2000 Miriam Ruiz  */
+  /*                                       Copyright (c) 2010 Miriam Ruiz  */
   /*                                                                       */
   /*************************************************************************/
 
@@ -1914,7 +1914,7 @@ void jfr_opd_stat(void)
 static int us_error(void) /* usage-error */
 {
 	char ttxt[82];
-	jfscmd_fprint_wrapped(stdout, 69, "usage: ", "       ", usage);
+	jfscmd_fprint_wrapped(stdout, jfscmd_num_of_columns() - 7, "usage: ", "       ", usage);
 	if (wait_return == 1)
 	{
 		printf("\nPress RETURN...");

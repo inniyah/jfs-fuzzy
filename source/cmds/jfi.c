@@ -2,7 +2,7 @@
   /*                                                                       */
   /* jfi.c - JFS improver using evolutionary programing                    */
   /*                             Copyright (c) 1998-2000 Jan E. Mortensen  */
-  /*                                       Copyright (c) 2000 Miriam Ruiz  */
+  /*                                       Copyright (c) 2010 Miriam Ruiz  */
   /*                                                                       */
   /*************************************************************************/
 
@@ -55,7 +55,7 @@ struct jfscmd_option_desc jf_options[] = {
 static const char *about[] = {
   "usage: jfi [options] <file.jfr>",
   "",
-  "JFI improves the jfs-program <jfrf> by changing the values of constants, starting with a '%'.",
+  "JFI improves the jfs-program <file.jfr> by changing the values of constants, starting with a '%'.",
   "",
   "Options:",
   "-f <fs>    : Use <fs> field-separator.    -s:      : silent.",
@@ -125,9 +125,6 @@ int jfi_t_mode = 1000; /* tekst-mode */
 
 char jfi_t_head[] =
 "  ind_no best-score  avg-score  median-score  used time";
-
-char jfi_t_jfi[] =
-"JFI   version  2.03    Copyright (c) 1998-2000 Jan E. Mortensen";
 
 /*************************************************************************/
 /* Option-data                                                           */
@@ -512,7 +509,7 @@ float this_judge(void)
 
 static int us_error(void)         /* usage-error. Fejl i kald af jfs */
 {
-	jfscmd_fprint_wrapped(stdout, 69, "usage: ", "       ", usage);
+	jfscmd_fprint_wrapped(stdout, jfscmd_num_of_columns() - 7, "usage: ", "       ", usage);
 	if (jfi_batch == 0)
 	{
 		printf("Press RETURN ....");
@@ -557,14 +554,12 @@ int main(int argc, const char *argv[])
 
   if (argc == 1)
   {
-    printf("\n\n%s\n\n", jfi_t_jfi);
     jfscmd_print_about(about);
     return 0;
   }
   if (argc == 2)
   { if (jfscmd_getoption(jf_options, argv, 1, argc) == 13)
     { jfi_batch = 0;
-      printf("\n\n%s\n\n", jfi_t_jfi);
       jfscmd_print_about(about);
       wait_if_needed();
       return 0;
@@ -697,7 +692,6 @@ int main(int argc, const char *argv[])
       printf("Cannot open the file %s.\n", sout_fname);
     }
   }
-  fprintf(jfi_stdout, "\n\n%s\n\n", jfi_t_jfi);
 
   if (strlen(op_fname) == 0)
   { strcpy(op_fname, ip_fname);

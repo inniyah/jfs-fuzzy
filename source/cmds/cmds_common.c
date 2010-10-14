@@ -10,6 +10,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <sys/types.h>
+#include <sys/ioctl.h>
 
 const char jfs_copyright[] =
 	"JFS - Jan's Fuzzy System - Copyright (c) 1999-2000 Jan E. Mortensen";
@@ -51,6 +53,7 @@ void jfscmd_fprint_wrapped(FILE *stream, int line_size, const char *first_prefix
 {
 	const char *head = text;
 	int pos = 0, last_space = 0;
+	int bracket = 0;
 	while (head[pos] !=0 ) {
 		int is_eol = (head[pos] == '\n');
 		if (is_eol || pos == line_size) {
@@ -70,8 +73,13 @@ void jfscmd_fprint_wrapped(FILE *stream, int line_size, const char *first_prefix
 			while (*head!=0 && *head==' ')
 				head++;  /* clear the leading space */
 			last_space = pos = 0;
+			bracket = 0;
 		} else {
-			if (head[pos]==' ')
+			switch (head[pos]) {
+				case '[': case '<': bracket++; break;
+				case ']': case '>': if (bracket>0) bracket--; break;
+			}
+			if (head[pos]==' ' && !bracket)
 				last_space = pos;
 			pos++;
 		}
@@ -81,15 +89,36 @@ void jfscmd_fprint_wrapped(FILE *stream, int line_size, const char *first_prefix
 	fprintf(stream, "%s\n", head);
 }
 
+int jfscmd_num_of_columns()
+{
+	struct winsize ws;
+
+	int c_num = 0;
+	const char *c_str = getenv("COLUMNS");
+	if (c_str != NULL)
+		c_num = atoi(c_str);
+	if (c_num > 1)
+		return c_num;
+
+	ioctl(1, TIOCGWINSZ, &ws); /* Will receive the number of columns (ws.ws_col) */
+	                           /* and rows (ws.ws_row) in the tty */
+	if (ws.ws_col > 1)
+		return ws.ws_col;
+	return 79;
+
+	return c_num;
+}
+
 void jfscmd_print_about(const char *about[])
 {
 	int line = 0;
+	int cols = jfscmd_num_of_columns();
 
-	jfscmd_fprint_wrapped(stdout, 76, NULL, NULL, jfs_copyright);
+	jfscmd_fprint_wrapped(stdout, cols, NULL, NULL, jfs_copyright);
 	printf("\n");
 
 	while (about[line]) {
-		jfscmd_fprint_wrapped(stdout, 76, NULL, NULL, about[line]);
+		jfscmd_fprint_wrapped(stdout, cols, NULL, NULL, about[line]);
 		line++;
 	}
 }
