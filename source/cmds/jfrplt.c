@@ -88,20 +88,19 @@ struct jfg_sprog_desc spdesc;
 /* Variables to input, output and expected values.               */
 /*****************************************************************/
 
-char so_fname[256] = "";    /* name of compiled jfs-program */
-char ip_fname[256] = "";    /* input-data file              */
-char ps_fname[256] = "";    /* plot-start-file              */
-char op_d_fname[256] = "";
-char op_p_fname[256] = "";
+static char so_fname[256] = "";    /* name of compiled jfs-program */
+static char ip_fname[256] = "";    /* input-data file              */
+static char ps_fname[256] = "";    /* plot-start-file              */
+static char op_d_fname[256] = "";
+static char op_p_fname[256] = "";
 
-struct jft_data_record ip_vars[256];
-struct jft_data_record exp_vars[256];
+static struct jft_data_record ip_vars[256];
 
-int ivar_c;
-int ovar_c;
+static int ivar_c;
+static int ovar_c;
 
-float ivar_values[256];
-float ovar_values[256];
+static float ivar_values[256];
+static float ovar_values[256];
 
 #define V_IVAR_C_MAX 8
 struct v_ivar_desc      /* input variable angivet med '*' */
@@ -198,8 +197,6 @@ struct jfr_err_desc jfr_err_texts[] =
 };
 
 static int jf_error(int errno, const char *name, int mode);
-void jf_ftoa(char *txt, float f);
-void jf_ftoit(char *txt, float f);
 int closest_adjectiv(int var_no, float val);
 static int kb_ip_get(struct jft_data_record *v, int var_no);
 static int fl_ip_get(struct jft_data_record *dd, int var_no);
@@ -252,80 +249,6 @@ static int jf_error(int eno, const char *name, int mode)
     exit(res);
   }
   return -1;
-}
-
-void jf_ftoa(char *txt, float f)
-{
-  char it[30] = "   ";
-  char *t;
-  int m, cif, mente, dp, ep, dl, sign, at;
-
-  if (f < 0.0)
-  { f = -f;
-    sign = -1;
-  }
-  else
-    sign = 1;
-
-  t = &(it[1]);
-  sprintf(t, "%20.10f", f);
-  dl = strlen(it);
-  dp = dl - 1;
-  while (it[dp] != '.')
-    dp--;
-  mente = 0;
-  ep = dp + digits - 1;
-  for (m = dl - 1; m >= 0; m--)
-  { if (it[m] != '.' && it[m] != ' ')
-    { cif = it[m] - '0' + mente;
-      if (cif == 10)
-      { cif = 0;
-	       mente = 1;
-      }
-      else
-	       mente = 0;
-      if (m > ep)
-      { if (cif >= 5)
-	         mente = 1;
-	       it[m] = '\0';
-      }
-      else
-	      it[m] = cif + '0';
-    }
-    else
-    if (it[m] == ' ' && mente == 1)
-    { it[m] = '1';
-      mente = 0;
-    }
-  }
-  at = 0;
-  if (sign == -1)
-  { txt[0] = '-';
-    at++;
-  }
-  for (m = 0; it[m] != '\0'; m++)
-  { if (it[m] != ' ' && it[m] != '-')
-    { txt[at] = it[m];
-      at++;
-    }
-  }
-  if (at == 0 || (at == 1 && txt[0] == '-'))
-  { txt[0] = '0';
-    at = 1;
-  }
-  txt[at] = '\0';
-}
-
-void jf_ftoit(char *txt, float f)
-{
-  int rm_digits;
-
-  rm_digits = digits;
-  digits = 0;
-  jf_ftoa(txt, f);
-  if (txt[strlen(txt) - 1] == '.')
-    txt[strlen(txt) - 1] = '\0';
-  digits = rm_digits;
 }
 
 int closest_adjectiv(int var_no, float val)
@@ -439,14 +362,15 @@ static int kb_ip_get(struct jft_data_record *v, int var_no)
       { if (strlen(ddesc.unit) > 0)
           printf(" (%s)", ddesc.unit);
         if ((ddesc.flags & JFS_DF_MINENTER) != 0)
-        { jf_ftoa(text, ddesc.dmin);
-	         printf(" >= %s", text);
-	         if ((ddesc.flags & JFS_DF_MAXENTER) != 0)
-	           printf(" and");
+        { jfscmd_ftoa(text, ddesc.dmin, digits);
+          printf(" >= %s", text);
+          if ((ddesc.flags & JFS_DF_MAXENTER) != 0)
+            printf(" and");
         }
         if ((ddesc.flags & JFS_DF_MAXENTER) != 0)
-        {	jf_ftoa(text, ddesc.dmax);
-  	       printf(" <= %s", text);
+        {
+          jfscmd_ftoa(text, ddesc.dmax, digits);
+          printf(" <= %s", text);
         }
         printf(",\n   ");
       }
@@ -454,10 +378,11 @@ static int kb_ip_get(struct jft_data_record *v, int var_no)
       printf(
       "    the symbol '*' (optionally followed by: steps[:begin:end]), or one of:\n    ");
       for (m = 0; m < vdesc.fzvar_c; m++)
-      { jfg_adjectiv(&adesc, jf_head, vdesc.f_adjectiv_no + m);
-	       if (m != 0)
-	         printf(", ");
-	       printf("%s", adesc.name);
+      {
+        jfg_adjectiv(&adesc, jf_head, vdesc.f_adjectiv_no + m);
+        if (m != 0)
+          printf(", ");
+        printf("%s", adesc.name);
       }
       printf(".\n");
     }
@@ -563,10 +488,10 @@ static void data_write(FILE *opd, int ovar_no)
 
   for (m = 0; m < v_ivar_c; m++)
   { val = ivar_values[v_ivars[m].ivar_no];
-    jf_ftoa(txt, val);
+    jfscmd_ftoa(txt, val, digits);
     fprintf(opd, "%s ", txt);
   }
-  jf_ftoa(txt, ovar_values[ovar_no]);
+  jfscmd_ftoa(txt, ovar_values[ovar_no], digits);
   fprintf(opd, "%s\n", txt);
 }
 

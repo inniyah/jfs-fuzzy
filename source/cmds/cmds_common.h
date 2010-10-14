@@ -31,5 +31,7 @@ void jfscmd_print_about(const char *about[]);
 void jfscmd_ext_subst(char *d, const char *e, int forced);
 void jfscmd_ext_rm(char *d);
 int jfscmd_tmap_find(struct jfscmd_tmap_desc *map, const char *txt);
+void jfscmd_ftoa(char *txt, float f, int digits);
+void jfscmd_ftoit(char *txt, float f);
 
 #endif

@@ -44,7 +44,7 @@ static const char *about[] = {
   NULL
 };
 
-struct jfscmd_option_desc jf_options[] = {
+static struct jfscmd_option_desc jf_options[] = {
         {"-e", 1},         /* 0 */
         {"-s", 0},         /* 1 */
         {"-o", 1},         /* 2 */

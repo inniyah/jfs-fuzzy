@@ -173,3 +173,72 @@ int jfscmd_tmap_find(struct jfscmd_tmap_desc *map, const char *txt)
 	}
 	return res;
 }
+
+void jfscmd_ftoa(char *txt, float f, int digits)
+{
+  char it[30] = "   ";
+  char *t;
+  int m, cif, mente, dp, ep, dl, sign, at;
+
+  if (f < 0.0)
+  { f = -f;
+    sign = -1;
+  }
+  else
+    sign = 1;
+
+  t = &(it[1]);
+  sprintf(t, "%20.10f", f);
+  dl = strlen(it);
+  dp = dl - 1;
+  while (it[dp] != '.')
+    dp--;
+  mente = 0;
+  ep = dp + digits - 1;
+  for (m = dl - 1; m >= 0; m--)
+  { if (it[m] != '.' && it[m] != ' ')
+    { cif = it[m] - '0' + mente;
+      if (cif == 10)
+      { cif = 0;
+        mente = 1;
+      }
+      else
+        mente = 0;
+      if (m > ep)
+      { if (cif >= 5)
+          mente = 1;
+        it[m] = '\0';
+      }
+      else
+       it[m] = cif + '0';
+    }
+    else
+    if (it[m] == ' ' && mente == 1)
+    { it[m] = '1';
+      mente = 0;
+    }
+  }
+  at = 0;
+  if (sign == -1)
+  { txt[0] = '-';
+    at++;
+  }
+  for (m = 0; it[m] != '\0'; m++)
+  { if (it[m] != ' ' && it[m] != '-')
+    { txt[at] = it[m];
+      at++;
+    }
+  }
+  if (at == 0 || (at == 1 && txt[0] == '-'))
+  { txt[0] = '0';
+    at = 1;
+  }
+  txt[at] = '\0';
+}
+
+void jfscmd_ftoit(char *txt, float f)
+{
+  jfscmd_ftoa(txt, f, 0);
+  if (txt[strlen(txt) - 1] == '.')
+    txt[strlen(txt) - 1] = '\0';
+}

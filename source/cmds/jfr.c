@@ -382,7 +382,6 @@ struct jfr_err_desc jfr_err_texts[] = {
 
 static int jf_error(int errno, const char *name, int mode);
 int jf_tmap_find(struct jf_tmap_desc *map, const char *txt);
-void jf_ftoa(char *txt, float f);
 int closest_adjectiv(int var_no, float val);
 static int kb_ip_get(struct jft_data_record *v, int var_no);
 static int fl_ip_get(struct jft_data_record *dd, int var_no);
@@ -473,83 +472,6 @@ int jf_tmap_find(struct jf_tmap_desc *map, const char *txt)
   return res;
 }
 
-void jf_ftoa(char *txt, float f)
-{
-  char it[30] = "   ";
-  char *t;
-  int m, cif, mente, dp, ep, dl, sign, at;
-
-  if (f < 0.0)
-  { f = -f;
-    sign = -1;
-  }
-  else
-    sign = 1;
-
-  t = &(it[1]);
-  sprintf(t, "%20.10f", f);
-  dl = strlen(it);
-  dp = dl - 1;
-  while (it[dp] != '.')
-    dp--;
-  mente = 0;
-  ep = dp + digits - 1;
-  for (m = dl - 1; m >= 0; m--)
-  { if (it[m] != '.' && it[m] != ' ')
-    { cif = it[m] - '0' + mente;
-      if (cif == 10)
-      { cif = 0;
-	       mente = 1;
-      }
-      else
-	       mente = 0;
-      if (m > ep)
-      { if (cif >= 5)
-	         mente = 1;
-	       it[m] = '\0';
-      }
-      else
-	      it[m] = cif + '0';
-    }
-    else
-    if (it[m] == ' ' && mente == 1)
-    { it[m] = '1';
-      mente = 0;
-    }
-    else
-    if (it[m] == '.' && dc_comma == 1)
-      it[m] = ',';
-  }
-  at = 0;
-  if (sign == -1)
-  { txt[0] = '-';
-    at++;
-  }
-  for (m = 0; it[m] != '\0'; m++)
-  { if (it[m] != ' ' && it[m] != '-')
-    { txt[at] = it[m];
-      at++;
-    }
-  }
-  if (at == 0 || (at == 1 && txt[0] == '-'))
-  { txt[0] = '0';
-    at = 1;
-  }
-  txt[at] = '\0';
-}
-
-void jf_ftoit(char *txt, float f)
-{
-  int rm_digits;
-
-  rm_digits = digits;
-  digits = 0;
-  jf_ftoa(txt, f);
-  if (txt[strlen(txt) - 1] == '.')
-    txt[strlen(txt) - 1] = '\0';
-  digits = rm_digits;
-}
-
 int closest_adjectiv(int var_no, float val)
 {
   int m, best_adjectiv;
@@ -594,10 +516,10 @@ static int kb_ip_get(struct jft_data_record *v, int var_no)
   res = -1;
   while (res != 0)
   { if (ddesc.type == JFS_DT_FLOAT)
-      jf_ftoa(text, v->farg);
+      jfscmd_ftoa(text, v->farg, digits);
     else
     if (ddesc.type == JFS_DT_INTEGER)
-      jf_ftoit(text, v->farg);
+      jfscmd_ftoit(text, v->farg);
     else
     { a = closest_adjectiv(var_no, v->farg);
       jfg_adjectiv(&adesc, jf_head, a);
@@ -613,10 +535,10 @@ static int kb_ip_get(struct jft_data_record *v, int var_no)
     else
     if (v->mode == JFT_DM_MMINTERVAL)
     { sprintf(text, "*%d:", v->sarg);
-      jf_ftoa(t2, v->imin);
+      jfscmd_ftoa(t2, v->imin, digits);
       strcat(text, t2);
       strcat(text, ":");
-      jf_ftoa(t2, v->imax);
+      jfscmd_ftoa(t2, v->imax, digits);
       strcat(text, t2);
     }
 
@@ -664,14 +586,16 @@ static int kb_ip_get(struct jft_data_record *v, int var_no)
       { if (strlen(ddesc.unit) > 0)
           printf(" (%s)", ddesc.unit);
         if ((ddesc.flags & JFS_DF_MINENTER) != 0)
-        { jf_ftoa(text, ddesc.dmin);
-	         printf(" >= %s", text);
-	         if ((ddesc.flags & JFS_DF_MAXENTER) != 0)
-	           printf(" and");
+        {
+          jfscmd_ftoa(text, ddesc.dmin, digits);
+          printf(" >= %s", text);
+          if ((ddesc.flags & JFS_DF_MAXENTER) != 0)
+            printf(" and");
         }
         if ((ddesc.flags & JFS_DF_MAXENTER) != 0)
-        {	jf_ftoa(text, ddesc.dmax);
-  	       printf(" <= %s", text);
+        {
+          jfscmd_ftoa(text, ddesc.dmax, digits);
+          printf(" <= %s", text);
         }
         printf(",\n   ");
       }
@@ -913,7 +837,7 @@ void f_print(FILE *op, float val)
 {
   char txt[80];
 
-  jf_ftoa(txt, val);
+  jfscmd_ftoa(txt, val, digits);
   jf_align(txt, jfr_f_len, 0);
   fprintf(op, "%s", txt);
 }
@@ -977,7 +901,7 @@ void jpr_var(FILE *op, int var_no, float val, float confidence)
       fprintf(op, "%s", txt);
     }
     if (confidence > 0.0 && confidence != 1.0)
-    { jf_ftoa(txt, confidence);
+    { jfscmd_ftoa(txt, confidence, digits);
       fprintf(op, ":%s", txt);
     }
   }
@@ -1688,37 +1612,37 @@ static int init(void)
     jfr_f_len = 1;
   for (m = 0; m < spdesc.var_c; m++)
   { if (   (m >= spdesc.f_ivar_no
-	           && m < spdesc.f_ivar_no + spdesc.ivar_c)
-	       || (m >= spdesc.f_ovar_no
-	           && m < spdesc.f_ovar_no + spdesc.ovar_c))
+            && m < spdesc.f_ivar_no + spdesc.ivar_c)
+        || (m >= spdesc.f_ovar_no
+            && m < spdesc.f_ovar_no + spdesc.ovar_c))
     { jfg_var(&vdesc, jf_head, m);
       jfg_domain(&ddesc, jf_head, vdesc.domain_no);
       le = strlen(vdesc.text) + strlen(ddesc.unit) + 4;
       if (le > jfr_t_len)
-	       jfr_t_len = le;
+        jfr_t_len = le;
       if (op_header == 1)
       { if (((int) strlen(vdesc.name)) > jfr_f_len)
           jfr_f_len = strlen(vdesc.name);
       }
       if (op_vformat == JFS_DT_CATEGORICAL
-	         || (op_vformat == -1 && ddesc.type == JFS_DT_CATEGORICAL))
+          || (op_vformat == -1 && ddesc.type == JFS_DT_CATEGORICAL))
       { for (v = 0; v < vdesc.fzvar_c; v++)
-	       { jfg_adjectiv(&adesc, jf_head, vdesc.f_adjectiv_no + v);
-	         if (((int) strlen(adesc.name)) > jfr_f_len)
-	           jfr_f_len = strlen(adesc.name);
-	       }
+        { jfg_adjectiv(&adesc, jf_head, vdesc.f_adjectiv_no + v);
+          if (((int) strlen(adesc.name)) > jfr_f_len)
+            jfr_f_len = strlen(adesc.name);
+        }
       }
       else
       { if ((ddesc.flags & JFS_DF_MINENTER) != 0)
-	       { jf_ftoa(txt, ddesc.dmin);
-	         if (((int) strlen(txt)) > jfr_f_len)
-	           jfr_f_len = strlen(txt);
-	       }
-	       if ((ddesc.flags & JFS_DF_MAXENTER) != 0)
-	       { jf_ftoa(txt, ddesc.dmax);
-	         if (((int) strlen(txt)) > jfr_f_len)
-	           jfr_f_len = strlen(txt);
-	       }
+        { jfscmd_ftoa(txt, ddesc.dmin, digits);
+          if (((int) strlen(txt)) > jfr_f_len)
+            jfr_f_len = strlen(txt);
+        }
+        if ((ddesc.flags & JFS_DF_MAXENTER) != 0)
+        { jfscmd_ftoa(txt, ddesc.dmax, digits);
+          if (((int) strlen(txt)) > jfr_f_len)
+            jfr_f_len = strlen(txt);
+        }
       }
       if (op_fuzzy == 1 && m >= spdesc.f_ovar_no
 	         && m <= spdesc.f_ovar_no + spdesc.ovar_c)
