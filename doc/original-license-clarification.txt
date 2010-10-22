@@ -1,0 +1,168 @@
+X-Apparently-To: little_miry@yahoo.es via 217.12.10.78; Sat, 19 Mar 2005 10:39:10 -0800
+Authentication-Results: mta144.mail.dcn.yahoo.com from=inet.uni2.dk; domainkeys=neutral (no sig)
+X-Originating-IP: [193.162.159.95]
+Return-Path: <jemor@inet.uni2.dk>
+Received: from 193.162.159.95 (EHLO pasmtp.tele.dk) (193.162.159.95) by mta144.mail.dcn.yahoo.com with SMTP; Sat, 19 Mar 2005 10:39:10 -0800
+Received: from Jan (0x50a47029.boanxx16.adsl-dhcp.tele.dk [80.164.112.41]) by pasmtp.tele.dk (Postfix) with SMTP id D1B801EC314 for <little_miry@yahoo.es>; Sat, 19 Mar 2005 19:39:09 +0100 (CET)
+Message-ID: <001101c52cb2$f5c9c890$0601a8c0@Jan>
+De: "Jan E. Mortensen" <jemor@inet.uni2.dk>
+Para: "Miriam Ruiz" <little_miry@yahoo.es>
+References: <20050319162656.54770.qmail@web25309.mail.ukl.yahoo.com>
+Asunto: Re: JFS2
+Fecha: Sat, 19 Mar 2005 19:39:17 +0100
+MIME-Version: 1.0
+Content-Type: text/plain; format=flowed; charset="iso-8859-1"; reply-type=original
+Content-Transfer-Encoding: 8bit
+X-Priority: 3
+X-MSMail-Priority: Normal
+X-Mailer: Microsoft Outlook Express 6.00.2900.2527
+X-MimeOLE: Produced By Microsoft MimeOLE V6.00.2900.2527
+Content-Length: 826
+
+Hi,
+
+Regarding the license of JFS2.
+
+The intension with the license was: you can use the program and its 
+documentation any way you want, as long as you don't try to take control 
+over (copyright) the program (I should y have releases it under a 
+GNU-lincense). So the answer to your questions is:
+
+> Does the license include permission to modify the code
+> and redistribute the modified program?
+
+Yes. You are welcome to modify the code and redistribute the modified code.
+
+> Also, does this license covers the contents of
+> jfsdoc204.tar.gz too?
+
+Yes. You can use the documentation any way you want.
+
+Best regards
+Jan
+
+
+----- Original Message ----- 
+From: "Miriam Ruiz" <little_miry@yahoo.es>
+To: <jemor@inet.uni2.dk>
+Sent: Saturday, March 19, 2005 5:26 PM
+Subject: JFS2
+
+
+> Hi,
+>
+> I'm interested in your program JFS2, even though it is
+> unmaintained now. I just have a doubt regarding the
+> license of the program:
+>
+>   Permission to use, copy, and distribute this
+> software and its
+>   documentation for any purpose with or without fee
+> is hereby granted,
+>   provided that the above copyright notice appear in
+> all copies.
+>
+>   Permission to distribute binaries including
+> jfs-files for any purpose
+>   is hereby granted.
+>
+>   This software is provided "as is" without express
+> or implied warranty.
+>
+> Does the license include permission to modify the code
+> and redistribute the modified program?
+>
+> Also, does this license covers the contents of
+> jfsdoc204.tar.gz too?
+>
+> Thanks in advance,
+> Miry
+>
+>
+>
+>
+>
+>
+> ______________________________________________
+> Renovamos el Correo Yahoo!: ¡250 MB GRATIS!
+> Nuevos servicios, más seguridad
+> http://correo.yahoo.es
+>
+> 
+
+
+Delivered-To: little.miry@gmail.com
+Received: by 10.229.218.147 with SMTP id hq19cs24364qcb;
+        Fri, 22 Oct 2010 07:56:06 -0700 (PDT)
+Received: by 10.101.12.15 with SMTP id p15mr2195416ani.236.1287759365982;
+        Fri, 22 Oct 2010 07:56:05 -0700 (PDT)
+Return-Path: <jemor60@gmail.com>
+Received: from master.debian.org (master.debian.org [70.103.162.29])
+        by mx.google.com with ESMTP id f37si7176249anh.150.2010.10.22.07.56.04;
+        Fri, 22 Oct 2010 07:56:04 -0700 (PDT)
+Received-SPF: neutral (google.com: 70.103.162.29 is neither permitted nor denied by domain of jemor60@gmail.com) client-ip=70.103.162.29;
+Authentication-Results: mx.google.com; spf=neutral (google.com: 70.103.162.29 is neither permitted nor denied by domain of jemor60@gmail.com) smtp.mail=jemor60@gmail.com; dkim=pass (test mode) header.i=@gmail.com
+Received: from mail-wy0-f180.google.com ([74.125.82.180])
+	by master.debian.org with esmtp (Exim 4.69)
+	(envelope-from <jemor60@gmail.com>)
+	id 1P9J2K-0004yj-7n
+	for little.miry@gmail.com; Fri, 22 Oct 2010 14:56:04 +0000
+Received: by wyb32 with SMTP id 32so993506wyb.25
+        for <miriam@debian.org>; Fri, 22 Oct 2010 07:55:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=gamma;
+        h=domainkey-signature:mime-version:received:received:date:message-id
+         :subject:from:to:content-type;
+        bh=25A6zoZezRaAMse3a4hmbm3pQ38F/2CXaPlayxbOFcg=;
+        b=Z144R6JNz7KfRpuwVgIMcyt9RtlVTQMRuHvAU6rgEPROeY9Gf9i4VGYV0OZSEFOkUs
+         A3SlP6/RV/kl582fGeCZO7RvZJ2isHYqn6odYUJTKQ6rfEsp4YLDzVdiotCC2DfrqBtV
+         Ik91P759Pa20v5s4P9Zkr/etLNEA5i5rKDjIo=
+DomainKey-Signature: a=rsa-sha1; c=nofws;
+        d=gmail.com; s=gamma;
+        h=mime-version:date:message-id:subject:from:to:content-type;
+        b=E3oE0zsO3prEnxDEKnesRVeluydqQik7hmCUmYUUF6hPeEMjXBAcyDvmD/eCy38IBt
+         oN1VOfPH4PiGc18rPGtKqOTpuLm8RImrY34ZMYOH7qQcI7GnNckEa4cUj+bJqf6raqF1
+         MEcwFZ1QX9D6BAUQJQJlDoGF605hWD+oQZd/4=
+MIME-Version: 1.0
+Received: by 10.227.146.199 with SMTP id i7mr2725187wbv.225.1287759358146;
+ Fri, 22 Oct 2010 07:55:58 -0700 (PDT)
+Received: by 10.227.144.208 with HTTP; Fri, 22 Oct 2010 07:55:57 -0700 (PDT)
+Date: Fri, 22 Oct 2010 16:55:57 +0200
+Message-ID: <AANLkTik9CUyv8NKgbw5uGjBUb2WVzRc6fjHGhmsO7vM4@mail.gmail.com>
+Subject: About JFS
+From: Jan Mortensen <jemor60@gmail.com>
+To: miriam@debian.org
+Content-Type: multipart/alternative; boundary=001636832e08193d1a049335d73c
+
+--001636832e08193d1a049335d73c
+Content-Type: text/plain; charset=ISO-8859-1
+
+Hi Miriam!
+
+I didn't know, that JFS is still being used! The JFS homepage was deleted
+several years ago, and I have never found the time to get it back online
+uder another domain, so if you are goint to distributing JFS in any form,
+then it is great with me.
+
+You have my permission to distribute the JFS code under the MIT license (or
+the BSD license).
+
+My current email is jemor60@gmail.com
+
+Best regards
+Jan E. Mortensen
+
+--001636832e08193d1a049335d73c
+Content-Type: text/html; charset=ISO-8859-1
+Content-Transfer-Encoding: quoted-printable
+
+Hi Miriam!<div><br></div><div>I didn&#39;t know, that JFS is still being us=
+ed! The JFS homepage was deleted several years ago, and I have never found =
+the time to get it back online uder another domain, so if you are goint to =
+distributing JFS in any form, then it is great with me.</div>
+<div><br></div><div>You have my permission to distribute the JFS code under=
+ the MIT license (or the BSD license).</div><div><br></div><div>My current =
+email is <a href=3D"mailto:jemor60@gmail.com">jemor60@gmail.com</a></div>
+<div><br></div><div>Best regards</div><div>Jan E. Mortensen</div>
+
+--001636832e08193d1a049335d73c--

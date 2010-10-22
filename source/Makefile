@@ -172,8 +172,8 @@ $(BIN_PREFIX)jhlp: commands/jhlp.o
 	$(CC) -o $@ $< $(LIBS)
 
 JHLP_OBJS = commands/jhlp.o helpers/jhlp_lib.o helpers/cmds_lib.o core/jfm_lib.o
-../doc/bin/jhlp: $(JHLP_OBJS)
-	mkdir -p ../doc/bin/
+../manual/bin/jhlp: $(JHLP_OBJS)
+	mkdir -p ../manual/bin/
 	$(CC) -o $@ $(JHLP_OBJS) -lm
 
 #JFPLOT_OBJS = jfplot.o jfpltlib.o jopt_lib.o jfr_lib.o jfg_lib.o jfs_text.o
