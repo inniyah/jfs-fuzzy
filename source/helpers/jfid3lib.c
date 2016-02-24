@@ -727,7 +727,7 @@ static void jfid3_resolve_contradiction(unsigned long rno1, unsigned long rno2)
 
 static int jfid3_closest_adjectiv(int ifvar_no)
 {
-  int m, best_cur;
+  int m, best_cur = 0;
   float best_value, value;
   struct jfg_var_desc vdesc;
 
@@ -807,7 +807,7 @@ static int jfid3_in_stack(int id)
 
 static int jfid3_id3_chose(void)
 {
-  int a, m, v, best;
+  int a, m, v, best = 0;
   float it, antal, best_score, gain, ant2;
   float id3_score[JFRD_VMAX];
 
@@ -884,7 +884,7 @@ static void jfid3_no_call(void)
 static void jfid3_ip2rule(unsigned long rno)
 {
   float d, dist, best_dist;
-  int m, v, best_no;
+  int m, v, best_no = 0;
 
   best_dist = 0.0;
   jfr_arun(jfid3_ovalues, jfid3_head, jfid3_ivalues, jfid3_confidences,
@@ -1144,7 +1144,7 @@ static int jfid3_data(void)
 {
   int oomc;
   int rule_type;
-  unsigned long cruleno;
+  unsigned long cruleno = 0;
 
   if ((jfid3_darea = (unsigned char *) malloc(jfid3_data_size)) == NULL)
     return 6;

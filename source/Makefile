@@ -42,11 +42,11 @@ RANLIB= ranlib
 RESFLAGS    = --include-dir /mingw/include --include-dir . --define __WIN32__ --define __WIN95__ --define __GNUWIN32__
 RESCOMP     = windres
 
-WARN?= -pedantic -Wall -ansi
+WARN?= -pedantic -Wall -ansi -Wno-unused-value -Wno-unused-function
 OPT?= -O2 -g
 INCS= -Iinclude
 DEFS= -DPRG_PREFIX="$(PRG_PREFIX)"
-LIBS= -L$(LIB_DIR) -ljfs-helpers -ljfs-core -lm
+LIBS= -L$(LIB_DIR) -ljfs-helpers -ljfs -lm
 
 EXTRA_LDFLAGS=
 EXTRA_CFLAGS=
@@ -131,7 +131,7 @@ $(LIB_DIR)/$(LIBHLPR).so.$(MAJOR).$(MINOR): $(LIBHLPR_SHARED_OBJS) $(LIB_DIR)/$(
 	mkdir -p $(LIB_DIR)
 	$(CC) $(LDFLAGS) -shared \
 		-Wl,-soname,$(LIBHLPR).so.$(MAJOR) \
-		$(LIBHLPR_SHARED_OBJS) -o $@ -L$(LIB_DIR) -ljfs-core -lm
+		$(LIBHLPR_SHARED_OBJS) -o $@ -L$(LIB_DIR) -ljfs -lm
 
 $(LIB_DIR)/$(LIBHLPR).so: $(LIB_DIR)/$(LIBHLPR).so.$(MAJOR).$(MINOR)
 	mkdir -p $(LIB_DIR)
@@ -260,7 +260,7 @@ SHARED_CFLAGS= $(STATIC_CFLAGS) -fPIC
 	$(CC) -o $@ -c $+ $(STATIC_CFLAGS)
 
 clean: 
-	rm -f *.o core/*.o helpers/*.o commands/*.o *~
+	rm -f *.o core/*.o helpers/*.o commands/*.o *~ core
 
 distclean: clean
 	rm -f $(PROGRAMS) $(LIB_DIR)/*.a $(LIB_DIR)/*.so $(LIB_DIR)/*.so.*

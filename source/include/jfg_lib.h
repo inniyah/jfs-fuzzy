@@ -138,11 +138,11 @@ struct jfg_var_desc   /* Information about a domain-variable           */
                                 /* 2: adjective-default:         */
                                 /* default_no + f_adjectiv_no    */
                                 /* = adjectiv_no.                */
-	char           f_comp;         /* fuzzy composite-operator-no.  */
-	char           d_comp;         /* domain composite operator (see*/
-				                            /* below).                       */
-	char           defuz_1;        /* First defuz-func (see below). */
-	char           defuz_2;        /* Second defuz-func (see below).*/
+	int            f_comp;         /* fuzzy composite-operator-no.  */
+	int            d_comp;         /* domain composite operator (see*/
+                                /* below).                       */
+	int            defuz_1;        /* First defuz-func (see below). */
+	int            defuz_2;        /* Second defuz-func (see below).*/
 	unsigned char  domain_no;
 	unsigned char  flags;          /* Flags (see below).            */
 };

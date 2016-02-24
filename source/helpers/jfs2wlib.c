@@ -51,7 +51,7 @@ static char jfc_buf[JFC_MAXBUF];  /* input buffer.                    */
 static int  jfc_cu_buf;           /* aktual char in input buffer.     */
 static int  jfc_ff_buf;           /* first free in input buffer.      */
 static int  jfc_eof;              /* 1: eof in sourcefil.             */
-static char jfc_cu_source;        /* current char in sourcen.         */
+static int  jfc_cu_source;        /* current char in sourcen.         */
 
 static int  jfc_maxargline = 1024;
 static char *jfc_argline = NULL;  /* tokens i current statement.      */

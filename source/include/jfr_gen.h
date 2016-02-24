@@ -138,10 +138,10 @@ struct jfr_var_desc
 		      unsigned char default_type;
 		      unsigned char default_no; /* default = adjs[      */
             						                /* f_adj + default].cent*/
-		      char f_comp;       /* fuzzy comp-operator.        */
-		      char d_comp;       /* domain comp-operator        */
-		      char defuz_1;
-		      char defuz_2;
+		      int f_comp;       /* fuzzy comp-operator.        */
+		      int d_comp;       /* domain comp-operator        */
+		      int defuz_1;
+		      int defuz_2;
 		      unsigned char domain_no;
 		      unsigned char status;       /* 0: ok,                   */
                                     /* 1: undefined,            */

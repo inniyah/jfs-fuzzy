@@ -124,7 +124,7 @@ static char jfc_buf[JFC_MAXBUF];  /* input buffer.                    */
 static int  jfc_cu_buf;           /* aktual char in input buffer.     */
 static int  jfc_ff_buf;           /* first free in input buffer.      */
 static int  jfc_eof;              /* 1: eof in sourcefil.             */
-static char jfc_cu_source;        /* current char in sourcen.         */
+static int  jfc_cu_source;        /* current char in sourcen.         */
 
 static int  jfc_maxargline = 1024;
 static char *jfc_argline = NULL;  /* tokens i current statement.      */
@@ -388,8 +388,6 @@ struct jfc_err_desc jfc_err_texts[] =
 
   static int jfc_dops_find(int v);
   static int jfc_func_find(char *name);
-
-  static unsigned char *jfc_malloc(int size);
 
 /* jfc_comp */
   static int jfc_comp(void);
@@ -713,23 +711,6 @@ static int jfc_func_find(char *name)
       return m;
   }
   return -1;
-}
-
-static unsigned char *jfc_malloc(int size)
-{
-  /* Intern malloc. Allocates memory in jfm_memory.  */
-
-  unsigned char *adr;
-
-  if (jfc_ff_jfr + size >= jfc_ff_memory)
-  { jfc_error(8, jfc_empty, JFE_FATAL);
-    adr =  jfc_head->program_code;
-  }
-  else
-  { adr = jfc_ff_jfr;
-    jfc_ff_jfr += size;
-  }
-  return adr;
 }
 
 

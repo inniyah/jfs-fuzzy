@@ -779,7 +779,7 @@ static void jffam_resolve_contradiction(unsigned long rno1,	unsigned long rno2)
 
 static int closest_adjectiv(int ifvar_no)
 {
-  int m, best_cur;
+  int m, best_cur = 0;
   float best_value, value;
   struct jfg_var_desc vdesc;
 
@@ -815,7 +815,7 @@ static void jffam_no_call(void)
 static void jffam_ip2rule(unsigned long rno)
 {
   float dist, best_dist;
-  int m, v, best_no;
+  int m, v, best_no = 0;
 
   best_dist = 0.0;
   /* run the program with jffam_ivalues. The rules if-part              */
@@ -1137,8 +1137,8 @@ static void jffam_skema_write(void)
 
 static int jffam_cel_step(void)
 {
-  int m, changed, slut, val, dval, glval, ant, sum, slut2;
-  int vmin, vmax, t, n, ant2, sum2;
+  int m, changed, slut, val = 0, dval = 0, glval, ant, sum, slut2;
+  int vmin, vmax, t, n, ant2 = 0, sum2 = 0;
 
   changed = 0;
   slut = jffam_first_cel();
@@ -1305,7 +1305,7 @@ static int jffam_create(void)
 static int jffam_data(unsigned char *program_id)
 {
   int rule_type, res;
-  unsigned long cruleno;
+  unsigned long cruleno = 0;
 
   jffam_program_id = program_id;
   if ((jffam_darea = (unsigned char *) malloc(jffam_data_size)) == NULL)
@@ -1360,7 +1360,7 @@ int jffam_run(char *op_fn, char *ip_fn, char *ru_fn, char *da_fn,
 {
   int m;
   unsigned char *pc;
-  int slut, res;
+  int slut, res = 0;
 
   sout = stdout;
   if (sout_fn != NULL && strlen(sout_fn) != 0)

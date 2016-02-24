@@ -438,9 +438,7 @@ static void jfw2s_vars_handle(int f_var_no, int var_c)
   struct jfr_domain_desc *domain_info;
   struct jfr_operator_desc *op;
   struct jfr_adjectiv_desc *adesc;
-  char ftxt[2];
 
-  ftxt[1] = '\0';
   for (m = 0; m < var_c; m++)
   { var_info = &(jf_head.vars[f_var_no + m]);
     if (jfw2s_write_vnos == 1)

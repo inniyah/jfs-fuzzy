@@ -1068,7 +1068,7 @@ static void jfrd_resolve_contradiction(unsigned long rno1, unsigned long rno2)
 
 static int jfrd_closest_adjectiv(int ifvar_no)
 {
-  int m, best_cur;
+  int m, best_cur = 0;
   float best_value, value;
   struct jfg_var_desc vdesc;
 
@@ -1285,7 +1285,7 @@ static int jfrd_in_contradictions(void)
 static void jfrd_ip2rule(unsigned long rno)
 {
   float dist, best_dist;
-  int m, v, best_no;
+  int m, v, best_no = 0;
 
   best_dist = 0.0;
   jfr_arun(jfrd_ovalues, jfrd_head, jfrd_ivalues, jfrd_confidences,
@@ -1833,7 +1833,7 @@ static void jfrd_insert_rules(void)
 static int jfrd_data(unsigned char *program_id)
 {
   int rule_type, ctype;
-  unsigned long cruleno;
+  unsigned long cruleno = 0;
 
   jfrd_program_id = program_id;
   if ((jfrd_darea = (unsigned char *) malloc(jfrd_data_size)) == NULL)

@@ -1172,7 +1172,7 @@ static int jhlp_head_insert(int fid, struct jhlp_head_desc *hdesc, int sorted)
 static int jhlp_create_contents(char *name, char *pname, char *sname,
                                char *lname, int sorted, int nowrite)
 {
-  int id, pid, fid, res, psorted;
+  int id, pid, fid = 0, res, psorted;
   struct jhlp_head_desc *phead;
   struct jhlp_head_desc chead;
 
@@ -1318,7 +1318,7 @@ static int jhlp_find_var(char *name)
 
 static int jhlp_expr_split(char *expr)
 {
-  int res, stop, m, c, cmp_c, ctype, t;
+  int res, stop, m, c, cmp_c = 0, ctype, t;
   int state;  /* states:  0       2      4     7     11    */
               /*           [!] <name> [<op> <value>]       */
   res = 0;

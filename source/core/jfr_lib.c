@@ -219,7 +219,7 @@ static void jfr_vround(unsigned short var_no)
 {
   /* rounding of a variable's value to legal domain-values */
 
-  float dist, bdist, res;
+  float dist, bdist, res = 0;
   double t, r;
   int m, ano;
   struct jfr_domain_desc *domain;
@@ -298,7 +298,7 @@ static float jfr_ihedge_calc(int hedge_no, float val)
 {
   /* Internal function. Calculates <hedge_no>(<val>).  */
   struct jfr_hedge_desc *hedge;
-  float f, res;
+  float f, res = 0;
 
   hedge = &(jfr_head->hedges[hedge_no]);
 
@@ -424,7 +424,7 @@ static void jfr_defuz(unsigned short var_no)
 {
    /* Calculates the value of <var_no> by defuzzification.      */
    int fv, m, defuz_func;
-   float sum, f, e, b, tael, naevn, res, res_1, max_conf;
+   float sum, f, e, b, tael, naevn, res_1, max_conf, res = 0;
    float values[256];
    struct jfr_var_desc *ovar;
    struct jfr_domain_desc *domain;
@@ -830,7 +830,7 @@ static unsigned short jfr_fzvno(void)
 static float jfr_ivfunc_calc(unsigned short fno, unsigned short vno)
 {
   /* internal variable-function calculation.    */
-  float fval, res, vv;
+  float fval, vv, res = 0;
   struct jfr_var_desc *var;
   struct jfr_domain_desc *domain;
   unsigned short m;

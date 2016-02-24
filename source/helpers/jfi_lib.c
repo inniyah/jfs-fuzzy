@@ -942,7 +942,7 @@ static void jfi_ind_create(void)
   float *s1_ind;
   float *s2_ind;
   float *d_ind;
-  float r, tval;
+  float r, tval = 0;
 
   d_sno = jfi_ind_rm();
 

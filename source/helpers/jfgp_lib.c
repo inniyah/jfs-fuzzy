@@ -1209,7 +1209,7 @@ static signed short jfgp_ir_change(long ano, signed short value)
   /* changes ref-count for the (sub)-tree starting in ano with value */
   /* (value is -1 or 1). Return number of nodes in tree.             */
 
-  signed short count;
+  signed short count = 0;
   struct jfgp_atom_desc *atom;
 
   atom = &(jfgp_atoms[ano]);
@@ -1603,7 +1603,7 @@ static signed short jfgp_ind_create(signed short ind_no)
   /* creates a new individual. <ind_no> is a dead individual */
 
   int r, ok, s1_ind_no, s2_ind_no, s3_ind_no,
-      one_replace, this_replace;
+      one_replace, this_replace = 0;
   long m, ano1, ano2, ano3, dno;
   struct jfgp_rule_head_desc *gp1_ind_rules;
   struct jfgp_rule_head_desc *gp2_ind_rules;
@@ -1741,7 +1741,7 @@ static void jfgp_re_judge(void)
 static int jfgp_pop_create(void)
 {
   /* Create the initial population */
-  int m, r, rh, worst_id;
+  int m, r, rh, worst_id = 0;
   long ff_atom;
   int x, d_ind_no, s1_ind_no, s2_ind_no, s3_ind_no, ok;
   long ano1, ano2, ano3, dno;

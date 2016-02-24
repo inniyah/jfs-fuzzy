@@ -598,7 +598,7 @@ static int jfr2c_adj_parent(int *res, int ano)
 
 static int jfr2c_pl_write(void)  /* write constant arrays to pl-functions */
 {
-  int m, i, pt, first, li, no, res;
+  int m, i, pt, first, li, no = 0, res;
   struct jfg_hedge_desc hdesc;
   struct jfg_relation_desc rdesc;
   struct jfg_adjectiv_desc adesc;

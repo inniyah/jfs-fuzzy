@@ -863,7 +863,7 @@ static void jfplt_f_defuz_plt(void)
 {
   int a, dupli;
   unsigned short vno, v;
-  float base, af, bf, imin, imax;
+  float base = 0, af, bf, imin, imax;
   struct jfg_var_desc vdesc;
   struct jfg_var_desc v2desc;
   struct jfg_domain_desc ddesc;
