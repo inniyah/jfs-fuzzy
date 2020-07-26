@@ -28,7 +28,7 @@ int jfw2r_convert(char *de_fname, char *so_fname,
 /* er_fname    : If <er_fname> == NULL then error-messages are written to */
 /*               stdout, else error-messages are written to <er_fname>.   */
 /* er_append   : <er_append> == 0: open <er_fname> for writing; discard   */
-/*                                 previus contents if any.                */
+/*                                 previous contents if any.              */
 /*                           == 1: append error-messages to <er_fname>.   */
 /* max_stack   : The size of the expression-stack. If <max_stack>==0 then */
 /*               the size of the expression-stack is set to 100.          */

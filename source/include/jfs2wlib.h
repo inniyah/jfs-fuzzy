@@ -27,7 +27,7 @@ int jfs2w_convert(char *de_fname, char *so_fname,
 /* er_fname    : If <er_fname> == NULL then error-messages are written to */
 /*               stdout, else error-messages are written to <er_fname>.   */
 /* er_append   : <er_append> == 0: open <er_fname> for writing; discard   */
-/*                                 previus contents if any.                */
+/*                                 previous contents if any.              */
 /*                           == 1: append error-messages to <er_fname>.   */
 /* maxargline  : The maximal number of characters in a statement. If      */
 /*               <maxargline>==0 then the maximal number of characters    */

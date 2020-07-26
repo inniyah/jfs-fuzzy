@@ -56,15 +56,15 @@ extern struct jfea_error_rec jfea_error_desc;
 /*    3, Error writing to file: <argument>.                             */
 /*    6, Cannot allocate memory to: <argument>.                         */
 /*  504, Syntax error in jfrd-statement: <argument>.                    */
-/*  505, Too many variables in statement (max 64).                       */
+/*  505, Too many variables in statement (max 64).                      */
 /*  506, Undefined variable: <argument>.                                */
-/*  519, Too many words in statement (max 255).                          */
+/*  519, Too many words in statement (max 255).                         */
 /*  520, No 'extern jfrd'-statement in program.                         */
 /*  522, 'No default'-output, but default not defined.                  */
 /*  550, No min/max domain-values for variable: <argument>.             */
 /*  551, No adjectives bound to: <argument>.                            */
 /*  552, Option 'a' or 'v' has to be specified for: <argument>.         */
-/*  553, Too many adjectives (max 24) for 'i'-option to: <argument>.     */
+/*  553, Too many adjectives (max 24) for 'i'-option to: <argument>.    */
 /*  554, 'i'-option without 'a'-option for variable: <argument>.        */
 /*  555, No legal option for variable: <argument>.                      */
 /*  556, No Input-variables.                                            */

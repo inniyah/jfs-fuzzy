@@ -128,7 +128,7 @@ void jft_init(void *jf_head);
 int jft_fopen(char *fname, int fmode, int count_records);
 
 /* Opens the file <fname> for reading values to the jfs-program         */
-/* <jf_head>. <fmode> describes the contents of the file. See below for  */
+/* <jf_head>. <fmode> describes the contents of the file. See below for */
 /* the possible values. If this call is succesfull, data can be         */
 /* read from the file by jft_gettoken(), jft_getvar() etc.              */
 /* The fields in <jft_data_desc> is assigned values.                    */

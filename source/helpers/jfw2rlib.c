@@ -267,7 +267,7 @@ static struct jfc_t_func_desc jfc_t_funcs[] =
 
 static struct jfc_t_dop_desc jfc_t_dops[] =
  { {"+",     JFR_OP_DFUNC, 0, 50},
-   {"-",     JFR_OP_DFUNC, 1, 50},  /* NB: speciel */
+   {"-",     JFR_OP_DFUNC, 1, 50},  /* NB: special */
    {"*",     JFR_OP_DFUNC, 2, 60},
    {"/",     JFR_OP_DFUNC, 3, 60},
    {"=",     JFR_OP_DFUNC,10, 40},
