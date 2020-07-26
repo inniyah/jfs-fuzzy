@@ -292,7 +292,7 @@ static int jfi_data_get(int mode)
 {
   int slut, m;
   float confs[256];
-  char txt[256];
+  char txt[540];
 
   slut = 0;
   jfi_data_c = 0;

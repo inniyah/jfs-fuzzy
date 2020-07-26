@@ -306,7 +306,7 @@ static int jf_error(int eno, const char *name, int mode)
 static int jfrd_fl_ip_get(struct jft_data_record *dd)
 {
   int m;
-  char txt[256];
+  char txt[540];
 
   m = jft_getdata(dd);
   if (m != 0)

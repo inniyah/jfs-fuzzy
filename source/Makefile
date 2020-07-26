@@ -34,7 +34,7 @@ all: libs programs
 
 CC = gcc
 CPP = g++
-AR= ar rcu
+AR= ar rc
 RANLIB= ranlib
 #RANLIB= ar s
 
@@ -48,10 +48,17 @@ INCS= -Iinclude
 DEFS= -DPRG_PREFIX="$(PRG_PREFIX)"
 LIBS= -L$(LIB_DIR) -ljfs-helpers -ljfs -lm
 
+PROTECT= \
+	-fstack-protector-strong \
+	-Wformat \
+	-Werror=format-security \
+	-Wdate-time \
+	-D_FORTIFY_SOURCE=2
+
 EXTRA_LDFLAGS=
 EXTRA_CFLAGS=
 
-LDFLAGS= -Wl,-z,defs -Wl,--as-needed -Wl,--no-undefined $(EXTRA_LDFLAGS)
+LDFLAGS= -Wl,--as-needed -Wl,--no-undefined -Wl,--no-allow-shlib-undefined $(EXTRA_LDFLAGS)
 
 # jft_lib = JFS-Tokeniser. Functions to read jfs-values from an ascii-file or from text-strings
 # jfm_lib = Memory-management system. System of circular list with variable-sized data bound to each node.
@@ -228,8 +235,8 @@ $(BIN_PREFIX)jfi: commands/jfi.o
 
 .SUFFIXES: .o .c .cpp .rc _resources.o
 
-CFLAGS= $(OPT) $(WARN) $(INCS) $(DEFS) $(EXTRA_CFLAGS)
-CPPFLAGS= $(OPT) $(WARN) $(INCS) $(DEFS) $(EXTRA_CFLAGS)
+CFLAGS= $(OPT) $(WARN) $(PROTECT) $(INCS) $(DEFS) $(EXTRA_CFLAGS)
+CPPFLAGS= $(OPT) $(WARN) $(PROTECT) $(INCS) $(DEFS) $(EXTRA_CFLAGS)
 
 .c.o :
 	$(CC) -c $(CFLAGS) -o $@ $<
@@ -241,7 +248,7 @@ CPPFLAGS= $(OPT) $(WARN) $(INCS) $(DEFS) $(EXTRA_CFLAGS)
 	$(RESCOMP) -i $< -o $@ $(RESFLAGS)
 
 
-STATIC_CFLAGS= $(OPT) $(WARN) $(INCS) $(DEFS) $(EXTRA_CFLAGS)
+STATIC_CFLAGS= $(OPT) $(WARN) $(PROTECT) $(INCS) $(DEFS) $(EXTRA_CFLAGS)
 SHARED_CFLAGS= $(STATIC_CFLAGS) -fPIC
 
 %.shared.o: %.cpp

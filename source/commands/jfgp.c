@@ -333,7 +333,7 @@ static int jfgp_data_get(int mode)
   int slut, m;
   long adr = 0;
   float confs[256];
-  char txt[256];
+  char txt[284];
 
   slut = 0;
   jfgp_data_c = 0;

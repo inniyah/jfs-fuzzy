@@ -327,7 +327,7 @@ static int jfea_data_get(int mode)
   int slut, m;
   long adr = 0;
   float confs[256];
-  char txt[256];
+  char txt[540];
 
   slut = 0;
   jfea_data_c = 0;

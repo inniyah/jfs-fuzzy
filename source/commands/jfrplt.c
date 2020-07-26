@@ -394,7 +394,7 @@ static int fl_ip_get(struct jft_data_record *dd, int var_no)
 {
   /* reading the value of variable number <var_no> from a file */
   int m;
-  char txt[80];
+  char txt[805];
 
   m = jft_getvar(dd, var_no);
   if (m != 0)

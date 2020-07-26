@@ -425,10 +425,10 @@ static void jfr2c_sub_print(FILE *fp, const char *t)
 
   if (jfr2c_use_double == 1)
   { jfr2c_subst(ttxt, t, "double", "float");
-    fprintf(fp, ttxt);
+    fprintf(fp, "%s", ttxt);
   }
   else
-    fprintf(fp, t);
+    fprintf(fp, "%s", t);
 }
 
 static void jf_ftoa(char *txt, float f)

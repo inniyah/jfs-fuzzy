@@ -618,7 +618,7 @@ static int fl_ip_get(struct jft_data_record *dd, int var_no)
 {
   /* reading the value of variable number <var_no> from a file */
   int m;
-  char txt[80];
+  char txt[805];
 
   m = jft_getvar(dd, var_no);
   if (m != 0)
@@ -652,7 +652,7 @@ int jfr_ip_get()
   struct jfg_var_desc vdesc;
   struct jft_data_record dd;
   char txt[80];
-  char err_txt[128];
+  char err_txt[276];
 
   slut = 0;
   ident_text[0] = '\0';
@@ -1167,7 +1167,7 @@ void this_call(void)  /* call-statement. Only handles printf/read. */
 void err_check(int mode)
 {
   int ecode;
-  char sno_txt[100];
+  char sno_txt[289];
   struct jfr_stat_desc dprog_info;
 
   if (mode == 1)
@@ -1429,25 +1429,25 @@ static void write_header(void)
   if (op_ivars == 1)
   { for (m = 0; m < spdesc.ivar_c; m++)
     { jfg_var(&vdesc, jf_head, spdesc.f_ivar_no + m);
-      sprintf(txt, vdesc.name);
+      sprintf(txt, "%s", vdesc.name);
       jf_align(txt, jfr_f_len, 1);
-      fprintf(jfs_op, txt);
+      fprintf(jfs_op, "%s", txt);
     }
   }
   if (op_ovars == 1)
   { for (m = 0; m < spdesc.ovar_c; m++)
     { jfg_var(&vdesc, jf_head, spdesc.f_ovar_no + m);
-      sprintf(txt, vdesc.name);
+      sprintf(txt, "%s", vdesc.name);
       jf_align(txt, jfr_f_len, 1);
-      fprintf(jfs_op, txt);
+      fprintf(jfs_op, "%s", txt);
     }
   }
   if (op_expected == 1)
   { for (m = 0; m < spdesc.ovar_c; m++)
     { jfg_var(&vdesc, jf_head, spdesc.f_ovar_no + m);
-      sprintf(txt, vdesc.name);
+      sprintf(txt, "%s", vdesc.name);
       jf_align(txt, jfr_f_len, 1);
-      fprintf(jfs_op, txt);
+      fprintf(jfs_op, "%s", txt);
     }
   }
   if (op_key == 1)

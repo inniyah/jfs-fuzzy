@@ -2502,7 +2502,7 @@ static int jhlp_write_glosary(const char *_name)
   while (odid != -1)
   { odesc = (struct jhlp_odata_desc *) jfm_data_adr(odid);
     fprintf(jhlp_ofp, "<DT>\n");
-    fprintf(jhlp_ofp, (char *) jfm_data_adr(odesc->name_id));
+    fprintf(jhlp_ofp, "%s", (char *) jfm_data_adr(odesc->name_id));
 
     did = odesc->fdata_id;
     fprintf(jhlp_ofp, "<DD>\n");
