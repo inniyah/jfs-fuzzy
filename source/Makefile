@@ -42,7 +42,7 @@ RANLIB= ranlib
 RESFLAGS    = --include-dir /mingw/include --include-dir . --define __WIN32__ --define __WIN95__ --define __GNUWIN32__
 RESCOMP     = windres
 
-WARN?= -pedantic -Wall -ansi -Wno-unused-value -Wno-unused-function
+WARN?= -pedantic -Wall -ansi -Wno-unused-value -Wno-unused-function -Wno-unused-result
 OPT?= -O2 -g
 INCS= -Iinclude
 DEFS= -DPRG_PREFIX="$(PRG_PREFIX)"
